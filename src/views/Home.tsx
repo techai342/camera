@@ -650,10 +650,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
       <div className="clay-board w-full max-w-[1400px] p-3 sm:p-5 lg:p-6 flex flex-col lg:flex-row gap-4 sm:gap-5 relative">
 
         {/* ==================== LEFT CLAY SIDEBAR ==================== */}
-        <aside className={cn(
-          "clay-sidebar w-full lg:w-[270px] shrink-0 p-5 flex flex-col justify-between",
-          mobileTab === 'recent' ? "flex" : "hidden lg:flex"
-        )}>
+        <aside className="clay-sidebar w-full lg:w-[270px] shrink-0 p-5 hidden lg:flex flex-col justify-between">
           <div>
             {/* Avatar / Branding Clay Ring */}
             <div className="flex flex-col items-center pt-1 pb-4">
@@ -791,42 +788,42 @@ create policy "Allow public delete access" on public.urls for delete using (true
         </aside>
 
         {/* ==================== RIGHT MAIN CONTENT AREA ==================== */}
-        <main className={cn("flex-1 flex flex-col gap-4 sm:gap-5 min-w-0", mobileTab === 'recent' && "hidden lg:flex")}>
+        <main className="flex-1 flex flex-col gap-3.5 sm:gap-5 min-w-0">
 
           {/* 1. TOP HEADER BAR */}
-          <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1 px-1">
-            <div>
+          <header className="flex items-center justify-between gap-2 pt-1 px-1">
+            <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="embossed-title text-[20px] sm:text-[28px] font-extrabold leading-tight">
+                <h1 className="embossed-title text-[18px] sm:text-[28px] font-extrabold leading-tight truncate">
                   Saqib Visuals
                 </h1>
-                <span className="clay-small-pill px-2.5 py-0.5 text-[10px] font-mono-code font-bold text-[#142c38] flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>Supabase Live</span>
+                <span className="clay-small-pill px-2 py-0.5 text-[9px] sm:text-[10px] font-mono-code font-bold text-[#142c38] flex items-center gap-1 shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Live</span>
                 </span>
               </div>
-              <p className="text-[#23394d] text-[11px] sm:text-[12px] font-bold mt-1">
-                💎 High-Performance URL Shortener • Camera Verification • Device Intelligence
+              <p className="text-[#23394d] text-[10px] sm:text-[12px] font-bold mt-0.5 truncate hidden sm:block">
+                💎 URL Shortener • Camera Verification • Device Intel
               </p>
             </div>
 
-            <div className="flex items-center gap-2 justify-end shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
               {/* Sync Device Button */}
               <button 
                 onClick={() => setShowSyncModal(true)} 
-                className="clay-circle-grey w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-[#1d3346] active:scale-95 transition-transform"
+                className="clay-circle-grey w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-[#1d3346] active:scale-95 transition-transform"
                 title={phoneNumber ? `Synced: ${phoneNumber}` : "Sync Device Identity"}
               >
-                <Smartphone className="w-4 h-4" />
+                <Smartphone className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
 
               {/* API Modal Button */}
               <button 
                 onClick={() => setShowApiModal(true)} 
-                className="clay-circle-grey w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-[#1d3346] active:scale-95 transition-transform"
+                className="clay-circle-grey w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-[#1d3346] active:scale-95 transition-transform"
                 title="API Hub & Documentation"
               >
-                <Code className="w-4 h-4" />
+                <Code className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
 
               {/* Join Channel Button */}
@@ -834,15 +831,96 @@ create policy "Allow public delete access" on public.urls for delete using (true
                 href="https://www.whatsapp.com/channel/0029VbBTSK1EquiWrUt5uV1I"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="clay-teal-btn px-3.5 py-2 text-xs font-bold flex items-center gap-1.5 active:scale-95 transition-transform"
+                className="clay-teal-btn px-2.5 py-1.5 sm:px-3.5 sm:py-2 text-[11px] sm:text-xs font-bold flex items-center gap-1 active:scale-95 transition-transform shrink-0"
               >
-                <span>Join Channel</span>
+                <span>Channel</span>
               </a>
             </div>
           </header>
 
           {/* 2. DYNAMIC TAB CONTENT */}
-          {mobileTab === 'media' ? (
+          {mobileTab === 'recent' ? (
+            <div className="space-y-4 animate-in fade-in duration-300">
+              <div className="clay-panel p-4 sm:p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-[#152432] font-extrabold text-base sm:text-xl flex items-center gap-2">
+                      <History className="w-5 h-5 text-[#2b606c]" />
+                      <span>Recent Generated Links</span>
+                    </h3>
+                    <p className="text-[11px] sm:text-xs text-[#31495e] font-semibold mt-0.5">
+                      Tap Intel to view live visitor logs, GPS and camera photos
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {history.length > 0 && (
+                      <button 
+                        onClick={clearHistory} 
+                        className="clay-small-pill px-2.5 py-1 text-[10px] text-red-600 font-bold hover:text-red-700"
+                      >
+                        Clear
+                      </button>
+                    )}
+                    <span className="clay-badge-teal px-2 py-0.5 text-xs text-white font-mono font-bold">
+                      {history.length}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5">
+                  {history.map((link: any) => (
+                    <div key={link.code} className="clay-recessed p-3 sm:p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 transition-transform hover:-translate-y-0.5">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <span className="text-xs sm:text-sm font-extrabold text-[#0e3b44] font-mono">/{link.code}</span>
+                          {link.enablePassword && <span className="clay-small-pill px-2 py-0.5 text-[8px] sm:text-[9px] font-bold text-amber-800">Lock</span>}
+                          {link.enableSocialGate && <span className="clay-small-pill px-2 py-0.5 text-[8px] sm:text-[9px] font-bold text-blue-800">Gate</span>}
+                          {link.captureCamera && <span className="clay-badge-teal px-1.5 py-0.5 text-[8px] sm:text-[9px] text-white">Cam</span>}
+                          {link.captureLocation && <span className="clay-badge-slate px-1.5 py-0.5 text-[8px] sm:text-[9px] text-[#142332]">GPS</span>}
+                        </div>
+                        <p className="text-[11px] text-[#344f63] font-medium truncate">{link.longUrl}</p>
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+                        <button 
+                          onClick={() => fetchAnalytics(link)} 
+                          className="clay-teal-btn px-3 py-1.5 text-xs font-bold flex items-center gap-1.5 text-white active:scale-95"
+                        >
+                          <BarChart3 className="w-3.5 h-3.5" />
+                          <span>Intel</span>
+                        </button>
+                        <button 
+                          onClick={() => copyToClipboard(link.shortUrl)} 
+                          className="clay-small-pill p-2 text-[#1c3546] active:scale-95" 
+                          title="Copy Link"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                        </button>
+                        <button 
+                          onClick={() => handleEditClick(link.code)} 
+                          className="clay-small-pill p-2 text-[#1c3546] active:scale-95" 
+                          title="Manage Link"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteLink(link.code)} 
+                          className="clay-small-pill p-2 text-red-600 hover:text-red-700 active:scale-95" 
+                          title="Delete Link"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  {history.length === 0 && (
+                    <div className="text-center py-12 text-[#31495e] font-bold text-xs sm:text-sm">
+                      No links generated yet. Tap "Shorten" to create your first link!
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : mobileTab === 'media' ? (
             <div className="clay-panel p-5">
               <ImageConverter />
             </div>
@@ -1018,18 +1096,18 @@ create policy "Allow public delete access" on public.urls for delete using (true
             /* ==================== SHORTEN LINK (CREATE TAB) ==================== */
             <div className="space-y-5">
               {/* Main Clay Hero Card */}
-              <section className="clay-hero-card p-5 sm:p-7 relative">
-                <div className="mb-5">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[#88e2f2] text-[11px] font-extrabold tracking-wide mb-2">
-                    <span>🚀 URL INTELLIGENCE ENGINE</span>
+              <section className="clay-hero-card p-4 sm:p-7 relative">
+                <div className="mb-3.5 sm:mb-5">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-white/10 border border-white/15 text-[#88e2f2] text-[10px] sm:text-[11px] font-extrabold tracking-wide mb-1.5 sm:mb-2">
+                    <span>🚀 URL INTELLIGENCE</span>
                     <span>•</span>
                     <span>✨ SAQIB VISUALS</span>
                   </div>
-                  <h2 className="text-[21px] sm:text-[25px] font-extrabold text-[#f1f7fb] tracking-tight leading-tight drop-shadow">
+                  <h2 className="text-[19px] sm:text-[25px] font-extrabold text-[#f1f7fb] tracking-tight leading-tight drop-shadow">
                     Simplify Your Links &amp; Verify Visitors
                   </h2>
-                  <p className="text-[#c5d7e6] text-[13px] font-medium mt-1">
-                    Paste any destination URL to create ultra-fast short links with silent selfie camera verification and GPS geolocation.
+                  <p className="text-[#c5d7e6] text-[11px] sm:text-[13px] font-medium mt-1 leading-snug">
+                    Paste any destination URL to create ultra-fast short links with selfie verification and GPS intelligence.
                   </p>
                 </div>
 
@@ -1063,31 +1141,31 @@ create policy "Allow public delete access" on public.urls for delete using (true
                     <label className="text-[11px] font-extrabold text-[#d2e2ee] uppercase tracking-wider mb-2.5 block flex items-center gap-1.5">
                       <Sparkles className="w-3.5 h-3.5 text-[#7bd3e2]" /> Quick Verification Toggles (Primary)
                     </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div className="grid grid-cols-2 gap-2 sm:gap-3.5">
                       {/* Camera Card */}
                       <div
                         onClick={() => setCaptureCamera(!captureCamera)}
                         className={cn(
-                          "p-3.5 sm:p-4 rounded-2xl cursor-pointer transition-all duration-150 select-none flex items-center justify-between group active:scale-[0.98]",
+                          "p-2.5 sm:p-4 rounded-2xl cursor-pointer transition-all duration-150 select-none flex flex-col sm:flex-row items-center sm:justify-between text-center sm:text-left gap-2 sm:gap-3.5 group active:scale-[0.98]",
                           captureCamera 
                             ? "clay-stat-teal ring-2 ring-[#8be5f5] shadow-lg" 
                             : "clay-stat-slate opacity-90 hover:opacity-100"
                         )}
                       >
-                        <div className="flex items-center gap-3.5">
-                          <div className="clay-badge-teal w-11 h-11 flex items-center justify-center shrink-0">
-                            <Camera className="w-5 h-5 text-white drop-shadow" />
+                        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3.5 min-w-0">
+                          <div className="clay-badge-teal w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center shrink-0">
+                            <Camera className="w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow" />
                           </div>
-                          <div>
-                            <p className="text-xs font-extrabold uppercase tracking-wider text-[#0e1e26]">Camera Capture</p>
-                            <p className="text-[11px] font-semibold text-[#18343d]">Auto-capture selfie photo</p>
+                          <div className="min-w-0">
+                            <p className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-[#0e1e26] truncate">Camera</p>
+                            <p className="text-[9px] sm:text-[11px] font-semibold text-[#18343d] truncate hidden xs:block">Selfie Intel</p>
                           </div>
                         </div>
                         <div className={cn(
-                          "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all",
+                          "w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center transition-all shrink-0",
                           captureCamera ? "bg-[#25606d] border-[#16434d] text-white shadow-md" : "border-slate-500/40 bg-white/30"
                         )}>
-                          {captureCamera && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                          {captureCamera && <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 stroke-[3]" />}
                         </div>
                       </div>
 
@@ -1095,26 +1173,26 @@ create policy "Allow public delete access" on public.urls for delete using (true
                       <div
                         onClick={() => setCaptureLocation(!captureLocation)}
                         className={cn(
-                          "p-3.5 sm:p-4 rounded-2xl cursor-pointer transition-all duration-150 select-none flex items-center justify-between group active:scale-[0.98]",
+                          "p-2.5 sm:p-4 rounded-2xl cursor-pointer transition-all duration-150 select-none flex flex-col sm:flex-row items-center sm:justify-between text-center sm:text-left gap-2 sm:gap-3.5 group active:scale-[0.98]",
                           captureLocation 
                             ? "clay-stat-teal ring-2 ring-[#8be5f5] shadow-lg" 
                             : "clay-stat-slate opacity-90 hover:opacity-100"
                         )}
                       >
-                        <div className="flex items-center gap-3.5">
-                          <div className="clay-badge-slate w-11 h-11 flex items-center justify-center shrink-0">
-                            <MapPin className="w-5 h-5 text-white drop-shadow" />
+                        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3.5 min-w-0">
+                          <div className="clay-badge-slate w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center shrink-0">
+                            <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow" />
                           </div>
-                          <div>
-                            <p className="text-xs font-extrabold uppercase tracking-wider text-[#0e1e26]">GPS Location</p>
-                            <p className="text-[11px] font-semibold text-[#18343d]">Request exact coordinates</p>
+                          <div className="min-w-0">
+                            <p className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-[#0e1e26] truncate">Location</p>
+                            <p className="text-[9px] sm:text-[11px] font-semibold text-[#18343d] truncate hidden xs:block">GPS Intel</p>
                           </div>
                         </div>
                         <div className={cn(
-                          "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all",
+                          "w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center transition-all shrink-0",
                           captureLocation ? "bg-[#25606d] border-[#16434d] text-white shadow-md" : "border-slate-500/40 bg-white/30"
                         )}>
-                          {captureLocation && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                          {captureLocation && <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 stroke-[3]" />}
                         </div>
                       </div>
                     </div>
@@ -1370,8 +1448,8 @@ create policy "Allow public delete access" on public.urls for delete using (true
         <button 
           onClick={() => setMobileTab('create')}
           className={cn(
-            "flex-1 py-2 px-2 rounded-xl flex items-center justify-center gap-1.5 text-xs font-bold transition-all active:scale-95",
-            mobileTab === 'create' ? "nav-pill-active" : "text-[#b2c8d8] hover:text-white"
+            "flex-1 py-2 px-1 rounded-xl flex flex-col xs:flex-row items-center justify-center gap-1 text-[11px] font-bold transition-all active:scale-95",
+            mobileTab === 'create' ? "nav-pill-active shadow-md" : "text-[#b2c8d8] hover:text-white"
           )}
         >
           <Plus className="w-4 h-4 shrink-0" />
@@ -1380,8 +1458,8 @@ create policy "Allow public delete access" on public.urls for delete using (true
         <button 
           onClick={() => setMobileTab('media')}
           className={cn(
-            "flex-1 py-2 px-2 rounded-xl flex items-center justify-center gap-1.5 text-xs font-bold transition-all active:scale-95",
-            mobileTab === 'media' ? "nav-pill-active" : "text-[#b2c8d8] hover:text-white"
+            "flex-1 py-2 px-1 rounded-xl flex flex-col xs:flex-row items-center justify-center gap-1 text-[11px] font-bold transition-all active:scale-95",
+            mobileTab === 'media' ? "nav-pill-active shadow-md" : "text-[#b2c8d8] hover:text-white"
           )}
         >
           <Camera className="w-4 h-4 shrink-0" />
@@ -1393,8 +1471,8 @@ create policy "Allow public delete access" on public.urls for delete using (true
             if (!analyticsLink && history.length > 0) fetchAnalytics(history[0]);
           }}
           className={cn(
-            "flex-1 py-2 px-2 rounded-xl flex items-center justify-center gap-1.5 text-xs font-bold transition-all active:scale-95",
-            mobileTab === 'analytics' ? "nav-pill-active" : "text-[#b2c8d8] hover:text-white"
+            "flex-1 py-2 px-1 rounded-xl flex flex-col xs:flex-row items-center justify-center gap-1 text-[11px] font-bold transition-all active:scale-95",
+            mobileTab === 'analytics' ? "nav-pill-active shadow-md" : "text-[#b2c8d8] hover:text-white"
           )}
         >
           <BarChart3 className="w-4 h-4 shrink-0" />
@@ -1403,8 +1481,8 @@ create policy "Allow public delete access" on public.urls for delete using (true
         <button 
           onClick={() => setMobileTab('recent')}
           className={cn(
-            "flex-1 py-2 px-2 rounded-xl flex items-center justify-center gap-1.5 text-xs font-bold transition-all active:scale-95",
-            mobileTab === 'recent' ? "nav-pill-active" : "text-[#b2c8d8] hover:text-white"
+            "flex-1 py-2 px-1 rounded-xl flex flex-col xs:flex-row items-center justify-center gap-1 text-[11px] font-bold transition-all active:scale-95",
+            mobileTab === 'recent' ? "nav-pill-active shadow-md" : "text-[#b2c8d8] hover:text-white"
           )}
         >
           <History className="w-4 h-4 shrink-0" />

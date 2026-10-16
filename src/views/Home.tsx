@@ -1009,291 +1009,316 @@ create policy "Allow public delete access" on public.urls for delete using (true
                 {/* Shortener Tool Form */}
                 <div className="bg-zinc-900/50 border border-white/10 p-6 md:p-8 rounded-[32px] backdrop-blur-xl shadow-2xl">
                   <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label htmlFor="url" className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2 block">
-                    Destination URL
-                  </label>
-                  <input
-                    id="url"
-                    type="text"
-                    value={longUrl}
-                    onChange={(e) => setLongUrl(e.target.value)}
-                    placeholder="https://example.com/very-long-link-with-many-parameters"
-                    className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg py-4 px-5 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-700 transition-all font-sans"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
-                      <Lock className="w-3 h-3"/> Password Protection
-                    </label>
-                    <button
-                      type="button"
-                      role="switch"
-                      aria-checked={isPasswordEnabled}
-                      onClick={() => setIsPasswordEnabled(!isPasswordEnabled)}
-                      className={cn(
-                        "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/50",
-                        isPasswordEnabled ? "bg-emerald-500" : "bg-neutral-700"
-                      )}
-                    >
-                      <span className={cn(
-                        "inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm",
-                        isPasswordEnabled ? "translate-x-6" : "translate-x-1"
-                      )} />
-                    </button>
-                  </div>
-                  
-                  {isPasswordEnabled && (
-                    <div className="animate-in slide-in-from-top-2 fade-in duration-200">
-                      <input
-                        id="password"
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Enter password..."
-                        required={isPasswordEnabled}
-                        className="w-full bg-[#0A0A0A] rounded-lg py-4 px-5 text-zinc-200 focus:outline-none placeholder:text-zinc-700 transition-all font-sans border animate-rgb"
-                      />
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
-                      <Link2 className="w-3 h-3"/> Social Gate (Sub2Unlock)
-                    </label>
-                    <button
-                      type="button"
-                      role="switch"
-                      aria-checked={isSocialGateEnabled}
-                      onClick={() => setIsSocialGateEnabled(!isSocialGateEnabled)}
-                      className={cn(
-                        "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/50",
-                        isSocialGateEnabled ? "bg-emerald-500" : "bg-neutral-700"
-                      )}
-                    >
-                      <span className={cn(
-                        "inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm",
-                        isSocialGateEnabled ? "translate-x-6" : "translate-x-1"
-                      )} />
-                    </button>
-                  </div>
-                  
-                  {isSocialGateEnabled && (
-                    <div className="animate-in slide-in-from-top-2 fade-in duration-200 space-y-4">
-                      <div>
-                        <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2 block">Choose Icon</label>
-                        <div className="flex flex-wrap gap-2">
-                          {SOCIAL_ICONS.map((item) => (
-                            <button
-                              key={item.id}
-                              type="button"
-                              onClick={() => setSocialGateIcon(item.id)}
-                              className={cn(
-                                "flex items-center gap-2 px-3 py-2 rounded-lg transition-all",
-                                socialGateIcon === item.id 
-                                  ? "bg-blue-500/10 text-blue-400 ring-1 ring-blue-500" 
-                                  : "bg-[#0F0F0F] border border-white/5 text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
-                              )}
-                            >
-                              <SocialIcon id={item.id} className="w-6 h-6" />
-                              <span className="text-xs font-medium">{item.label}</span>
-                            </button>
-                          ))}
-                        </div>
+                    {/* 1. Destination URL Input */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label htmlFor="url" className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                          <Link2 className="w-3.5 h-3.5 text-blue-400" /> Destination URL (Target Link)
+                        </label>
+                        <span className="text-[10px] text-zinc-500 font-medium">Required</span>
                       </div>
-                      <input
-                        type="text"
-                        value={socialGateTitle}
-                        onChange={(e) => setSocialGateTitle(e.target.value)}
-                        placeholder="e.g. Follow my WhatsApp Channel"
-                        required={isSocialGateEnabled}
-                        className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg py-4 px-5 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-700 transition-all font-sans text-sm"
-                      />
-                      <input
-                        type="url"
-                        value={socialGateUrl}
-                        onChange={(e) => setSocialGateUrl(e.target.value)}
-                        placeholder="https://whatsapp.com/channel/..."
-                        required={isSocialGateEnabled}
-                        className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg py-4 px-5 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-700 transition-all font-sans text-sm"
-                      />
-                      <input
-                        type="text"
-                        value={socialGateDescription}
-                        onChange={(e) => setSocialGateDescription(e.target.value)}
-                        placeholder="Step description (e.g. Complete the action below)"
-                        className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg py-4 px-5 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-700 transition-all font-sans text-sm"
-                      />
-                      <input
-                        type="text"
-                        value={socialGateButtonText}
-                        onChange={(e) => setSocialGateButtonText(e.target.value)}
-                        placeholder="Button text (e.g. Verify & Continue)"
-                        required={isSocialGateEnabled}
-                        className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg py-4 px-5 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-700 transition-all font-sans text-sm"
-                      />
+                      <div className="relative">
+                        <input
+                          id="url"
+                          type="text"
+                          value={longUrl}
+                          onChange={(e) => setLongUrl(e.target.value)}
+                          placeholder="https://example.com/very-long-link-with-many-parameters"
+                          className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl py-4 pl-4 pr-12 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-700 transition-all font-sans text-sm"
+                          required
+                        />
+                        {longUrl && (
+                          <button
+                            type="button"
+                            onClick={() => setLongUrl('')}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  )}
-                </div>
 
-                <div className="pt-4 border-t border-white/5">
-                  <div className="flex flex-col gap-4">
+                    {/* 2. PRIMARY QUICK INTEL ACTIONS (Camera & Location Right Upfront!) */}
                     <div>
-                      <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2 block flex items-center gap-2">
-                        <Clock className="w-3 h-3 text-white/40" /> Expiration Date (Optional)
+                      <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-3 block flex items-center gap-2">
+                        <Sparkles className="w-3.5 h-3.5 text-blue-400" /> Quick Verification Actions (Primary)
                       </label>
-                      <input
-                        type="datetime-local"
-                        value={expiresAt}
-                        onChange={(e) => setExpiresAt(e.target.value)}
-                        className="w-full bg-[#0A0A0A] border border-white/5 rounded-lg px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500/50 transition-colors"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2 block">Animation Display Text</label>
-                      <input
-                        type="text"
-                        value={animationText}
-                        onChange={(e) => setAnimationText(e.target.value.toUpperCase())}
-                        placeholder="E.G. LOADING, REDIRECTING..."
-                        className="w-full bg-[#0A0A0A] border border-white/5 rounded-lg px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500/50 transition-colors uppercase tracking-[0.2em]"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3 block">Redirect Animation Style</label>
-                      <div className="grid grid-cols-2 gap-4">
-                        <button
-                          type="button"
-                          onClick={() => setAnimationType('ring')}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        {/* Camera Toggle Card */}
+                        <div
+                          onClick={() => setCaptureCamera(!captureCamera)}
                           className={cn(
-                            "flex flex-col items-center gap-3 p-4 rounded-xl border transition-all duration-300 group",
-                            animationType === 'ring' 
-                              ? "bg-blue-600/10 border-blue-500/50 text-blue-400 ring-1 ring-blue-500/20" 
-                              : "bg-[#0A0A0A] border-white/5 text-zinc-500 hover:border-white/10 hover:bg-white/5"
+                            "p-4 rounded-2xl border cursor-pointer transition-all duration-200 select-none flex items-center justify-between group",
+                            captureCamera 
+                              ? "bg-blue-600/10 border-blue-500/50 shadow-[0_0_20px_rgba(37,99,235,0.15)] ring-1 ring-blue-500/30" 
+                              : "bg-[#0A0A0A] border-white/10 hover:border-white/20 hover:bg-white/[0.02]"
                           )}
                         >
-                          <div className="relative w-10 h-10 flex items-center justify-center">
-                            <div className="absolute inset-0 rounded-full border-2 border-current border-t-transparent animate-[spin_1s_linear_infinite]" />
-                            <img 
-                              src="https://ik.imagekit.io/19imy4f1u/lite_1777560977588_frMe1_REC.png" 
-                              className="w-5 h-5 object-contain opacity-80"
-                              alt="App Icon"
-                              referrerPolicy="no-referrer"
+                          <div className="flex items-center gap-3.5">
+                            <div className={cn(
+                              "w-11 h-11 rounded-xl flex items-center justify-center transition-colors shrink-0",
+                              captureCamera ? "bg-blue-500 text-white shadow-lg shadow-blue-500/30" : "bg-white/5 text-zinc-400 group-hover:text-zinc-200"
+                            )}>
+                              <Camera className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <p className={cn("text-xs font-bold uppercase tracking-wider", captureCamera ? "text-blue-400" : "text-zinc-200")}>
+                                Camera Capture
+                              </p>
+                              <p className="text-[10px] text-zinc-500 mt-0.5">Auto-capture selfie photo</p>
+                            </div>
+                          </div>
+                          <div className={cn(
+                            "w-5 h-5 rounded-full border flex items-center justify-center transition-all",
+                            captureCamera ? "bg-blue-500 border-blue-500 text-white" : "border-zinc-700 bg-transparent"
+                          )}>
+                            {captureCamera && <Check className="w-3 h-3 stroke-[3]" />}
+                          </div>
+                        </div>
+
+                        {/* Location Toggle Card */}
+                        <div
+                          onClick={() => setCaptureLocation(!captureLocation)}
+                          className={cn(
+                            "p-4 rounded-2xl border cursor-pointer transition-all duration-200 select-none flex items-center justify-between group",
+                            captureLocation 
+                              ? "bg-emerald-600/10 border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500/30" 
+                              : "bg-[#0A0A0A] border-white/10 hover:border-white/20 hover:bg-white/[0.02]"
+                          )}
+                        >
+                          <div className="flex items-center gap-3.5">
+                            <div className={cn(
+                              "w-11 h-11 rounded-xl flex items-center justify-center transition-colors shrink-0",
+                              captureLocation ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/30" : "bg-white/5 text-zinc-400 group-hover:text-zinc-200"
+                            )}>
+                              <MapPin className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <p className={cn("text-xs font-bold uppercase tracking-wider", captureLocation ? "text-emerald-400" : "text-zinc-200")}>
+                                GPS Location
+                              </p>
+                              <p className="text-[10px] text-zinc-500 mt-0.5">Request exact coordinates</p>
+                            </div>
+                          </div>
+                          <div className={cn(
+                            "w-5 h-5 rounded-full border flex items-center justify-center transition-all",
+                            captureLocation ? "bg-emerald-500 border-emerald-500 text-white" : "border-zinc-700 bg-transparent"
+                          )}>
+                            {captureLocation && <Check className="w-3 h-3 stroke-[3]" />}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 3. PRIMARY ACTION BUTTON (Shorten & Generate Link) */}
+                    <div>
+                      <button
+                        type="submit"
+                        disabled={isSubmitting || !longUrl.trim()}
+                        className="w-full h-14 bg-blue-600 hover:bg-blue-500 text-white font-bold uppercase tracking-wider text-xs rounded-xl shadow-[0_0_25px_rgba(37,99,235,0.3)] active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                            Generating Link...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-4 h-4" />
+                            Shorten & Generate Link
+                            <ArrowRight className="w-4 h-4" />
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    {/* 4. SEPARATE CUSTOMIZATION ACCORDION (Password, Social Guard, Custom Alias, Expiry) */}
+                    <div className="pt-2 border-t border-white/5">
+                      <button
+                        type="button"
+                        onClick={() => setShowAdvanced(!showAdvanced)}
+                        className="w-full flex items-center justify-between p-3.5 bg-white/[0.02] hover:bg-white/[0.05] border border-white/10 rounded-xl transition-all group"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <Settings2 className="w-4 h-4 text-zinc-400 group-hover:text-blue-400 transition-colors" />
+                          <span className="text-xs font-bold uppercase tracking-wider text-zinc-300 group-hover:text-white">
+                            Add More Customizations
+                          </span>
+                          {(isPasswordEnabled || isSocialGateEnabled || customCode.trim() || expiresAt) && (
+                            <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 border border-blue-500/30 text-[9px] font-bold rounded-full">
+                              Active
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 text-zinc-500 text-xs">
+                          <span className="text-[10px] hidden sm:inline">Password, Social Guard, Alias</span>
+                          <ChevronDown className={cn("w-4 h-4 transition-transform duration-200", showAdvanced && "rotate-180 text-blue-400")} />
+                        </div>
+                      </button>
+
+                      {/* Expanded Customization Options */}
+                      {showAdvanced && (
+                        <div className="mt-4 p-5 bg-[#0A0A0A] border border-white/10 rounded-2xl space-y-6 animate-in slide-in-from-top-3 fade-in duration-200">
+                          
+                          {/* Custom Alias */}
+                          <div>
+                            <label htmlFor="customCode" className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2 block">
+                              Custom Alias (Back-Half)
+                            </label>
+                            <div className="flex items-center">
+                              <span className="bg-zinc-900 border-y border-l border-white/10 px-4 py-3.5 rounded-l-xl text-zinc-500 text-xs font-mono">
+                                /
+                              </span>
+                              <input
+                                id="customCode"
+                                type="text"
+                                maxLength={20}
+                                value={customCode}
+                                onChange={(e) => setCustomCode(e.target.value.replace(/[^a-zA-Z0-9_\-]/g, ''))}
+                                placeholder="my-custom-link"
+                                className="w-full bg-[#0F0F0F] border border-white/10 rounded-r-xl py-3.5 px-4 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-700 font-sans text-xs"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Password Protection */}
+                          <div className="pt-4 border-t border-white/5">
+                            <div className="flex items-center justify-between mb-2">
+                              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                                <Lock className="w-3.5 h-3.5 text-blue-400" /> Password Protection
+                              </label>
+                              <button
+                                type="button"
+                                role="switch"
+                                aria-checked={isPasswordEnabled}
+                                onClick={() => setIsPasswordEnabled(!isPasswordEnabled)}
+                                className={cn(
+                                  "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none",
+                                  isPasswordEnabled ? "bg-blue-600" : "bg-neutral-800"
+                                )}
+                              >
+                                <span className={cn(
+                                  "inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm",
+                                  isPasswordEnabled ? "translate-x-6" : "translate-x-1"
+                                )} />
+                              </button>
+                            </div>
+                            
+                            {isPasswordEnabled && (
+                              <div className="mt-3 animate-in slide-in-from-top-2 fade-in duration-200">
+                                <input
+                                  id="password"
+                                  type="password"
+                                  value={password}
+                                  onChange={(e) => setPassword(e.target.value)}
+                                  placeholder="Enter required unlock password..."
+                                  required={isPasswordEnabled}
+                                  className="w-full bg-[#0F0F0F] border border-white/10 rounded-xl py-3.5 px-4 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-700 font-sans text-xs"
+                                />
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Social Gate (Sub2Unlock) */}
+                          <div className="pt-4 border-t border-white/5">
+                            <div className="flex items-center justify-between mb-2">
+                              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                                <Link2 className="w-3.5 h-3.5 text-emerald-400" /> Social Guard (Sub2Unlock Action)
+                              </label>
+                              <button
+                                type="button"
+                                role="switch"
+                                aria-checked={isSocialGateEnabled}
+                                onClick={() => setIsSocialGateEnabled(!isSocialGateEnabled)}
+                                className={cn(
+                                  "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none",
+                                  isSocialGateEnabled ? "bg-emerald-600" : "bg-neutral-800"
+                                )}
+                              >
+                                <span className={cn(
+                                  "inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm",
+                                  isSocialGateEnabled ? "translate-x-6" : "translate-x-1"
+                                )} />
+                              </button>
+                            </div>
+                            
+                            {isSocialGateEnabled && (
+                              <div className="mt-3 animate-in slide-in-from-top-2 fade-in duration-200 space-y-3.5">
+                                <div>
+                                  <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2 block">Choose Platform Icon</label>
+                                  <div className="flex flex-wrap gap-2">
+                                    {SOCIAL_ICONS.map((item) => (
+                                      <button
+                                        key={item.id}
+                                        type="button"
+                                        onClick={() => setSocialGateIcon(item.id)}
+                                        className={cn(
+                                          "flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all text-xs",
+                                          socialGateIcon === item.id 
+                                            ? "bg-blue-500/15 text-blue-400 ring-1 ring-blue-500/40" 
+                                            : "bg-[#0F0F0F] border border-white/5 text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
+                                        )}
+                                      >
+                                        <SocialIcon id={item.id} className="w-4 h-4" />
+                                        <span>{item.label}</span>
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+                                <input
+                                  type="text"
+                                  value={socialGateTitle}
+                                  onChange={(e) => setSocialGateTitle(e.target.value)}
+                                  placeholder="e.g. Subscribe to my YouTube Channel"
+                                  required={isSocialGateEnabled}
+                                  className="w-full bg-[#0F0F0F] border border-white/10 rounded-xl py-3 px-4 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-700 text-xs"
+                                />
+                                <input
+                                  type="url"
+                                  value={socialGateUrl}
+                                  onChange={(e) => setSocialGateUrl(e.target.value)}
+                                  placeholder="https://youtube.com/@channel or https://t.me/..."
+                                  required={isSocialGateEnabled}
+                                  className="w-full bg-[#0F0F0F] border border-white/10 rounded-xl py-3 px-4 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-700 text-xs"
+                                />
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                  <input
+                                    type="text"
+                                    value={socialGateDescription}
+                                    onChange={(e) => setSocialGateDescription(e.target.value)}
+                                    placeholder="Step instruction..."
+                                    className="w-full bg-[#0F0F0F] border border-white/10 rounded-xl py-3 px-4 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-700 text-xs"
+                                  />
+                                  <input
+                                    type="text"
+                                    value={socialGateButtonText}
+                                    onChange={(e) => setSocialGateButtonText(e.target.value)}
+                                    placeholder="Button text (e.g. Subscribe & Unlock)"
+                                    required={isSocialGateEnabled}
+                                    className="w-full bg-[#0F0F0F] border border-white/10 rounded-xl py-3 px-4 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-700 text-xs"
+                                  />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Expiration Date */}
+                          <div className="pt-4 border-t border-white/5">
+                            <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2 block flex items-center gap-2">
+                              <Clock className="w-3.5 h-3.5 text-zinc-500" /> Link Expiration Timer (Optional)
+                            </label>
+                            <input
+                              type="datetime-local"
+                              value={expiresAt}
+                              onChange={(e) => setExpiresAt(e.target.value)}
+                              className="w-full bg-[#0F0F0F] border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-blue-500/50 transition-colors"
                             />
                           </div>
-                          <span className="text-[10px] font-bold uppercase tracking-wider">RGB Ring</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setAnimationType('bar')}
-                          className={cn(
-                            "flex flex-col items-center gap-3 p-4 rounded-xl border transition-all duration-300 group",
-                            animationType === 'bar' 
-                              ? "bg-blue-600/10 border-blue-500/50 text-blue-400 ring-1 ring-blue-500/20" 
-                              : "bg-[#0A0A0A] border-white/5 text-zinc-500 hover:border-white/10 hover:bg-white/5"
-                          )}
-                        >
-                          <div className="w-12 h-2.5 bg-zinc-800 rounded-full overflow-hidden p-0.5 border border-white/5">
-                            <div className="h-full bg-current rounded-full animate-[loading_1.5s_ease-in-out_infinite]" />
-                          </div>
-                          <span className="text-[10px] font-bold uppercase tracking-wider">Loading Bar</span>
-                        </button>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3 block">Link Intelligence (Advanced)</label>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-                        <div className="flex items-center justify-between p-3 md:p-4 bg-[#0A0A0A] border border-white/5 rounded-xl">
-                          <div className="flex flex-col min-w-0 pr-2">
-                            <span className="text-[10px] font-bold text-white uppercase tracking-wider mb-1 flex items-center gap-2 truncate">
-                              <Monitor className="w-3 h-3 text-blue-400 shrink-0" /> Capture Camera
-                            </span>
-                            <span className="text-[9px] text-zinc-600 truncate">Takes visitor's photo</span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => setCaptureCamera(!captureCamera)}
-                            className={cn(
-                              "relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors focus:outline-none",
-                              captureCamera ? "bg-blue-600" : "bg-neutral-800"
-                            )}
-                          >
-                            <span className={cn(
-                              "inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform",
-                              captureCamera ? "translate-x-5" : "translate-x-0.5"
-                            )} />
-                          </button>
-                        </div>
-                        <div className="flex items-center justify-between p-3 md:p-4 bg-[#0A0A0A] border border-white/5 rounded-xl">
-                          <div className="flex flex-col min-w-0 pr-2">
-                            <span className="text-[10px] font-bold text-white uppercase tracking-wider mb-1 flex items-center gap-2 truncate">
-                              <Globe className="w-3 h-3 text-emerald-400 shrink-0" /> Exact Location
-                            </span>
-                            <span className="text-[9px] text-zinc-600 truncate">Requests GPS coordinates</span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => setCaptureLocation(!captureLocation)}
-                            className={cn(
-                              "relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors focus:outline-none",
-                              captureLocation ? "bg-blue-600" : "bg-neutral-800"
-                            )}
-                          >
-                            <span className={cn(
-                              "inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform",
-                              captureLocation ? "translate-x-5" : "translate-x-0.5"
-                            )} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="md:col-span-2">
-                    <label htmlFor="customCode" className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2 block">
-                      Custom Alias (Optional)
-                    </label>
-                    <div className="flex items-center">
-                      <span className="bg-zinc-800 border-y border-l border-white/10 px-4 py-4 rounded-l-lg text-zinc-500 text-sm italic truncate max-w-[120px] md:max-w-none">
-                        shorty.os/
-                      </span>
-                      <input
-                        id="customCode"
-                        type="text"
-                        maxLength={10}
-                        value={customCode}
-                        onChange={(e) => setCustomCode(e.target.value.replace(/[^a-zA-Z0-9_\-]/g, ''))}
-                        placeholder="rtyuiq"
-                        className="w-full bg-[#0A0A0A] border border-white/10 rounded-r-lg py-4 px-5 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-800 font-sans"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex flex-col justify-end">
-                    <button
-                      type="submit"
-                      disabled={isSubmitting || !longUrl.trim()}
-                      className="h-[54px] bg-blue-600 hover:bg-blue-500 text-white font-medium py-4 px-6 rounded-lg shadow-[0_0_20px_rgba(37,99,235,0.2)] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shrink-0 w-full"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin mr-2" />
-                          Wait...
-                        </>
-                      ) : (
-                        "Shorten Link"
+                        </div>
                       )}
-                    </button>
-                  </div>
-                </div>
+                    </div>
 
                 {error && (
                   <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-lg flex items-start gap-3 mt-4">

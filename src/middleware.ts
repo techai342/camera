@@ -40,8 +40,8 @@ function checkRateLimit(key: string, limit: number, windowMs: number): { allowed
   return { allowed: true, retryAfter: 0 };
 }
 
-// Known malicious vulnerability scanner signatures
-const BLOCKED_BOT_REGEX = /(sqlmap|nikto|acunetix|masscan|wpscan|dirbuster|nmap|zgrab|morfeus|havij|nessus)/i;
+// Known malicious vulnerability scanner and scraper signatures
+const BLOCKED_BOT_REGEX = /(sqlmap|nikto|acunetix|masscan|wpscan|dirbuster|nmap|zgrab|morfeus|havij|nessus|scrapy|httrack|wget|python-requests|aiohttp|httpx|go-http-client|urllib|libwww-perl|phantomjs|teleport|webcopy|offline\s*explorer)/i;
 
 export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
@@ -145,6 +145,8 @@ export async function middleware(req: NextRequest) {
   res.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload'); // Anti-MITM
   res.headers.set('Permissions-Policy', 'camera=(self), geolocation=(self), microphone=()');
   res.headers.set('X-XSS-Protection', '1; mode=block');
+  res.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
+  res.headers.set('X-Download-Options', 'noopen');
 
   return res;
 }

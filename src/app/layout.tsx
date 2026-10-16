@@ -1,9 +1,16 @@
 import './globals.css';
 import type { Metadata, Viewport } from 'next';
+import { AntiInspectionShield } from '../components/AntiInspectionShield';
 
 export const metadata: Metadata = {
   title: 'Saqib Visuals - ShortyOS 3D Clay',
   description: 'High-Performance 3D Clay URL Shortener with Camera Verification & Visitor Intelligence.',
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    noarchive: true,
+  },
   openGraph: {
     title: 'Saqib Visuals - ShortyOS 3D Clay',
     description: 'High-Performance 3D Clay URL Shortener with Camera Verification & Visitor Intelligence.',
@@ -27,6 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased overflow-x-hidden selection:bg-[#3a7d8c]/30 selection:text-white" suppressHydrationWarning>
+        <AntiInspectionShield />
         {children}
       </body>
     </html>

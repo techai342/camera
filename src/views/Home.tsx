@@ -645,9 +645,9 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
 
   return (
-    <div className="min-h-screen clay-noise py-3 sm:py-6 px-2 sm:px-4 md:px-6 flex items-center justify-center font-sans">
+    <div className="min-h-screen clay-noise py-2 sm:py-6 px-2 sm:px-4 md:px-6 flex items-center justify-center font-sans safe-bottom-padding pb-28 lg:pb-6">
       {/* MAIN 3D CLAY BOARD CONTAINER */}
-      <div className="clay-board w-full max-w-[1400px] p-3.5 sm:p-5 lg:p-6 flex flex-col lg:flex-row gap-5 relative">
+      <div className="clay-board w-full max-w-[1400px] p-3 sm:p-5 lg:p-6 flex flex-col lg:flex-row gap-4 sm:gap-5 relative">
 
         {/* ==================== LEFT CLAY SIDEBAR ==================== */}
         <aside className={cn(
@@ -791,30 +791,30 @@ create policy "Allow public delete access" on public.urls for delete using (true
         </aside>
 
         {/* ==================== RIGHT MAIN CONTENT AREA ==================== */}
-        <main className="flex-1 flex flex-col gap-5 min-w-0">
+        <main className={cn("flex-1 flex flex-col gap-4 sm:gap-5 min-w-0", mobileTab === 'recent' && "hidden lg:flex")}>
 
           {/* 1. TOP HEADER BAR */}
-          <header className="flex flex-wrap items-center justify-between gap-3 pt-1 px-1">
+          <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1 px-1">
             <div>
-              <div className="flex items-center gap-2.5">
-                <h1 className="embossed-title text-[24px] sm:text-[28px] font-extrabold leading-none">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="embossed-title text-[20px] sm:text-[28px] font-extrabold leading-tight">
                   Saqib Visuals
                 </h1>
-                <span className="clay-small-pill px-3 py-1 text-[11px] font-mono-code font-bold text-[#142c38] flex items-center gap-1.5">
+                <span className="clay-small-pill px-2.5 py-0.5 text-[10px] font-mono-code font-bold text-[#142c38] flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>Supabase Connected</span>
+                  <span>Supabase Live</span>
                 </span>
               </div>
-              <p className="text-[#23394d] text-[12px] font-bold mt-1">
+              <p className="text-[#23394d] text-[11px] sm:text-[12px] font-bold mt-1">
                 💎 High-Performance URL Shortener • Camera Verification • Device Intelligence
               </p>
             </div>
 
-            <div className="flex items-center gap-2.5 justify-end">
+            <div className="flex items-center gap-2 justify-end shrink-0">
               {/* Sync Device Button */}
               <button 
                 onClick={() => setShowSyncModal(true)} 
-                className="clay-circle-grey w-10 h-10 flex items-center justify-center text-[#1d3346]"
+                className="clay-circle-grey w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-[#1d3346] active:scale-95 transition-transform"
                 title={phoneNumber ? `Synced: ${phoneNumber}` : "Sync Device Identity"}
               >
                 <Smartphone className="w-4 h-4" />
@@ -823,7 +823,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
               {/* API Modal Button */}
               <button 
                 onClick={() => setShowApiModal(true)} 
-                className="clay-circle-grey w-10 h-10 flex items-center justify-center text-[#1d3346]"
+                className="clay-circle-grey w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-[#1d3346] active:scale-95 transition-transform"
                 title="API Hub & Documentation"
               >
                 <Code className="w-4 h-4" />
@@ -834,7 +834,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                 href="https://www.whatsapp.com/channel/0029VbBTSK1EquiWrUt5uV1I"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="clay-teal-btn px-4 py-2 text-xs font-bold flex items-center gap-1.5"
+                className="clay-teal-btn px-3.5 py-2 text-xs font-bold flex items-center gap-1.5 active:scale-95 transition-transform"
               >
                 <span>Join Channel</span>
               </a>
@@ -1047,7 +1047,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                         value={longUrl}
                         onChange={(e) => setLongUrl(e.target.value)}
                         placeholder="https://example.com/very-long-link-with-many-parameters"
-                        className="bg-transparent border-none outline-none text-[13px] sm:text-[14px] font-semibold text-[#142636] placeholder-[#385368]/70 w-full font-sans"
+                        className="bg-transparent border-none outline-none text-[16px] sm:text-[14px] font-semibold text-[#142636] placeholder-[#385368]/70 w-full font-sans"
                         required
                       />
                       {longUrl && (
@@ -1068,7 +1068,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                       <div
                         onClick={() => setCaptureCamera(!captureCamera)}
                         className={cn(
-                          "p-4 rounded-2xl cursor-pointer transition-all duration-200 select-none flex items-center justify-between group",
+                          "p-3.5 sm:p-4 rounded-2xl cursor-pointer transition-all duration-150 select-none flex items-center justify-between group active:scale-[0.98]",
                           captureCamera 
                             ? "clay-stat-teal ring-2 ring-[#8be5f5] shadow-lg" 
                             : "clay-stat-slate opacity-90 hover:opacity-100"
@@ -1095,7 +1095,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                       <div
                         onClick={() => setCaptureLocation(!captureLocation)}
                         className={cn(
-                          "p-4 rounded-2xl cursor-pointer transition-all duration-200 select-none flex items-center justify-between group",
+                          "p-3.5 sm:p-4 rounded-2xl cursor-pointer transition-all duration-150 select-none flex items-center justify-between group active:scale-[0.98]",
                           captureLocation 
                             ? "clay-stat-teal ring-2 ring-[#8be5f5] shadow-lg" 
                             : "clay-stat-slate opacity-90 hover:opacity-100"
@@ -1125,7 +1125,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                     <button
                       type="submit"
                       disabled={isSubmitting || !longUrl.trim()}
-                      className="clay-teal-btn w-full py-3.5 text-[14px] font-extrabold uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-2xl disabled:opacity-50"
+                      className="clay-teal-btn w-full min-h-[48px] py-3 sm:py-3.5 text-[14px] sm:text-[15px] font-extrabold uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-2xl active:scale-[0.98] transition-all disabled:opacity-50"
                     >
                       {isSubmitting ? (
                         <>
@@ -1184,7 +1184,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                               value={customCode}
                               onChange={(e) => setCustomCode(e.target.value.replace(/[^a-zA-Z0-9_\-]/g, ''))}
                               placeholder="my-custom-code"
-                              className="bg-transparent border-none outline-none py-2 px-3 text-xs font-bold text-[#102030] placeholder-[#405c72]/60 w-full"
+                              className="bg-transparent border-none outline-none py-2 px-3 text-[16px] sm:text-xs font-bold text-[#102030] placeholder-[#405c72]/60 w-full"
                             />
                           </div>
                         </div>
@@ -1217,7 +1217,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                               onChange={(e) => setPassword(e.target.value)}
                               placeholder="Enter unlock password..."
                               required={isPasswordEnabled}
-                              className="w-full bg-white/50 border border-white/60 rounded-xl py-2 px-3 text-xs font-bold text-[#102030] placeholder-[#405c72]/60 outline-none"
+                              className="w-full bg-white/50 border border-white/60 rounded-xl py-2 px-3 text-[16px] sm:text-xs font-bold text-[#102030] placeholder-[#405c72]/60 outline-none"
                             />
                           )}
                         </div>
@@ -1304,7 +1304,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
                 {/* Result Card */}
                 {shortUrl && (
-                  <div ref={resultRef} className="clay-stat-teal mt-5 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 animate-in slide-in-from-bottom-3 duration-300">
+                  <div ref={resultRef} className="clay-stat-teal mt-4 sm:mt-5 p-3.5 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 animate-in slide-in-from-bottom-3 duration-300">
                     <div className="flex items-center gap-3.5 min-w-0">
                       <div className="clay-badge-teal w-11 h-11 flex items-center justify-center shrink-0">
                         <Check className="w-6 h-6 text-white stroke-[3]" />
@@ -1328,7 +1328,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
               </section>
 
               {/* 3. BOTTOM DISCOVER / BUILD TOGETHER BANNER */}
-              <section className="clay-panel px-5 py-3.5 flex flex-wrap items-center justify-between gap-4 relative">
+              <section className="clay-panel p-4 sm:px-5 sm:py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 relative">
                 <div className="flex items-center gap-3.5">
                   <div className="w-12 h-12 flex items-center justify-center shrink-0">
                     <Sparkles className="w-8 h-8 text-[#265e6b]" />
@@ -1366,25 +1366,25 @@ create policy "Allow public delete access" on public.urls for delete using (true
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <div className="lg:hidden fixed bottom-3 left-4 right-4 clay-sidebar p-2 flex items-center justify-around z-50 shadow-2xl">
+      <div className="lg:hidden fixed bottom-3 left-3 right-3 sm:left-6 sm:right-6 clay-sidebar p-1.5 flex items-center justify-around z-50 shadow-2xl safe-bottom-bar border border-white/20">
         <button 
           onClick={() => setMobileTab('create')}
           className={cn(
-            "px-3 py-1.5 rounded-xl flex items-center gap-1.5 text-xs font-bold transition-all",
-            mobileTab === 'create' ? "bg-white/20 text-[#7bd3e2]" : "text-zinc-400"
+            "flex-1 py-2 px-2 rounded-xl flex items-center justify-center gap-1.5 text-xs font-bold transition-all active:scale-95",
+            mobileTab === 'create' ? "nav-pill-active" : "text-[#b2c8d8] hover:text-white"
           )}
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-4 h-4 shrink-0" />
           <span>Shorten</span>
         </button>
         <button 
           onClick={() => setMobileTab('media')}
           className={cn(
-            "px-3 py-1.5 rounded-xl flex items-center gap-1.5 text-xs font-bold transition-all",
-            mobileTab === 'media' ? "bg-white/20 text-[#7bd3e2]" : "text-zinc-400"
+            "flex-1 py-2 px-2 rounded-xl flex items-center justify-center gap-1.5 text-xs font-bold transition-all active:scale-95",
+            mobileTab === 'media' ? "nav-pill-active" : "text-[#b2c8d8] hover:text-white"
           )}
         >
-          <Camera className="w-4 h-4" />
+          <Camera className="w-4 h-4 shrink-0" />
           <span>Media</span>
         </button>
         <button 
@@ -1393,21 +1393,21 @@ create policy "Allow public delete access" on public.urls for delete using (true
             if (!analyticsLink && history.length > 0) fetchAnalytics(history[0]);
           }}
           className={cn(
-            "px-3 py-1.5 rounded-xl flex items-center gap-1.5 text-xs font-bold transition-all",
-            mobileTab === 'analytics' ? "bg-white/20 text-[#7bd3e2]" : "text-zinc-400"
+            "flex-1 py-2 px-2 rounded-xl flex items-center justify-center gap-1.5 text-xs font-bold transition-all active:scale-95",
+            mobileTab === 'analytics' ? "nav-pill-active" : "text-[#b2c8d8] hover:text-white"
           )}
         >
-          <BarChart3 className="w-4 h-4" />
+          <BarChart3 className="w-4 h-4 shrink-0" />
           <span>Stats</span>
         </button>
         <button 
           onClick={() => setMobileTab('recent')}
           className={cn(
-            "px-3 py-1.5 rounded-xl flex items-center gap-1.5 text-xs font-bold transition-all",
-            mobileTab === 'recent' ? "bg-white/20 text-[#7bd3e2]" : "text-zinc-400"
+            "flex-1 py-2 px-2 rounded-xl flex items-center justify-center gap-1.5 text-xs font-bold transition-all active:scale-95",
+            mobileTab === 'recent' ? "nav-pill-active" : "text-[#b2c8d8] hover:text-white"
           )}
         >
-          <History className="w-4 h-4" />
+          <History className="w-4 h-4 shrink-0" />
           <span>Recent</span>
         </button>
       </div>

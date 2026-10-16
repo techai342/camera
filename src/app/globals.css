@@ -358,3 +358,88 @@ body {
     box-shadow: 0 0 10px #ff0000, inset 0 0 10px #ff0000;
   }
 }
+
+/* ============================================================
+   MOBILE RESPONSIVENESS & BUTTERY SMOOTH TOUCH PHYSICS
+============================================================ */
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* GPU hardware acceleration for smooth 60fps / 120fps animations */
+.clay-board,
+.clay-sidebar,
+.clay-panel,
+.clay-hero-card,
+.clay-stat-teal,
+.clay-stat-slate,
+.clay-stat-ice,
+.clay-stat-purple,
+.clay-teal-btn,
+.clay-circle-grey,
+.clay-small-pill {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+/* Smooth momentum touch scrolling */
+.clay-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Mobile optimized responsive layout and shadows */
+@media (max-width: 768px) {
+  .clay-board {
+    border-radius: 26px !important;
+    box-shadow:
+      0 12px 28px rgba(21, 35, 49, 0.38),
+      -3px -3px 12px rgba(235, 245, 255, 0.35),
+      inset 2px 2px 5px rgba(255, 255, 255, 0.5),
+      inset -2px -3px 7px rgba(42, 62, 82, 0.25) !important;
+    border-width: 1.5px !important;
+  }
+
+  .clay-sidebar {
+    border-radius: 22px !important;
+  }
+
+  .clay-panel {
+    border-radius: 20px !important;
+  }
+
+  .clay-hero-card {
+    border-radius: 22px !important;
+  }
+
+  .clay-recessed {
+    border-radius: 16px !important;
+  }
+
+  .clay-stat-teal,
+  .clay-stat-slate,
+  .clay-stat-ice,
+  .clay-stat-purple {
+    border-radius: 20px !important;
+  }
+}
+
+/* iPhone safe area insets */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .safe-bottom-padding {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 6rem) !important;
+  }
+  .safe-bottom-bar {
+    bottom: calc(env(safe-area-inset-bottom) + 0.75rem) !important;
+  }
+}

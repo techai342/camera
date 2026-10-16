@@ -1414,24 +1414,24 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
       {/* Edit Password Modal */}
       {editingLink && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-[#0F0F0F] border border-white/10 rounded-2xl shadow-2xl p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-medium text-white">Manage Link</h3>
-              <button onClick={() => setEditingLink(null)} className="text-zinc-500 hover:text-white transition-colors">
-                <X className="w-5 h-5"/>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#14212e]/75 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto clay-board p-6 md:p-7 text-[#162432] clay-scroll shadow-2xl">
+            <div className="flex justify-between items-center mb-5">
+              <h3 className="text-xl font-extrabold embossed-title">Manage Link</h3>
+              <button onClick={() => setEditingLink(null)} className="w-9 h-9 clay-circle-grey flex items-center justify-center text-[#243747] hover:text-[#0f1922] transition-all">
+                <X className="w-4 h-4"/>
               </button>
             </div>
             
-             <p className="text-sm text-zinc-400 mb-6 font-mono bg-white/5 p-2 rounded truncate block">
+             <p className="text-sm text-[#13323c] font-mono font-bold clay-recessed p-2.5 rounded-xl truncate block mb-5">
                /{editingLink.code}
              </p>
 
-             <form onSubmit={handleUpdateLink} className="space-y-6">
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <label className="text-sm font-medium text-white flex items-center gap-2">
-                       <Lock className="w-4 h-4 text-zinc-400"/> Password Protection
+             <form onSubmit={handleUpdateLink} className="space-y-5">
+                <div className="clay-panel p-4 rounded-2xl">
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-xs font-extrabold text-[#162736] flex items-center gap-2">
+                       <Lock className="w-4 h-4 text-[#2b6574]"/> Password Protection
                     </label>
                     <button
                       type="button"
@@ -1439,38 +1439,38 @@ create policy "Allow public delete access" on public.urls for delete using (true
                       aria-checked={editingLink.enablePassword}
                       onClick={() => setEditingLink({ ...editingLink, enablePassword: !editingLink.enablePassword })}
                       className={cn(
-                        "relative inline-flex h-7 w-14 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/50",
-                        editingLink.enablePassword ? "bg-emerald-500" : "bg-neutral-700"
+                        "relative inline-flex h-7 w-14 items-center rounded-full transition-colors focus:outline-none",
+                        editingLink.enablePassword ? "bg-[#3a7d8c]" : "clay-recessed"
                       )}
                     >
                       <span className={cn(
-                        "inline-block h-5 w-5 transform rounded-full bg-white transition-transform shadow-sm",
+                        "inline-block h-5 w-5 transform rounded-full bg-white transition-transform shadow-md",
                         editingLink.enablePassword ? "translate-x-8" : "translate-x-1"
                       )} />
                     </button>
                   </div>
                   
                   {editingLink.enablePassword && (
-                    <div className="animate-in slide-in-from-top-2 fade-in duration-200">
-                      <p className="text-xs text-zinc-500 mb-2">Set a new password to update</p>
+                    <div className="animate-in slide-in-from-top-2 fade-in duration-200 mt-3">
+                      <p className="text-[11px] text-[#344f64] font-bold mb-2">Set a new password to update</p>
                       <input
                         type="password"
                         value={editingLink.newPassword}
                         onChange={(e) => setEditingLink({ ...editingLink, newPassword: e.target.value })}
                         placeholder="Enter new password..."
-                        className="w-full bg-[#0A0A0A] rounded-lg py-3 px-4 text-zinc-200 focus:outline-none placeholder:text-zinc-700 transition-all font-sans border animate-rgb"
+                        className="w-full clay-search-pill py-2.5 px-4 text-[#162635] text-xs font-bold focus:outline-none placeholder:text-[#526a7e] transition-all"
                       />
                     </div>
                   )}
                   {!editingLink.enablePassword && (
-                     <p className="text-xs text-zinc-500 italic">Password will be removed, link will be public.</p>
+                     <p className="text-[11px] text-[#425d73] italic">Password will be removed, link will be public.</p>
                   )}
                 </div>
 
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <label className="text-sm font-medium text-white flex items-center gap-2">
-                      <Link2 className="w-4 h-4 text-zinc-400"/> Social Gate (Sub2Unlock)
+                <div className="clay-panel p-4 rounded-2xl">
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-xs font-extrabold text-[#162736] flex items-center gap-2">
+                      <Link2 className="w-4 h-4 text-[#2b6574]"/> Social Gate (Sub2Unlock)
                     </label>
                     <button
                       type="button"
@@ -1478,21 +1478,21 @@ create policy "Allow public delete access" on public.urls for delete using (true
                       aria-checked={editingLink.enableSocialGate}
                       onClick={() => setEditingLink({ ...editingLink, enableSocialGate: !editingLink.enableSocialGate })}
                       className={cn(
-                        "relative inline-flex h-7 w-14 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/50",
-                        editingLink.enableSocialGate ? "bg-emerald-500" : "bg-neutral-700"
+                        "relative inline-flex h-7 w-14 items-center rounded-full transition-colors focus:outline-none",
+                        editingLink.enableSocialGate ? "bg-[#3a7d8c]" : "clay-recessed"
                       )}
                     >
                       <span className={cn(
-                        "inline-block h-5 w-5 transform rounded-full bg-white transition-transform shadow-sm",
+                        "inline-block h-5 w-5 transform rounded-full bg-white transition-transform shadow-md",
                         editingLink.enableSocialGate ? "translate-x-8" : "translate-x-1"
                       )} />
                     </button>
                   </div>
                   
                   {editingLink.enableSocialGate && (
-                    <div className="animate-in slide-in-from-top-2 fade-in duration-200 space-y-4">
+                    <div className="animate-in slide-in-from-top-2 fade-in duration-200 space-y-3 mt-3">
                       <div>
-                        <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2 block">Choose Icon</label>
+                        <label className="text-[9px] font-extrabold text-[#2c4558] uppercase tracking-widest mb-2 block">Choose Icon</label>
                         <div className="flex flex-wrap gap-2">
                           {SOCIAL_ICONS.map((item) => (
                             <button
@@ -1500,14 +1500,14 @@ create policy "Allow public delete access" on public.urls for delete using (true
                               type="button"
                               onClick={() => setEditingLink({ ...editingLink, socialGateIcon: item.id })}
                               className={cn(
-                                "flex items-center gap-2 px-3 py-2 rounded-lg transition-all",
+                                "flex items-center gap-2 px-3 py-1.5 rounded-xl transition-all",
                                 editingLink.socialGateIcon === item.id 
-                                  ? "bg-blue-500/10 text-blue-400 ring-1 ring-blue-500" 
-                                  : "bg-[#0F0F0F] border border-white/5 text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
+                                  ? "clay-badge-teal text-white ring-2 ring-[#3a7d8c]" 
+                                  : "clay-small-pill text-[#263e50]"
                               )}
                             >
-                              <SocialIcon id={item.id} className="w-6 h-6" />
-                              <span className="text-xs font-medium">{item.label}</span>
+                              <SocialIcon id={item.id} className="w-5 h-5" />
+                              <span className="text-xs font-bold">{item.label}</span>
                             </button>
                           ))}
                         </div>
@@ -1518,7 +1518,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                         onChange={(e) => setEditingLink({ ...editingLink, socialGateTitle: e.target.value })}
                         placeholder="e.g. Follow my WhatsApp Channel"
                         required={editingLink.enableSocialGate}
-                        className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg py-3 px-4 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-700 transition-all font-sans text-sm"
+                        className="w-full clay-search-pill py-2.5 px-4 text-[#162635] text-xs font-bold focus:outline-none placeholder:text-[#526a7e] transition-all"
                       />
                       <input
                         type="url"
@@ -1526,14 +1526,14 @@ create policy "Allow public delete access" on public.urls for delete using (true
                         onChange={(e) => setEditingLink({ ...editingLink, socialGateUrl: e.target.value })}
                         placeholder="https://whatsapp.com/channel/..."
                         required={editingLink.enableSocialGate}
-                        className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg py-3 px-4 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-700 transition-all font-sans text-sm"
+                        className="w-full clay-search-pill py-2.5 px-4 text-[#162635] text-xs font-bold focus:outline-none placeholder:text-[#526a7e] transition-all"
                       />
                       <input
                         type="text"
                         value={editingLink.socialGateDescription}
                         onChange={(e) => setEditingLink({ ...editingLink, socialGateDescription: e.target.value })}
                         placeholder="Step description (e.g. Complete the action below)"
-                        className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg py-3 px-4 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-700 transition-all font-sans text-sm"
+                        className="w-full clay-search-pill py-2.5 px-4 text-[#162635] text-xs font-bold focus:outline-none placeholder:text-[#526a7e] transition-all"
                       />
                       <input
                         type="text"
@@ -1541,31 +1541,31 @@ create policy "Allow public delete access" on public.urls for delete using (true
                         onChange={(e) => setEditingLink({ ...editingLink, socialGateButtonText: e.target.value })}
                         placeholder="Button text (e.g. Verify & Continue)"
                         required={editingLink.enableSocialGate}
-                        className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg py-3 px-4 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-700 transition-all font-sans text-sm"
+                        className="w-full clay-search-pill py-2.5 px-4 text-[#162635] text-xs font-bold focus:outline-none placeholder:text-[#526a7e] transition-all"
                       />
-                      <div className="pt-4 border-t border-white/5 space-y-4">
+                      <div className="pt-3 border-t border-white/20 space-y-3">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                            <button
                              type="button"
                              onClick={() => setEditingLink({ ...editingLink, captureCamera: !editingLink.captureCamera })}
                              className={cn(
-                               "p-3 rounded-xl border text-left transition-all flex items-center justify-between sm:flex-col sm:items-start",
-                               editingLink.captureCamera ? "bg-blue-600/10 border-blue-500/50" : "bg-black border-white/5 opacity-60"
+                               "p-3 rounded-2xl text-left transition-all flex items-center justify-between sm:flex-col sm:items-start",
+                               editingLink.captureCamera ? "clay-stat-teal text-[#103038]" : "clay-recessed opacity-70"
                              )}
                            >
                              <div className="flex flex-col">
-                               <div className="flex items-center gap-2 mb-1">
-                                 <Monitor className={cn("w-3 h-3", editingLink.captureCamera ? "text-blue-400" : "text-zinc-600")} />
-                                 <span className={cn("text-[9px] font-bold uppercase tracking-widest truncate", editingLink.captureCamera ? "text-blue-400" : "text-zinc-600")}>Camera</span>
+                               <div className="flex items-center gap-1.5 mb-1">
+                                 <Monitor className="w-3.5 h-3.5 text-[#1b4e58]" />
+                                 <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#103038]">Camera</span>
                                </div>
-                               <p className="text-[8px] text-zinc-500 leading-tight">Capture image</p>
+                               <p className="text-[9px] font-bold opacity-75">Capture image</p>
                              </div>
                              <div className={cn(
                                "w-7 h-4 rounded-full relative transition-colors sm:mt-2",
-                               editingLink.captureCamera ? "bg-blue-500" : "bg-zinc-800"
+                               editingLink.captureCamera ? "bg-[#25626f]" : "bg-[#718899]"
                              )}>
                                <div className={cn(
-                                 "absolute top-0.5 w-3 h-3 bg-white rounded-full transition-transform",
+                                 "absolute top-0.5 w-3 h-3 bg-white rounded-full transition-transform shadow",
                                  editingLink.captureCamera ? "right-0.5" : "left-0.5"
                                )} />
                              </div>
@@ -1574,66 +1574,66 @@ create policy "Allow public delete access" on public.urls for delete using (true
                              type="button"
                              onClick={() => setEditingLink({ ...editingLink, captureLocation: !editingLink.captureLocation })}
                              className={cn(
-                               "p-3 rounded-xl border text-left transition-all flex items-center justify-between sm:flex-col sm:items-start",
-                               editingLink.captureLocation ? "bg-emerald-600/10 border-emerald-500/50" : "bg-black border-white/5 opacity-60"
+                               "p-3 rounded-2xl text-left transition-all flex items-center justify-between sm:flex-col sm:items-start",
+                               editingLink.captureLocation ? "clay-stat-ice text-[#162736]" : "clay-recessed opacity-70"
                              )}
                            >
                              <div className="flex flex-col">
-                               <div className="flex items-center gap-2 mb-1">
-                                 <Globe className={cn("w-3 h-3", editingLink.captureLocation ? "text-emerald-400" : "text-zinc-600")} />
-                                 <span className={cn("text-[9px] font-bold uppercase tracking-widest truncate", editingLink.captureLocation ? "text-emerald-400" : "text-zinc-600")}>Location</span>
+                               <div className="flex items-center gap-1.5 mb-1">
+                                 <Globe className="w-3.5 h-3.5 text-[#1a445c]" />
+                                 <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#162736]">Location</span>
                                </div>
-                               <p className="text-[8px] text-zinc-500 leading-tight">GPS data</p>
+                               <p className="text-[9px] font-bold opacity-75">GPS data</p>
                              </div>
                              <div className={cn(
                                "w-7 h-4 rounded-full relative transition-colors sm:mt-2",
-                               editingLink.captureLocation ? "bg-emerald-500" : "bg-zinc-800"
+                               editingLink.captureLocation ? "bg-[#24526d]" : "bg-[#718899]"
                              )}>
                                <div className={cn(
-                                 "absolute top-0.5 w-3 h-3 bg-white rounded-full transition-transform",
+                                 "absolute top-0.5 w-3 h-3 bg-white rounded-full transition-transform shadow",
                                  editingLink.captureLocation ? "right-0.5" : "left-0.5"
                                )} />
                              </div>
                            </button>
                         </div>
                         <div>
-                          <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1 block">Expiry Date</label>
+                          <label className="text-[10px] font-extrabold text-[#2c4558] uppercase tracking-widest mb-1 block">Expiry Date</label>
                           <input
                             type="datetime-local"
                             value={editingLink.expiresAt}
                             onChange={(e) => setEditingLink({ ...editingLink, expiresAt: e.target.value })}
-                            className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg p-2.5 text-xs text-white focus:outline-none"
+                            className="w-full clay-search-pill py-2 px-3 text-xs text-[#162635] font-bold focus:outline-none"
                           />
                         </div>
                         <div>
-                          <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1 block">Animation Text</label>
+                          <label className="text-[10px] font-extrabold text-[#2c4558] uppercase tracking-widest mb-1 block">Animation Text</label>
                           <input
                             type="text"
                             value={animationText}
                             onChange={(e) => setAnimationText(e.target.value.toUpperCase())}
-                            className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg p-2.5 text-xs text-white focus:outline-none"
+                            className="w-full clay-search-pill py-2 px-3 text-xs text-[#162635] font-bold focus:outline-none"
                           />
                         </div>
                       </div>
                     </div>
                   )}
                   {!editingLink.enableSocialGate && (
-                     <p className="text-xs text-zinc-500 italic mt-2">Social gate is disabled.</p>
+                     <p className="text-[11px] text-[#425d73] italic mt-2">Social gate is disabled.</p>
                   )}
                 </div>
 
-                <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+                <div className="flex justify-end gap-3 pt-3 border-t border-white/20">
                   <button
                     type="button"
                     onClick={() => setEditingLink(null)}
-                    className="px-4 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-white transition-colors"
+                    className="clay-small-pill px-5 py-2.5 text-xs font-bold text-[#243a4c] transition-all"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isUpdating}
-                    className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-lg text-sm font-medium transition-all shadow-[0_0_15px_rgba(37,99,235,0.2)] disabled:opacity-50"
+                    className="clay-teal-btn px-6 py-2.5 text-xs font-extrabold uppercase tracking-wider text-white shadow-lg disabled:opacity-50"
                   >
                     {isUpdating ? 'Saving...' : 'Save Changes'}
                   </button>
@@ -1645,53 +1645,58 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
       {/* Detailed Analytics Modal */}
       {analyticsLink && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
-           <div className="w-full max-w-4xl max-h-[85vh] overflow-hidden bg-[#0F0F0F] border border-white/10 rounded-[32px] shadow-2xl flex flex-col">
-              <div className="p-8 border-b border-white/5 flex items-center justify-between shrink-0">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#14212e]/75 backdrop-blur-md animate-in fade-in duration-300">
+           <div className="w-full max-w-5xl max-h-[88vh] clay-board overflow-hidden flex flex-col shadow-2xl">
+              <div className="p-6 md:p-8 border-b border-white/20 flex items-center justify-between shrink-0">
                  <div>
-                    <h3 className="text-2xl font-light tracking-tight text-white mb-1">Link Intelligence</h3>
-                    <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest flex items-center gap-2">
-                       Analytics for <span className="text-blue-400 font-mono">/{analyticsLink.code}</span>
+                    <h3 className="text-2xl font-extrabold tracking-tight embossed-title mb-1">Link Intelligence</h3>
+                    <p className="text-xs text-[#2c445a] font-bold uppercase tracking-widest flex items-center gap-2">
+                       Analytics for <span className="clay-small-pill px-3 py-0.5 text-[#1b434d] font-mono font-bold">/{analyticsLink.code}</span>
                     </p>
                  </div>
-                 <button onClick={() => setAnalyticsLink(null)} className="p-2 bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white rounded-full transition-all">
-                    <X className="w-6 h-6"/>
+                 <button onClick={() => setAnalyticsLink(null)} className="w-10 h-10 clay-circle-grey flex items-center justify-center text-[#243747] hover:text-[#0f1922] transition-all">
+                    <X className="w-5 h-5"/>
                  </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+              <div className="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar clay-scroll">
                  {isLoadingAnalytics ? (
                    <div className="h-64 flex flex-col items-center justify-center gap-4">
-                      <div className="w-10 h-10 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />
-                      <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest animate-pulse">Decrypting Click Data...</p>
+                      <div className="w-12 h-12 border-3 border-[#3a7d8c]/30 border-t-[#3a7d8c] rounded-full animate-spin" />
+                      <p className="text-[11px] text-[#2c445a] font-extrabold uppercase tracking-widest animate-pulse">Decrypting Click Data...</p>
                    </div>
                  ) : analyticsData.length === 0 ? (
-                   <div className="h-64 flex flex-col items-center justify-center text-center">
-                      <BarChart3 className="w-12 h-12 text-zinc-800 mb-4" />
-                      <p className="text-zinc-500 font-medium">No clicks detected yet.</p>
-                      <p className="text-[10px] text-zinc-600 uppercase tracking-widest mt-1">Start sharing your link to see data</p>
+                   <div className="clay-recessed p-10 flex flex-col items-center justify-center text-center rounded-3xl">
+                      <BarChart3 className="w-12 h-12 text-[#466074] mb-4" />
+                      <p className="text-[#1c2c3a] font-bold text-lg">No clicks detected yet.</p>
+                      <p className="text-xs text-[#3d566b] uppercase tracking-widest mt-1">Start sharing your link to see live intelligence</p>
                    </div>
                  ) : (
-                   <div className="space-y-8">
+                   <div className="space-y-6">
                       {/* Summary Grid */}
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                          {[
-                           { label: 'Total Clicks', val: analyticsData.length, icon: ArrowUpRight, color: 'text-blue-400' },
-                           { label: 'Uniques', val: new Set(analyticsData.map(d => d.ip_address)).size, icon: Globe, color: 'text-emerald-400' },
-                           { label: 'Top Browser', val: Object.entries(analyticsData.reduce((acc, obj) => ({...acc, [obj.browser]: (acc[obj.browser] || 0) + 1}), {} as any)).sort((a: any, b: any) => b[1] - a[1])[0][0], icon: Monitor, color: 'text-orange-400' },
-                           { label: 'Last Active', val: 'Just Now', icon: Clock, color: 'text-purple-400' }
+                           { label: 'Total Clicks', val: analyticsData.length, icon: ArrowUpRight, cardClass: 'clay-stat-teal text-[#103038]', iconClass: 'text-[#1d5561]' },
+                           { label: 'Uniques', val: new Set(analyticsData.map(d => d.ip_address)).size, icon: Globe, cardClass: 'clay-stat-slate text-[#142332]', iconClass: 'text-[#2a455a]' },
+                           { label: 'Top Browser', val: Object.entries(analyticsData.reduce((acc, obj) => ({...acc, [obj.browser]: (acc[obj.browser] || 0) + 1}), {} as any)).sort((a: any, b: any) => b[1] - a[1])[0][0], icon: Monitor, cardClass: 'clay-stat-ice text-[#162736]', iconClass: 'text-[#22445b]' },
+                           { label: 'Last Active', val: 'Just Now', icon: Clock, cardClass: 'clay-stat-purple text-[#1a1c35]', iconClass: 'text-[#2d2f52]' }
                          ].map((stat, i) => (
-                           <div key={i} className="bg-white/[0.03] border border-white/[0.05] p-5 rounded-2xl">
-                              <stat.icon className={cn("w-5 h-5 mb-3", stat.color)} />
-                              <p className="text-2xl font-light text-white mb-1">{stat.val}</p>
-                              <p className="text-[9px] text-zinc-600 font-bold uppercase tracking-[0.2em]">{stat.label}</p>
+                           <div key={i} className={cn("p-5 rounded-2xl flex flex-col justify-between", stat.cardClass)}>
+                              <div className="flex items-center justify-between mb-3">
+                                <stat.icon className={cn("w-5 h-5", stat.iconClass)} />
+                                <span className="clay-badge-slate text-[9px] font-extrabold uppercase tracking-widest px-2 py-0.5 opacity-80">Live</span>
+                              </div>
+                              <div>
+                                <p className="text-2xl md:text-3xl font-extrabold tracking-tight mb-1">{stat.val}</p>
+                                <p className="text-[10px] font-bold uppercase tracking-[0.18em] opacity-80">{stat.label}</p>
+                              </div>
                            </div>
                          ))}
                       </div>
 
                       {/* Detailed Log Table */}
-                      <div className="bg-white/[0.02] border border-white/[0.04] rounded-2xl overflow-hidden">
-                         <div className="hidden md:grid grid-cols-7 p-4 border-b border-white/5 text-[9px] text-zinc-500 font-bold uppercase tracking-widest">
+                      <div className="clay-panel p-4 md:p-6 rounded-3xl overflow-hidden">
+                         <div className="hidden md:grid grid-cols-7 pb-3 mb-3 border-b border-white/20 text-[10px] text-[#2c445a] font-extrabold uppercase tracking-widest">
                             <div className="col-span-2">Visitor Details</div>
                             <div>Intel (Img)</div>
                             <div>System Specs</div>
@@ -1699,164 +1704,163 @@ create policy "Allow public delete access" on public.urls for delete using (true
                             <div>Geo</div>
                             <div className="text-right">Timestamp</div>
                          </div>
-                         <div className="divide-y divide-white/[0.03]">
+                         <div className="space-y-3">
                             {analyticsData.map((log, i) => (
-                              <div key={i} className="flex flex-col md:grid grid-cols-7 p-4 md:items-center group hover:bg-white/[0.02] transition-colors gap-4 md:gap-0">
-                                 {/* Column 1: Details */}
-                                 <div className="md:col-span-2">
-                                    <div className="flex items-center gap-2 mb-1 md:mb-0">
-                                       {log.os?.toLowerCase().includes('android') || log.os?.toLowerCase().includes('ios') || log.device_type === 'Mobile' ? (
-                                          <Smartphone className="w-3 h-3 text-blue-400" />
-                                       ) : (
-                                          <Monitor className="w-3 h-3 text-zinc-500" />
-                                       )}
-                                       <p className="text-zinc-300 font-mono text-xs">{log.ip_address}</p>
-                                    </div>
-                                    <p className="text-[10px] text-zinc-600 truncate pr-4">{log.referrer}</p>
-                                 </div>
+                               <div key={i} className="clay-recessed p-4 rounded-2xl flex flex-col md:grid grid-cols-7 md:items-center gap-4 md:gap-0 transition-transform hover:-translate-y-0.5">
+                                  {/* Column 1: Details */}
+                                  <div className="md:col-span-2">
+                                     <div className="flex items-center gap-2 mb-1">
+                                        {log.os?.toLowerCase().includes('android') || log.os?.toLowerCase().includes('ios') || log.device_type === 'Mobile' ? (
+                                           <Smartphone className="w-4 h-4 text-[#205e6b]" />
+                                        ) : (
+                                           <Monitor className="w-4 h-4 text-[#375267]" />
+                                        )}
+                                        <p className="text-[#132d3d] font-mono text-xs font-bold">{log.ip_address}</p>
+                                     </div>
+                                     <p className="text-[11px] text-[#425d73] font-medium truncate pr-4">{log.referrer || 'Direct / Internal'}</p>
+                                  </div>
 
-                                 {/* Column 2: Intel */}
-                                 <div className="flex items-center gap-3">
-                                    <span className="md:hidden text-[9px] text-zinc-600 font-bold uppercase tracking-widest w-16 shrink-0">Intel:</span>
-                                    {log.captured_image ? (
-                                       <button 
-                                         type="button"
-                                         onClick={() => setSelectedImage(log.captured_image)}
-                                         className="relative group/img focus:outline-none"
-                                       >
-                                          <img 
-                                            src={log.captured_image} 
-                                            className="w-10 h-10 object-cover rounded border border-white/10 hover:scale-[1.2] hover:z-20 transition-transform origin-left cursor-zoom-in" 
-                                            alt="Captured"
-                                          />
-                                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 flex items-center justify-center transition-opacity rounded">
-                                             <ArrowUpRight className="w-3 h-3 text-white" />
-                                          </div>
-                                       </button>
-                                    ) : (
-                                       <div className="w-10 h-10 bg-white/5 rounded flex items-center justify-center border border-dashed border-white/10 shrink-0">
-                                          <Monitor className="w-4 h-4 text-zinc-800" />
-                                       </div>
-                                    )}
-                                 </div>
+                                  {/* Column 2: Intel */}
+                                  <div className="flex items-center gap-3">
+                                     <span className="md:hidden text-[10px] text-[#344d60] font-bold uppercase tracking-widest w-16 shrink-0">Intel:</span>
+                                     {log.captured_image ? (
+                                        <button 
+                                          type="button"
+                                          onClick={() => setSelectedImage(log.captured_image)}
+                                          className="relative group/img focus:outline-none clay-thumb-frame"
+                                        >
+                                           <img 
+                                             src={log.captured_image} 
+                                             className="w-11 h-11 object-cover hover:scale-[1.15] hover:z-20 transition-transform origin-left cursor-zoom-in" 
+                                             alt="Captured"
+                                           />
+                                           <div className="absolute inset-0 bg-black/30 opacity-0 group-hover/img:opacity-100 flex items-center justify-center transition-opacity">
+                                              <ArrowUpRight className="w-3.5 h-3.5 text-white" />
+                                           </div>
+                                        </button>
+                                     ) : (
+                                        <div className="w-11 h-11 clay-small-pill flex items-center justify-center shrink-0 text-[#4c677c]">
+                                           <Monitor className="w-4 h-4" />
+                                        </div>
+                                     )}
+                                  </div>
 
-                                 {/* Column 3: Specs */}
-                                 <div className="flex items-center md:flex-col md:items-start gap-3 md:gap-1.5">
-                                    <span className="md:hidden text-[9px] text-zinc-600 font-bold uppercase tracking-widest w-16 shrink-0">System:</span>
-                                    <div className="flex flex-col gap-1.5">
-                                       <div className="flex items-center gap-2">
-                                          <div className={cn("w-1.5 h-1.5 rounded-full", log.battery_level > 0.2 ? "bg-emerald-500" : "bg-red-500")}></div>
-                                          <span className="text-[9px] text-zinc-400 font-mono">
-                                             {log.battery_level ? `${Math.round(log.battery_level * 100)}%` : '??%'}
-                                             {log.is_charging && ' ⚡'}
-                                          </span>
-                                          <span className="text-[8px] bg-zinc-800 text-zinc-500 px-1 rounded ml-1">{log.timezone || 'TZ'}</span>
-                                       </div>
-                                       <div className="flex items-center gap-2 flex-wrap">
-                                          <span className="text-[8px] px-1 bg-zinc-800 rounded text-zinc-500 font-mono uppercase truncate max-w-[60px]">{log.network_type || 'NET'}</span>
-                                          <span className="text-[8px] text-zinc-600 font-mono">{log.screen_resolution || '??x??'}</span>
-                                          {log.hardware_concurrency && (
-                                            <span className="text-[8px] text-red-400 font-mono" title="CPU Cores">
-                                              Cores:{log.hardware_concurrency}
-                                            </span>
-                                          )}
-                                          {log.device_memory && (
-                                            <span className="text-[8px] text-purple-400 font-mono" title="RAM">
-                                              RAM:{log.device_memory}GB
-                                            </span>
-                                          )}
-                                       </div>
-                                    </div>
-                                 </div>
+                                  {/* Column 3: Specs */}
+                                  <div className="flex items-center md:flex-col md:items-start gap-3 md:gap-1.5">
+                                     <span className="md:hidden text-[10px] text-[#344d60] font-bold uppercase tracking-widest w-16 shrink-0">System:</span>
+                                     <div className="flex flex-col gap-1.5">
+                                        <div className="flex items-center gap-2">
+                                           <div className={cn("w-2 h-2 rounded-full", log.battery_level > 0.2 ? "bg-emerald-600 shadow-[0_0_6px_rgba(16,185,129,0.5)]" : "bg-red-500")}></div>
+                                           <span className="text-[10px] text-[#1b3445] font-mono font-bold">
+                                              {log.battery_level ? `${Math.round(log.battery_level * 100)}%` : '??%'}
+                                              {log.is_charging && ' ⚡'}
+                                           </span>
+                                           <span className="clay-small-pill text-[9px] text-[#2c4558] font-bold px-2 py-0.5 ml-1">{log.timezone || 'TZ'}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 flex-wrap">
+                                           <span className="clay-small-pill text-[8px] px-2 py-0.5 text-[#2c4558] font-mono uppercase font-bold truncate max-w-[65px]">{log.network_type || 'NET'}</span>
+                                           <span className="text-[9px] text-[#3e596e] font-mono font-bold">{log.screen_resolution || '??x??'}</span>
+                                           {log.hardware_concurrency && (
+                                             <span className="clay-small-pill text-[8px] text-red-700 font-mono font-bold px-1.5 py-0.5" title="CPU Cores">
+                                               Cores:{log.hardware_concurrency}
+                                             </span>
+                                           )}
+                                           {log.device_memory && (
+                                             <span className="clay-small-pill text-[8px] text-purple-800 font-mono font-bold px-1.5 py-0.5" title="RAM">
+                                               RAM:{log.device_memory}GB
+                                             </span>
+                                           )}
+                                        </div>
+                                     </div>
+                                  </div>
 
-                                 {/* Column 4: Device */}
-                                 <div className="flex items-center gap-3">
-                                    <span className="md:hidden text-[9px] text-zinc-600 font-bold uppercase tracking-widest w-16 shrink-0">Device:</span>
-                                    <div className="flex items-center gap-3">
-                                       {log.os?.toLowerCase().includes('android') || log.os?.toLowerCase().includes('ios') || log.device_type === 'Mobile' ? (
-                                         <Smartphone className="w-3 h-3 text-blue-400" />
-                                       ) : (
-                                         <Monitor className="w-3 h-3 text-zinc-500" />
-                                       )}
-                                       <div className="min-w-0">
-                                          <p className="text-[10px] text-zinc-400 truncate">{log.browser}</p>
-                                          <p className="text-[9px] text-zinc-600 uppercase border-b border-zinc-800 inline-block">{log.os || 'UNKNOWN'}</p>
-                                          {log.webgl_vendor && log.webgl_vendor !== 'Unknown' && (
-                                            <p className="text-[7px] text-zinc-500 mt-1 truncate max-w-[80px]" title={log.webgl_renderer}>
-                                              GPU: {log.webgl_vendor.split(' ')[0]}
-                                            </p>
-                                          )}
-                                       </div>
-                                    </div>
-                                 </div>
+                                  {/* Column 4: Device */}
+                                  <div className="flex items-center gap-3">
+                                     <span className="md:hidden text-[10px] text-[#344d60] font-bold uppercase tracking-widest w-16 shrink-0">Device:</span>
+                                     <div className="flex items-center gap-2.5">
+                                        {log.os?.toLowerCase().includes('android') || log.os?.toLowerCase().includes('ios') || log.device_type === 'Mobile' ? (
+                                          <Smartphone className="w-4 h-4 text-[#205e6b]" />
+                                        ) : (
+                                          <Monitor className="w-4 h-4 text-[#375267]" />
+                                        )}
+                                        <div className="min-w-0">
+                                           <p className="text-[11px] text-[#142838] font-bold truncate">{log.browser}</p>
+                                           <p className="text-[9px] text-[#375267] uppercase font-bold">{log.os || 'UNKNOWN'}</p>
+                                           {log.webgl_vendor && log.webgl_vendor !== 'Unknown' && (
+                                             <p className="text-[8px] text-[#4b657b] font-mono mt-0.5 truncate max-w-[90px]" title={log.webgl_renderer}>
+                                               GPU: {log.webgl_vendor.split(' ')[0]}
+                                             </p>
+                                           )}
+                                        </div>
+                                     </div>
+                                  </div>
 
-                                 {/* Column 5: Geo */}
-                                 <div className="flex items-center gap-3">
-                                    <span className="md:hidden text-[9px] text-zinc-600 font-bold uppercase tracking-widest w-16 shrink-0">Geo:</span>
-                                    <div className="flex items-center gap-2">
-                                       <div className="w-6 h-6 bg-zinc-800/50 rounded-full flex items-center justify-center border border-white/5">
-                                          <Globe className="w-3 h-3 text-zinc-500" />
-                                       </div>
-                                       <div className="flex flex-col">
-                                          <span className="text-[10px] text-zinc-300 font-bold leading-none mb-0.5">{log.city || 'Unknown'}</span>
-                                          <span className="text-[8px] text-zinc-600 uppercase tracking-tighter leading-none">{log.country || 'Global'}</span>
-                                       </div>
-                                    </div>
-                                 </div>
+                                  {/* Column 5: Geo */}
+                                  <div className="flex items-center gap-3">
+                                     <span className="md:hidden text-[10px] text-[#344d60] font-bold uppercase tracking-widest w-16 shrink-0">Geo:</span>
+                                     <div className="flex items-center gap-2.5">
+                                        <div className="w-7 h-7 clay-circle-grey flex items-center justify-center text-[#265360]">
+                                           <Globe className="w-3.5 h-3.5" />
+                                        </div>
+                                        <div className="flex flex-col">
+                                           <span className="text-[11px] text-[#132c3c] font-extrabold leading-tight">{log.city || 'Unknown'}</span>
+                                           <span className="text-[9px] text-[#3e586d] uppercase font-bold tracking-tight">{log.country || 'Global'}</span>
+                                        </div>
+                                     </div>
+                                  </div>
 
-                                 {/* Column 6: Timestamp */}
-                                 <div className="md:text-right border-t border-white/5 pt-3 md:pt-0 md:border-0 flex justify-between md:block items-center">
-                                    <span className="md:hidden text-[9px] text-emerald-500/50 font-bold uppercase tracking-widest">Captured At</span>
-                                    <div>
-                                       <p className="text-[10px] text-zinc-500">{new Date(log.created_at).toLocaleTimeString()}</p>
-                                       <p className="text-[8px] text-zinc-700 font-bold uppercase tracking-tighter">{new Date(log.created_at).toLocaleDateString()}</p>
-                                    </div>
-                                 </div>
+                                  {/* Column 6: Timestamp */}
+                                  <div className="md:text-right border-t border-white/20 pt-3 md:pt-0 md:border-0 flex justify-between md:block items-center">
+                                     <span className="md:hidden text-[10px] text-[#2c6574] font-bold uppercase tracking-widest">Captured At</span>
+                                     <div>
+                                        <p className="text-[11px] text-[#1a3345] font-bold">{new Date(log.created_at).toLocaleTimeString()}</p>
+                                        <p className="text-[9px] text-[#486378] font-bold uppercase tracking-wider">{new Date(log.created_at).toLocaleDateString()}</p>
+                                     </div>
+                                  </div>
 
-                                 {/* Full Width Map Section */}
-                                 {log.latitude && (
-                                    <div className="col-span-full mt-4 bg-black/40 border border-white/5 rounded-2xl overflow-hidden group/large-map">
-                                       <div className="grid grid-cols-1 md:grid-cols-3">
-                                          <div className="md:col-span-2 relative aspect-[21/9] md:aspect-auto md:h-48 border-b md:border-b-0 md:border-r border-white/5">
-                                             <iframe 
-                                               title="Visitor Large Map"
-                                               width="100%" 
-                                               height="100%" 
-                                               frameBorder="0" 
-                                               scrolling="no" 
-                                               marginHeight={0} 
-                                               marginWidth={0} 
-                                               src={`https://maps.google.com/maps?q=${log.latitude},${log.longitude}&z=15&output=embed`}
-                                               className="grayscale contrast-125 opacity-40 group-hover/large-map:opacity-100 group-hover/large-map:grayscale-0 transition-all duration-700"
-                                             ></iframe>
-                                             <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_40px_rgba(0,0,0,0.6)]"></div>
-                                             <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md border border-white/10 px-2 py-1 rounded-md flex items-center gap-2">
-                                                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]"></div>
-                                                <span className="text-[8px] text-white font-bold uppercase tracking-widest">Live GPS Node</span>
-                                             </div>
-                                          </div>
-                                          <div className="p-4 flex flex-col justify-center items-center md:items-start text-center md:text-left gap-4">
-                                             <div>
-                                                <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-[0.2em] mb-1">Coordinates Tracked</p>
-                                                <p className="text-sm font-mono text-emerald-400 font-bold tracking-tight">
-                                                   {log.latitude.toFixed(6)}° N<br />
-                                                   {log.longitude.toFixed(6)}° E
-                                                </p>
-                                             </div>
-                                             <a 
-                                               href={`https://www.google.com/maps?q=${log.latitude},${log.longitude}`} 
-                                               target="_blank" 
-                                               rel="noopener noreferrer"
-                                               className="flex items-center gap-3 px-6 py-2.5 bg-emerald-500 text-black rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-400 transition-all hover:scale-[1.02] active:scale-95 shadow-[0_4px_20px_rgba(16,185,129,0.2)]"
-                                             >
-                                               <ExternalLink className="w-3.5 h-3.5" />
-                                               Launch Full Interface
-                                             </a>
-                                          </div>
-                                       </div>
-                                    </div>
-                                 )}
-                              </div>
+                                  {/* Full Width Map Section */}
+                                  {log.latitude && (
+                                     <div className="col-span-full mt-3 clay-panel p-3 rounded-2xl overflow-hidden group/large-map">
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                           <div className="md:col-span-2 relative aspect-[21/9] md:aspect-auto md:h-48 rounded-xl overflow-hidden clay-thumb-frame">
+                                              <iframe 
+                                                title="Visitor Large Map"
+                                                width="100%" 
+                                                height="100%" 
+                                                frameBorder="0" 
+                                                scrolling="no" 
+                                                marginHeight={0} 
+                                                marginWidth={0} 
+                                                src={`https://maps.google.com/maps?q=${log.latitude},${log.longitude}&z=15&output=embed`}
+                                                className="contrast-115 opacity-80 group-hover/large-map:opacity-100 transition-all duration-500"
+                                              ></iframe>
+                                              <div className="absolute top-3 left-3 clay-badge-teal px-2.5 py-1 flex items-center gap-2">
+                                                 <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
+                                                 <span className="text-[9px] text-white font-extrabold uppercase tracking-widest">Live GPS Node</span>
+                                              </div>
+                                           </div>
+                                           <div className="clay-recessed p-4 rounded-xl flex flex-col justify-center items-center md:items-start text-center md:text-left gap-3">
+                                              <div>
+                                                 <p className="text-[10px] text-[#344f63] font-extrabold uppercase tracking-[0.15em] mb-1">Coordinates Tracked</p>
+                                                 <p className="text-sm font-mono text-[#0e3b44] font-extrabold tracking-tight">
+                                                    {log.latitude.toFixed(6)}° N<br />
+                                                    {log.longitude.toFixed(6)}° E
+                                                 </p>
+                                              </div>
+                                              <a 
+                                                href={`https://www.google.com/maps?q=${log.latitude},${log.longitude}`} 
+                                                target="_blank" 
+                                                rel="noopener noreferrer"
+                                                className="clay-teal-btn flex items-center gap-2 px-5 py-2.5 text-[11px] font-bold uppercase tracking-wider text-white"
+                                              >
+                                                <ExternalLink className="w-3.5 h-3.5" />
+                                                Launch Full Interface
+                                              </a>
+                                           </div>
+                                        </div>
+                                     </div>
+                                  )}
+                               </div>
                             ))}
                          </div>
                       </div>
@@ -1864,16 +1868,16 @@ create policy "Allow public delete access" on public.urls for delete using (true
                  )}
               </div>
               
-              <div className="p-4 bg-black/40 border-t border-white/5 flex justify-center shrink-0">
-                 <p className="text-[10px] text-zinc-700 font-bold uppercase tracking-[0.4em]">Proprietary Link Tracking Core V2</p>
+              <div className="p-4 border-t border-white/20 flex justify-center shrink-0">
+                 <p className="text-[11px] text-[#2c4558] font-extrabold uppercase tracking-[0.3em]">Proprietary Link Tracking Core V2</p>
               </div>
            </div>
         </div>
       )}
       {/* Image Lightbox Modal */}
       {selectedImage && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl animate-in fade-in duration-300">
-           <div className="absolute top-6 right-6 flex items-center gap-4 z-10">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#0d1722]/90 backdrop-blur-xl animate-in fade-in duration-300">
+           <div className="absolute top-6 right-6 flex items-center gap-3 z-10">
               <button 
                 onClick={() => {
                   const link = document.createElement('a');
@@ -1883,33 +1887,33 @@ create policy "Allow public delete access" on public.urls for delete using (true
                   link.click();
                   document.body.removeChild(link);
                 }}
-                className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded-full text-[10px] text-white font-bold uppercase tracking-widest transition-all"
+                className="clay-teal-btn flex items-center gap-2 px-5 py-2.5 text-[11px] text-white font-extrabold uppercase tracking-widest transition-all"
               >
                  <Download className="w-3.5 h-3.5" />
                  Download intel
               </button>
               <button 
                 onClick={() => setSelectedImage(null)} 
-                className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all border border-white/10"
+                className="w-11 h-11 clay-circle-grey flex items-center justify-center text-[#243747] hover:text-[#0f1922] transition-all"
               >
-                <X className="w-6 h-6"/>
+                <X className="w-5 h-5"/>
               </button>
            </div>
            
-           <div className="w-full max-w-2xl max-h-[80vh] relative rounded-[32px] overflow-hidden border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] bg-black/50">
+           <div className="w-full max-w-3xl max-h-[82vh] relative clay-board p-3 overflow-hidden shadow-2xl">
               <img 
                 src={selectedImage} 
-                className="w-full h-full max-h-[80vh] object-contain" 
+                className="w-full h-full max-h-[78vh] object-contain rounded-2xl" 
                 alt="Captured Full" 
               />
-              <div className="absolute inset-0 pointer-events-none border-[1px] border-white/5 font-mono text-[8px] text-white/20 p-4 flex flex-col justify-between">
+              <div className="absolute inset-3 pointer-events-none rounded-2xl border border-white/20 font-mono text-[9px] text-[#1c3848] p-4 flex flex-col justify-between font-bold">
                  <div className="flex justify-between">
-                    <span>INTEL_NODE_LITE_SECURE</span>
-                    <span>{new Date().toISOString()}</span>
+                    <span className="clay-badge-teal px-2 py-0.5 text-white">INTEL_NODE_LITE_SECURE</span>
+                    <span className="clay-small-pill px-2 py-0.5 text-[#1b3445]">{new Date().toISOString()}</span>
                  </div>
                  <div className="flex justify-between">
-                    <span>ENCRYPTION: AES-256</span>
-                    <span>CID: {Math.random().toString(36).substring(7).toUpperCase()}</span>
+                    <span className="clay-badge-slate px-2 py-0.5 text-[#142332]">ENCRYPTION: AES-256</span>
+                    <span className="clay-small-pill px-2 py-0.5 text-[#1b3445]">CID: {Math.random().toString(36).substring(7).toUpperCase()}</span>
                  </div>
               </div>
            </div>
@@ -1918,31 +1922,31 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
       {/* Sync Modal */}
       {showSyncModal && (
-        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 min-h-screen">
-          <div className="bg-[#0A0A0A] border border-white/10 rounded-3xl p-8 w-full max-w-md relative shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-[#14212e]/75 backdrop-blur-md flex items-center justify-center p-4 min-h-screen">
+          <div className="clay-board p-8 w-full max-w-md relative text-[#162432] shadow-2xl">
             <button 
               onClick={() => setShowSyncModal(false)} 
-              className="absolute top-6 right-6 text-zinc-500 hover:text-white transition-colors"
+              className="absolute top-6 right-6 w-9 h-9 clay-circle-grey flex items-center justify-center text-[#243747] hover:text-[#0f1922] transition-all"
             >
-              <X className="w-5 h-5"/>
+              <X className="w-4 h-4"/>
             </button>
-            <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-6">
-              <Smartphone className="w-6 h-6 text-blue-500" />
+            <div className="w-14 h-14 clay-circle-grey flex items-center justify-center mb-5 text-[#2c6574]">
+              <Smartphone className="w-7 h-7 text-[#2c6574]" />
             </div>
-            <h3 className="text-2xl font-light text-white mb-2">Identify / Sync</h3>
-            <p className="text-xs text-zinc-500 mb-8 leading-relaxed">
+            <h3 className="text-2xl font-extrabold embossed-title mb-2">Identify / Sync</h3>
+            <p className="text-xs text-[#2c445a] mb-6 leading-relaxed font-medium">
               Enter your phone number to link your generated short URLs. If you clear data or use a bot, entering this number will recover your history. No OTP needed.
             </p>
             
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-[10px] text-zinc-400 font-bold uppercase tracking-[0.1em]">Phone Number</label>
+                <label className="text-[10px] text-[#2c445a] font-extrabold uppercase tracking-[0.1em]">Phone Number</label>
                 <input 
                   type="text" 
                   placeholder="e.g. +1234567890" 
                   value={syncPhoneInput}
                   onChange={(e) => setSyncPhoneInput(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 focus:bg-white/10 transition-all font-mono"
+                  className="w-full clay-search-pill px-4 py-3 text-sm text-[#142535] font-mono font-bold focus:outline-none transition-all"
                 />
               </div>
 
@@ -1953,7 +1957,6 @@ create policy "Allow public delete access" on public.urls for delete using (true
                     localStorage.setItem('supashort_phone', cleaned);
                     setPhoneNumber(cleaned);
                     setShowSyncModal(false);
-                    // Slight delay before syncing to allow state update
                     setTimeout(syncHistory, 100);
                   } else {
                     localStorage.removeItem('supashort_phone');
@@ -1962,7 +1965,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                     setTimeout(syncHistory, 100);
                   }
                 }}
-                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.2)]"
+                className="w-full clay-teal-btn py-3.5 text-sm font-extrabold uppercase tracking-wider text-white shadow-lg"
               >
                 {syncPhoneInput.trim() ? "Save Identity" : "Clear Identity"}
               </button>
@@ -1972,29 +1975,29 @@ create policy "Allow public delete access" on public.urls for delete using (true
       )}
       {/* API Docs & Standalone Widget Builder Modal */}
       {showApiModal && (
-        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 min-h-screen">
-          <div className="bg-[#0A0A0A] border border-white/10 rounded-3xl p-8 w-full max-w-2xl relative shadow-2xl max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 z-50 bg-[#14212e]/75 backdrop-blur-md flex items-center justify-center p-4 min-h-screen">
+          <div className="clay-board p-6 md:p-8 w-full max-w-3xl relative max-h-[90vh] flex flex-col shadow-2xl text-[#162432]">
             <button 
               onClick={() => setShowApiModal(false)} 
-              className="absolute top-6 right-6 text-zinc-500 hover:text-white transition-colors"
+              className="absolute top-6 right-6 w-9 h-9 clay-circle-grey flex items-center justify-center text-[#243747] hover:text-[#0f1922] transition-all"
             >
-              <X className="w-5 h-5"/>
+              <X className="w-4 h-4"/>
             </button>
             <div className="w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center mb-6 shrink-0">
               <Code className="w-6 h-6 text-green-500" />
             </div>
-            <h3 className="text-2xl font-light text-white mb-2 shrink-0">Developer Integration</h3>
-            <p className="text-sm text-zinc-500 mb-6 shrink-0 leading-relaxed">
+            <h3 className="text-2xl font-extrabold embossed-title mb-2 shrink-0">Developer Integration</h3>
+            <p className="text-xs text-[#2c445a] font-medium mb-5 shrink-0 leading-relaxed">
               Use our API with any chat bot or build your custom layout to generate short links independently.
             </p>
 
             {/* Navigation Tabs */}
-            <div className="flex bg-white/5 p-1 rounded-xl mb-6 shrink-0 gap-1">
+            <div className="flex clay-recessed p-1.5 rounded-2xl mb-6 shrink-0 gap-2">
               <button 
                 onClick={() => setApiModalTab('json')}
                 className={cn(
-                  "flex-1 py-2 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all",
-                  apiModalTab === 'json' ? "bg-blue-600 text-white" : "text-zinc-400 hover:text-white"
+                  "flex-1 py-2 text-[10px] font-extrabold uppercase tracking-widest rounded-xl transition-all",
+                  apiModalTab === 'json' ? "clay-teal-btn text-white shadow-md" : "text-[#2d465a] hover:text-[#162736]"
                 )}
               >
                 JSON API Docs
@@ -2002,8 +2005,8 @@ create policy "Allow public delete access" on public.urls for delete using (true
               <button 
                 onClick={() => setApiModalTab('code')}
                 className={cn(
-                  "flex-1 py-2 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all",
-                  apiModalTab === 'code' ? "bg-blue-600 text-white" : "text-zinc-400 hover:text-white"
+                  "flex-1 py-2 text-[10px] font-extrabold uppercase tracking-widest rounded-xl transition-all",
+                  apiModalTab === 'code' ? "clay-teal-btn text-white shadow-md" : "text-[#2d465a] hover:text-[#162736]"
                 )}
               >
                 Bot / SDK Codes
@@ -2011,8 +2014,8 @@ create policy "Allow public delete access" on public.urls for delete using (true
               <button 
                 onClick={() => setApiModalTab('html')}
                 className={cn(
-                  "flex-1 py-2 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all",
-                  apiModalTab === 'html' ? "bg-emerald-600 text-white" : "text-zinc-400 hover:text-white"
+                  "flex-1 py-2 text-[10px] font-extrabold uppercase tracking-widest rounded-xl transition-all",
+                  apiModalTab === 'html' ? "clay-teal-btn text-white shadow-md" : "text-[#2d465a] hover:text-[#162736]"
                 )}
               >
                 Standalone HTML
@@ -2021,7 +2024,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
             
             {apiModalTab === 'json' ? (
               <>
-                <div className="flex-1 overflow-y-auto custom-scrollbar mb-6 bg-black/50 border border-white/5 rounded-xl p-4 font-mono text-[11px] text-zinc-400 space-y-4">
+                <div className="flex-1 overflow-y-auto custom-scrollbar clay-scroll mb-6 clay-recessed-dark rounded-2xl p-4 font-mono text-[11px] text-zinc-300 space-y-4 shadow-inner">
                   <div>
                     <span className="text-emerald-400 font-bold">1. CREATE SMART SHORTLINK (POST)</span>
                     <br/>
@@ -2094,7 +2097,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                     setApiDocsCopied(true);
                     setTimeout(() => setApiDocsCopied(false), 2000);
                   }}
-                  className="w-full shrink-0 flex items-center justify-center gap-2 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold uppercase tracking-widest text-xs py-3.5 rounded-xl transition-all border border-blue-500/20 mb-2"
+                  className="w-full shrink-0 flex items-center justify-center gap-2 clay-teal-btn text-white font-extrabold uppercase tracking-widest text-xs py-3.5 shadow-lg mb-2"
                 >
                   {apiDocsCopied ? (
                     <>
@@ -2112,12 +2115,12 @@ create policy "Allow public delete access" on public.urls for delete using (true
             ) : apiModalTab === 'code' ? (
               <>
                 {/* Horizontal Language Selector */}
-                <div className="flex bg-white/5 p-1 rounded-xl gap-1 shrink-0 overflow-x-auto scrollbar-none mb-4 border border-white/5">
+                <div className="flex clay-recessed p-1.5 rounded-2xl gap-1.5 shrink-0 overflow-x-auto scrollbar-none mb-4">
                   <button
                     onClick={() => { setCodeSnippetLang('node-bot'); setSnippetCopied(false); }}
                     className={cn(
-                      "flex-1 px-3 py-1.5 text-[10px] uppercase tracking-widest font-bold rounded-lg transition-all whitespace-nowrap",
-                      codeSnippetLang === 'node-bot' ? "bg-zinc-800 text-white border border-white/10" : "text-zinc-400 hover:text-white"
+                      "flex-1 px-3 py-1.5 text-[10px] uppercase tracking-widest font-extrabold rounded-xl transition-all whitespace-nowrap",
+                      codeSnippetLang === 'node-bot' ? "clay-badge-teal text-white shadow" : "text-[#2a455a] hover:text-[#142332]"
                     )}
                   >
                     🤖 Telegram JS Bot
@@ -2125,8 +2128,8 @@ create policy "Allow public delete access" on public.urls for delete using (true
                   <button
                     onClick={() => { setCodeSnippetLang('py-bot'); setSnippetCopied(false); }}
                     className={cn(
-                      "flex-1 px-3 py-1.5 text-[10px] uppercase tracking-widest font-bold rounded-lg transition-all whitespace-nowrap",
-                      codeSnippetLang === 'py-bot' ? "bg-zinc-800 text-white border border-white/10" : "text-zinc-400 hover:text-white"
+                      "flex-1 px-3 py-1.5 text-[10px] uppercase tracking-widest font-extrabold rounded-xl transition-all whitespace-nowrap",
+                      codeSnippetLang === 'py-bot' ? "clay-badge-teal text-white shadow" : "text-[#2a455a] hover:text-[#142332]"
                     )}
                   >
                     🐍 Python/TeleBot
@@ -2134,8 +2137,8 @@ create policy "Allow public delete access" on public.urls for delete using (true
                   <button
                     onClick={() => { setCodeSnippetLang('curl'); setSnippetCopied(false); }}
                     className={cn(
-                      "flex-1 px-3 py-1.5 text-[10px] uppercase tracking-widest font-bold rounded-lg transition-all whitespace-nowrap",
-                      codeSnippetLang === 'curl' ? "bg-zinc-800 text-white border border-white/10" : "text-zinc-400 hover:text-white"
+                      "flex-1 px-3 py-1.5 text-[10px] uppercase tracking-widest font-extrabold rounded-xl transition-all whitespace-nowrap",
+                      codeSnippetLang === 'curl' ? "clay-badge-teal text-white shadow" : "text-[#2a455a] hover:text-[#142332]"
                     )}
                   >
                     ⚡ cURL
@@ -2143,8 +2146,8 @@ create policy "Allow public delete access" on public.urls for delete using (true
                   <button
                     onClick={() => { setCodeSnippetLang('node-fetch'); setSnippetCopied(false); }}
                     className={cn(
-                      "flex-1 px-3 py-1.5 text-[10px] uppercase tracking-widest font-bold rounded-lg transition-all whitespace-nowrap",
-                      codeSnippetLang === 'node-fetch' ? "bg-zinc-800 text-white border border-white/10" : "text-zinc-400 hover:text-white"
+                      "flex-1 px-3 py-1.5 text-[10px] uppercase tracking-widest font-extrabold rounded-xl transition-all whitespace-nowrap",
+                      codeSnippetLang === 'node-fetch' ? "clay-badge-teal text-white shadow" : "text-[#2a455a] hover:text-[#142332]"
                     )}
                   >
                     🟢 Node Fetch
@@ -2152,8 +2155,8 @@ create policy "Allow public delete access" on public.urls for delete using (true
                   <button
                     onClick={() => { setCodeSnippetLang('py-requests'); setSnippetCopied(false); }}
                     className={cn(
-                      "flex-1 px-3 py-1.5 text-[10px] uppercase tracking-widest font-bold rounded-lg transition-all whitespace-nowrap",
-                      codeSnippetLang === 'py-requests' ? "bg-zinc-800 text-white border border-white/10" : "text-zinc-400 hover:text-white"
+                      "flex-1 px-3 py-1.5 text-[10px] uppercase tracking-widest font-extrabold rounded-xl transition-all whitespace-nowrap",
+                      codeSnippetLang === 'py-requests' ? "clay-badge-teal text-white shadow" : "text-[#2a455a] hover:text-[#142332]"
                     )}
                   >
                     💡 Py Requests
@@ -2903,11 +2906,11 @@ except Exception as error:
                         setApiHtmlCopied(true);
                         setTimeout(() => setApiHtmlCopied(false), 2000);
                       }}
-                      className="flex-1 flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-medium py-3 rounded-xl transition-all border border-white/5 active:scale-[0.99]"
+                      className="flex-1 flex items-center justify-center gap-2 clay-small-pill py-3 text-xs font-bold text-[#1f3749] transition-all"
                     >
                       {apiHtmlCopied ? (
                         <>
-                          <Check className="w-4 h-4 text-green-400"/>
+                          <Check className="w-4 h-4 text-emerald-700"/>
                           HTML Code Copied!
                         </>
                       ) : (
@@ -2930,7 +2933,7 @@ except Exception as error:
                         document.body.removeChild(a);
                         URL.revokeObjectURL(url);
                       }}
-                      className="flex-1 flex items-center justify-center gap-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 font-semibold py-3 rounded-xl transition-all border border-blue-500/20 shadow-[0_0_20px_rgba(37,99,235,0.1)] active:scale-[0.99]"
+                      className="flex-1 flex items-center justify-center gap-2 clay-teal-btn py-3 text-xs font-extrabold uppercase tracking-wider text-white shadow-lg transition-all"
                     >
                       <Download className="w-4 h-4" />
                       Download index.html

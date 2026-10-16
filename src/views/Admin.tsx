@@ -119,17 +119,17 @@ export default function Admin() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-6 flex-col">
+      <div className="min-h-screen bg-transparent flex items-center justify-center p-6 flex-col">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-sm bg-zinc-900 border border-zinc-800 rounded-3xl p-8 text-center"
+          className="w-full max-w-sm clay-board p-8 text-center shadow-2xl"
         >
-          <div className="bg-blue-500/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Shield className="w-10 h-10 text-blue-500" />
+          <div className="clay-circle-grey w-20 h-20 flex items-center justify-center mx-auto mb-6 text-[#2c6574]">
+            <Shield className="w-10 h-10 text-[#2c6574]" />
           </div>
-          <h1 className="text-2xl font-black text-white mb-2 uppercase tracking-tighter">System Access</h1>
-          <p className="text-zinc-500 text-xs mb-8">Unauthorized access is monitored and reported.</p>
+          <h1 className="text-2xl font-extrabold embossed-title mb-2 uppercase tracking-tighter">System Access</h1>
+          <p className="text-[#2c445a] font-medium text-xs mb-8">Unauthorized access is monitored and reported.</p>
           
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="relative">
@@ -138,12 +138,12 @@ export default function Admin() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="ENTER ACCESS KEY"
-                className="w-full bg-black border border-zinc-800 rounded-xl py-4 pl-12 pr-4 text-white text-xs font-mono focus:border-blue-500 outline-none transition-colors"
+                className="w-full clay-search-pill py-3.5 pl-12 pr-4 text-[#162736] text-xs font-mono font-bold focus:outline-none transition-colors"
                 autoFocus
               />
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#436279]" />
             </div>
-            <button className="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl text-white font-bold uppercase tracking-widest text-[10px] transition-all">
+            <button className="w-full clay-teal-btn py-3.5 text-white font-extrabold uppercase tracking-widest text-xs shadow-lg transition-all">
               Initialize Handshake
             </button>
           </form>
@@ -600,22 +600,22 @@ export function useMyDomainAnalytics() {
                 animate={{ opacity: 1 }} 
                 exit={{ opacity: 0 }}
                 onClick={() => setSelectedLink(null)}
-                className="absolute inset-0 bg-black/80 backdrop-blur-md"
+                className="absolute inset-0 bg-[#14212e]/75 backdrop-blur-md"
               />
               <motion.div 
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="w-full max-w-6xl h-full md:h-auto md:max-h-[95vh] bg-zinc-950 border-0 md:border md:border-zinc-800 rounded-none md:rounded-[40px] shadow-2xl overflow-hidden flex flex-col relative z-50"
+                className="w-full max-w-6xl h-full md:h-auto md:max-h-[92vh] clay-board rounded-[36px] shadow-2xl overflow-hidden flex flex-col relative z-50 text-[#162432]"
               >
-                <div className="p-4 md:p-8 border-b border-zinc-900 bg-zinc-900/40 sticky top-0 z-[60] backdrop-blur-md">
+                <div className="p-4 md:p-6 border-b border-white/20 sticky top-0 z-[60] backdrop-blur-md">
                   <div className="flex items-center justify-between mb-0 md:mb-2">
                     <div className="flex items-center gap-3">
                       <div className="bg-blue-600 p-2.5 rounded-xl shadow-lg shadow-blue-500/20">
                         <BarChart3 className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-sm md:text-xl font-black uppercase tracking-tighter leading-tight">Intelligence Dashboard</h2>
+                        <h2 className="text-sm md:text-xl font-extrabold embossed-title uppercase tracking-tighter leading-tight">Intelligence Dashboard</h2>
                         <div className="flex items-center gap-2 mt-0.5">
                           <span className="text-[7px] md:text-xs text-blue-500 font-black uppercase tracking-widest leading-none">Real-time Stream</span>
                           <span className="text-[7px] md:text-xs font-mono text-zinc-500 py-0.5 px-1.5 bg-zinc-900 rounded border border-white/5 tracking-tighter self-center">/{selectedLink.short_code}</span>
@@ -624,7 +624,7 @@ export function useMyDomainAnalytics() {
                     </div>
                     <button 
                       onClick={() => setSelectedLink(null)}
-                      className="p-2.5 bg-zinc-900/50 hover:bg-zinc-800 rounded-xl transition-all text-zinc-500 active:scale-95 border border-white/5"
+                      className="w-10 h-10 clay-circle-grey flex items-center justify-center text-[#243747] hover:text-[#0f1922] transition-all"
                     >
                       <X className="w-5 h-5 md:w-6 h-6" />
                     </button>
@@ -924,7 +924,7 @@ export function useMyDomainAnalytics() {
                 animate={{ opacity: 1 }} 
                 exit={{ opacity: 0 }}
                 onClick={() => setSelectedImage(null)}
-                className="absolute inset-0 bg-black/95 backdrop-blur-xl"
+                className="absolute inset-0 bg-[#0d1722]/90 backdrop-blur-xl"
               />
               <motion.div 
                 initial={{ opacity: 0, scale: 0.9 }}

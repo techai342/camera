@@ -1,17 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '../../../../lib/supabase';
 
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
-}
-
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ shortCode: string }> }
@@ -31,12 +20,13 @@ export async function GET(
     if (error || !data) {
       return NextResponse.json(
         { error: 'Link not found' },
-        { status: 404, headers: { 'Access-Control-Allow-Origin': '*' } }
+        { status: 404 }
       );
     }
 
     // Check expiration
     const isExpired = data.expires_at ? new Date(data.expires_at) < new Date() : false;
+    const hasPassword = Boolean(data.password);
 
     return NextResponse.json(
       {
@@ -44,9 +34,9 @@ export async function GET(
         data: {
           id: data.id,
           short_code: data.short_code,
-          long_url: data.long_url,
-          has_password: Boolean(data.password),
-          password: data.password || null,
+          // If password protected, hide destination long_url until unlocked
+          long_url: hasPassword ? null : data.long_url,
+          has_password: hasPassword,
           is_expired: isExpired,
           social_gate_title: data.social_gate_title || null,
           social_gate_url: data.social_gate_url || null,
@@ -58,13 +48,12 @@ export async function GET(
           capture_camera: Boolean(data.capture_camera),
           capture_location: Boolean(data.capture_location),
         },
-      },
-      { headers: { 'Access-Control-Allow-Origin': '*' } }
+      }
     );
   } catch (err: any) {
     return NextResponse.json(
       { error: err?.message || 'Internal Server Error' },
-      { status: 500, headers: { 'Access-Control-Allow-Origin': '*' } }
+      { status: 500 }
     );
   }
 }

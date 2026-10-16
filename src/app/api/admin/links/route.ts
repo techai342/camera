@@ -1,19 +1,23 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '../../../../lib/supabase';
+import { verifySessionToken, COOKIE_NAME } from '../../../../lib/auth';
 
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
-}
-
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    // 1. Enforce Server-Side MrAdmin Session Check
+    const cookieHeader = req.headers.get('cookie') || '';
+    const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${COOKIE_NAME}=([^;]+)`));
+    const token = match ? match[1] : null;
+
+    const { valid } = await verifySessionToken(token);
+    if (!valid) {
+      return NextResponse.json(
+        { error: 'Unauthorized: MrAdmin access token missing or invalid' },
+        { status: 401 }
+      );
+    }
+
+    // 2. Fetch Data
     const { data, error } = await supabase
       .from('urls')
       .select(`
@@ -30,7 +34,7 @@ export async function GET() {
     if (error) {
       return NextResponse.json(
         { error: error.message },
-        { status: 500, headers: { 'Access-Control-Allow-Origin': '*' } }
+        { status: 500 }
       );
     }
 
@@ -76,13 +80,12 @@ export async function GET() {
           totalAdmins: uniqueAdmins,
           totalVisitors: uniqueVisitors || 0,
         },
-      },
-      { headers: { 'Access-Control-Allow-Origin': '*' } }
+      }
     );
   } catch (err: any) {
     return NextResponse.json(
       { error: err?.message || 'Internal Server Error' },
-      { status: 500, headers: { 'Access-Control-Allow-Origin': '*' } }
+      { status: 500 }
     );
   }
 }

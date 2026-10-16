@@ -128,8 +128,8 @@ export default function Admin() {
           <div className="clay-circle-grey w-20 h-20 flex items-center justify-center mx-auto mb-6 text-[#2c6574]">
             <Shield className="w-10 h-10 text-[#2c6574]" />
           </div>
-          <h1 className="text-2xl font-extrabold embossed-title mb-2 uppercase tracking-tighter">System Access</h1>
-          <p className="text-[#2c445a] font-medium text-xs mb-8">Unauthorized access is monitored and reported.</p>
+          <h1 className="text-2xl font-extrabold embossed-title mb-1 uppercase tracking-tighter">MrAdmin Access</h1>
+          <p className="text-[#2c445a] font-medium text-xs mb-8">Protected Admin Terminal • Authorized Personnel Only</p>
           
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="relative">
@@ -137,7 +137,7 @@ export default function Admin() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="ENTER ACCESS KEY"
+                placeholder="ENTER MRADMIN ACCESS KEY"
                 className="w-full clay-search-pill py-3.5 pl-12 pr-4 text-[#162736] text-xs font-mono font-bold focus:outline-none transition-colors"
                 autoFocus
               />
@@ -320,10 +320,10 @@ export function useMyDomainAnalytics() {
               </button>
               <div className="flex flex-col md:flex-row md:items-center gap-0 md:gap-2">
                 <div className="flex items-center gap-2">
-                  <Database className="w-4 h-4 text-blue-500" />
-                  <h1 className="text-sm md:text-lg font-black uppercase tracking-tighter">SuperAdmin</h1>
+                  <Database className="w-4 h-4 text-teal-400" />
+                  <h1 className="text-sm md:text-lg font-black uppercase tracking-tighter bg-gradient-to-r from-teal-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">MrAdmin</h1>
                 </div>
-                <span className="text-[10px] md:text-sm text-zinc-600 font-bold uppercase hidden md:inline">• PANEL</span>
+                <span className="text-[10px] md:text-sm text-zinc-500 font-bold uppercase hidden md:inline">• CONSOLE</span>
               </div>
             </div>
             <RefreshCw 

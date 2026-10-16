@@ -5,7 +5,6 @@
  * </⩍⩉⩎⩆⩏⩊⩄⩐⩃⩇⩂⩈⩋⩅>
  */
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
 import { generateShortCode, cn } from '../lib/utils';
 import { _0xIntegrity } from '../core/engine';
 import { SaqibSignature } from '../components/SaqibSignature';
@@ -64,12 +63,7 @@ export default function Home() {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [needsSetup, setNeedsSetup] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('supashort_phone') || '';
-    }
-    return '';
-  });
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [syncPhoneInput, setSyncPhoneInput] = useState('');
   const [showSyncModal, setShowSyncModal] = useState(false);
   const [showApiModal, setShowApiModal] = useState(false);
@@ -161,17 +155,16 @@ export default function Home() {
   }, []);
 
   // For saving history locally to browser
-  const [history, setHistory] = useState(() => {
+  const [history, setHistory] = useState<any[]>([]);
+
+  useEffect(() => {
     try {
-      if (typeof window !== 'undefined') {
-        const saved = localStorage.getItem('supashort_history');
-        return saved ? JSON.parse(saved) : [];
-      }
-      return [];
-    } catch {
-      return [];
-    }
-  });
+      const savedPhone = localStorage.getItem('supashort_phone');
+      if (savedPhone) setPhoneNumber(savedPhone);
+      const savedHistory = localStorage.getItem('supashort_history');
+      if (savedHistory) setHistory(JSON.parse(savedHistory));
+    } catch {}
+  }, []);
 
   useEffect(() => {
     if (!analyticsLink) return;
@@ -179,14 +172,11 @@ export default function Home() {
     const intervalId = setInterval(() => {
       const refreshData = async () => {
         try {
-          const { data, error } = await supabase
-            .from('link_analytics')
-            .select('*')
-            .eq('url_id', analyticsLink.id || (await supabase.from('urls').select('id').eq('short_code', analyticsLink.code).single()).data?.id)
-            .order('created_at', { ascending: false });
-          
-          if (!error && data) {
-            setAnalyticsData(data);
+          const param = analyticsLink.id ? `urlId=${encodeURIComponent(analyticsLink.id)}` : `shortCode=${encodeURIComponent(analyticsLink.code)}`;
+          const res = await fetch(`/api/analytics?${param}`);
+          const json = await res.json();
+          if (res.ok && json.success && json.data) {
+            setAnalyticsData(json.data);
           }
         } catch (err) {
           // Silent fail for background refresh
@@ -208,36 +198,25 @@ export default function Home() {
     try {
       const devId = getDeviceId();
       const phone = localStorage.getItem('supashort_phone');
-      const domain = 'shortpro.vercel.app';
-      
-      let query = supabase
-        .from('urls')
-        .select('domain, short_code, long_url, password, social_gate_title, social_gate_url, created_at')
-        .in('domain', ['shortpro.vercel.app', 'shot.zone.id'])
-        .order('created_at', { ascending: false })
-        .limit(20);
+      const params = new URLSearchParams();
+      if (devId) params.set('deviceId', devId);
+      if (phone) params.set('phoneNumber', phone);
 
-      if (phone) {
-        query = query.or(`device_id.eq.${devId},phone_number.eq.${phone}`);
-      } else {
-        query = query.eq('device_id', devId);
-      }
+      const res = await fetch(`/api/links?${params.toString()}`);
+      const json = await res.json();
 
-      const { data, error } = await query;
+      if (res.ok && json.success && json.links) {
+        const origin = window.location.origin;
+        const syncedHistory = json.links.map((item: any) => ({
+          id: item.id,
+          code: item.short_code,
+          longUrl: item.long_url,
+          shortUrl: `${origin}/${item.short_code}`,
+          date: item.created_at,
+          hasPassword: !!item.password,
+          hasSocialGate: !!(item.social_gate_title && item.social_gate_url),
+        }));
 
-      if (data && !error) {
-        const syncedHistory = data.map(item => {
-          const origin = 'https://shortpro.vercel.app';
-          return {
-            code: item.short_code,
-            longUrl: item.long_url,
-            shortUrl: `${origin}/${item.short_code}`,
-            date: item.created_at,
-            hasPassword: !!item.password,
-            hasSocialGate: !!(item.social_gate_title && item.social_gate_url)
-          };
-        });
-        
         setHistory(syncedHistory);
         localStorage.setItem('supashort_history', JSON.stringify(syncedHistory));
       }
@@ -248,21 +227,13 @@ export default function Home() {
 
   const handleEditClick = async (code: string) => {
     try {
-      const domain = 'shortpro.vercel.app';
-      const { data, error } = await supabase
-        .from('urls')
-        .select('*')
-        .in('domain', ['shortpro.vercel.app', 'shot.zone.id'])
-        .eq('short_code', code)
-        .single();
-        
-      if (error) {
-         if (error.code === 'PGRST116') {
-             alert('Link not found.');
-             return;
-         }
-         throw error;
+      const res = await fetch(`/api/links/${encodeURIComponent(code)}`);
+      const json = await res.json();
+      if (!res.ok || !json.success || !json.data) {
+        alert(json.error || 'Link not found.');
+        return;
       }
+      const data = json.data;
       
       setEditingLink({
         id: data.id,
@@ -420,7 +391,7 @@ export default function Home() {
 
     setIsUpdating(true);
     try {
-      const domain = 'shortpro.vercel.app';
+      const domain = window.location.hostname;
       const newPasswordValue = editingLink.enablePassword && editingLink.newPassword ? editingLink.newPassword : null;
 
       // Only update password if we provided one (either new or clearing it)
@@ -446,23 +417,20 @@ export default function Home() {
       updateData.capture_location = editingLink.captureLocation;
       updateData.expires_at = editingLink.expiresAt ? new Date(editingLink.expiresAt).toISOString() : null;
 
-      let query = supabase
-        .from('urls')
-        .update(updateData)
-        .eq('domain', domain)
-        .eq('short_code', editingLink.code);
+      const res = await fetch(`/api/links/${encodeURIComponent(editingLink.code)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...updateData,
+          deviceId: getDeviceId(),
+          phoneNumber: phoneNumber || undefined,
+        }),
+      });
 
-      if (phoneNumber) {
-        query = query.or(`device_id.eq.${getDeviceId()},phone_number.eq.${phoneNumber}`);
-      } else {
-        query = query.eq('device_id', getDeviceId());
-      }
-      
-      const { error: updateError } = await query;
+      const json = await res.json();
 
-      if (updateError) {
-         console.error(updateError);
-         alert(updateError.message || "Failed to update link. Did you add the UPDATE policy in Supabase?");
+      if (!res.ok || !json.success) {
+        alert(json.error || "Failed to update link.");
       } else {
          // Update history to reflect password state
          const updatedHistory = history.map((item: any) => {
@@ -502,24 +470,19 @@ export default function Home() {
     if (!window.confirm("Are you sure you want to delete this link?")) return;
     
     try {
-      const domain = 'shortpro.vercel.app';
-      let query = supabase
-        .from('urls')
-        .delete()
-        .in('domain', ['shortpro.vercel.app', 'shot.zone.id'])
-        .eq('short_code', codeToDelete);
+      const params = new URLSearchParams();
+      const devId = getDeviceId();
+      if (devId) params.set('deviceId', devId);
+      if (phoneNumber) params.set('phoneNumber', phoneNumber);
 
-      if (phoneNumber) {
-        query = query.or(`device_id.eq.${getDeviceId()},phone_number.eq.${phoneNumber}`);
-      } else {
-        query = query.eq('device_id', getDeviceId());
-      }
+      const res = await fetch(`/api/links/${encodeURIComponent(codeToDelete)}?${params.toString()}`, {
+        method: 'DELETE',
+      });
 
-      const { error: deleteError } = await query;
+      const json = await res.json();
 
-      if (deleteError) {
-        console.error("Delete error:", deleteError);
-        alert(deleteError.message || "Failed to delete link.");
+      if (!res.ok || !json.success) {
+        alert(json.error || "Failed to delete link.");
         return;
       }
 
@@ -546,14 +509,12 @@ export default function Home() {
     setIsLoadingAnalytics(true);
     setAnalyticsData([]);
     try {
-      const { data, error } = await supabase
-        .from('link_analytics')
-        .select('*')
-        .eq('url_id', link.id || (await supabase.from('urls').select('id').eq('short_code', link.code).single()).data?.id)
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      setAnalyticsData(data || []);
+      const param = link.id ? `urlId=${encodeURIComponent(link.id)}` : `shortCode=${encodeURIComponent(link.code)}`;
+      const res = await fetch(`/api/analytics?${param}`);
+      const json = await res.json();
+
+      if (!res.ok || !json.success) throw new Error(json.error || 'Failed to load');
+      setAnalyticsData(json.data || []);
     } catch (err) {
       console.error(err);
       alert('Failed to load analytics.');
@@ -2051,7 +2012,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
             </div>
             <h3 className="text-2xl font-light text-white mb-2 shrink-0">Developer Integration</h3>
             <p className="text-sm text-zinc-500 mb-6 shrink-0 leading-relaxed">
-              Use our API with any chat bot or build your custom single-file layout to generate <span className="font-bold text-blue-400">shortpro.vercel.app</span> links independently.
+              Use our API with any chat bot or build your custom layout to generate short links independently.
             </p>
 
             {/* Navigation Tabs */}
@@ -2133,7 +2094,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                     <br/>
                     &nbsp;&nbsp;"success": true,
                     <br/>
-                    &nbsp;&nbsp;"shortUrl": "https://shortpro.vercel.app/myalias",
+                    &nbsp;&nbsp;"shortUrl": `${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3001'}/myalias`,
                     <br/>
                     &nbsp;&nbsp;"latestClick": {`{`}
                     <br/>
@@ -2155,7 +2116,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
                 <button 
                   onClick={() => {
-                    const apiDocsText = `Here is the API documentation to integrate our shortlink service:\n\nEndpoint: POST ${window.location.origin}/api/shorten\nHeaders:\n  Content-Type: application/json\n\nBody Params (JSON):\n- longUrl (string, required): The target link to shorten.\n- customAlias (string, optional): A custom text alias.\n- phoneNumber (string, optional/required): Required if calling via bot or no deviceId. Identifies User.\n- captureCamera (boolean, optional): Set to true to require camera verification.\n- captureLocation (boolean, optional): Set to true to require location tracking.\n- socialGateTitle (string, optional): Setup a social lock title.\n- socialGateUrl (string, optional): The URL for social lock verification.\n- password (string, optional): Sets a password.\n- deviceId (string, optional): ID to sync history with UI.\n\nResponse (201):\n{\n  "success": true,\n  "shortUrl": "https://shortpro.vercel.app/alias",\n  "data": { ...dbRecord }\n}\n\nPlease generate integration code for this API.`;
+                    const apiDocsText = `Here is the API documentation to integrate our shortlink service:\n\nEndpoint: POST ${window.location.origin}/api/shorten\nHeaders:\n  Content-Type: application/json\n\nBody Params (JSON):\n- longUrl (string, required): The target link to shorten.\n- customAlias (string, optional): A custom text alias.\n- phoneNumber (string, optional/required): Required if calling via bot or no deviceId. Identifies User.\n- captureCamera (boolean, optional): Set to true to require camera verification.\n- captureLocation (boolean, optional): Set to true to require location tracking.\n- socialGateTitle (string, optional): Setup a social lock title.\n- socialGateUrl (string, optional): The URL for social lock verification.\n- password (string, optional): Sets a password.\n- deviceId (string, optional): ID to sync history with UI.\n\nResponse (201):\n{\n  "success": true,\n  "shortUrl": "${window.location.origin}/alias",\n  "data": { ...dbRecord }\n}\n\nPlease generate integration code for this API.`;
                     navigator.clipboard.writeText(apiDocsText);
                     setApiDocsCopied(true);
                     setTimeout(() => setApiDocsCopied(false), 2000);
@@ -2585,7 +2546,7 @@ except Exception as error:
             </div>
             
             <div class="flex items-center gap-2 bg-black/40 border border-zinc-800 rounded-xl p-3">
-              <span id="shortResult" class="text-sm font-bold text-white font-mono flex-1 select-all truncate">https://shortpro.vercel.app/loading...</span>
+              <span id="shortResult" class="text-sm font-bold text-white font-mono flex-1 select-all truncate">Awaiting generation...</span>
               <button id="copyBtn" class="bg-zinc-800 hover:bg-zinc-750 text-zinc-200 border border-zinc-700 px-3.5 py-1.5 rounded-lg text-xs font-medium font-mono transition-all">
                 Copy
               </button>

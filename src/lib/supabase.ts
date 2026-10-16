@@ -53,4 +53,11 @@ export function resolveSupabaseCredentials() {
 
 const { url: supabaseUrl, key: supabaseAnonKey } = resolveSupabaseCredentials();
 
-export const supabase: SupabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase: SupabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false,
+    detectSessionInUrl: false,
+  },
+});
+

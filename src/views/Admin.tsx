@@ -5,7 +5,6 @@
  * </⩍⩉⩎⩆⩏⩊⩄⩐⩃⩇⩂⩈⩋⩅>
  */
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
 import { SaqibSignature } from '../components/SaqibSignature';
 import { 
   Database, Shield, Lock, Search, ExternalLink, BarChart3, 
@@ -42,61 +41,14 @@ export default function Admin() {
   const fetchGlobalData = async () => {
     setLoading(true);
     try {
-      // Fetch URLs with counts
-      const { data, error } = await supabase
-        .from('urls')
-        .select(`
-          *,
-          link_analytics (
-            id,
-            captured_image,
-            location_name,
-            latitude
-          )
-        `)
-        .order('created_at', { ascending: false });
+      const res = await fetch('/api/admin/links');
+      const json = await res.json();
 
-      // Fetch Global Total Clicks
-      const { count: globalClicksCount } = await supabase
-        .from('link_analytics')
-        .select('*', { count: 'exact', head: true });
-
-      if (data && !error) {
-        const processedLinks = data.map(link => {
-          const analytics = link.link_analytics || [];
-          return {
-            ...link,
-            clicks: analytics.length,
-            image_count: analytics.filter((a: any) => a.captured_image).length,
-            location_count: analytics.filter((a: any) => a.location_name).length,
-            geo_count: analytics.filter((a: any) => a.latitude).length
-          };
-        }).sort((a, b) => {
-          // Sort by Pinned status first, then by date
-          if (a.is_pinned && !b.is_pinned) return -1;
-          if (!a.is_pinned && b.is_pinned) return 1;
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-        });
-
-        // Calculate Unique Visitors (based on IP in analytics)
-        // We'll fetch IP addresses separately as they are not in the above select to save bandwidth on big lists
-        const { data: visitorData } = await supabase
-          .from('link_analytics')
-          .select('ip_address');
-        
-        const uniqueVisitors = visitorData ? new Set(visitorData.map(v => (v as any).ip_address).filter(Boolean)).size : 0;
-
-        // Calculate Unique Admins (Device IDs that created links)
-        const uniqueAdmins = new Set(data.map(l => l.device_id)).size;
-
-        setLinks(processedLinks);
-        const sumClicks = processedLinks.reduce((acc, curr) => acc + (curr.clicks || 0), 0);
-        setStats({ 
-          totalLinks: processedLinks.length, 
-          totalClicks: globalClicksCount || sumClicks,
-          totalAdmins: uniqueAdmins,
-          totalVisitors: uniqueVisitors || 0
-        });
+      if (res.ok && json.success) {
+        setLinks(json.links || []);
+        if (json.stats) {
+          setStats(json.stats);
+        }
       }
     } catch (e) {
       console.error(e);
@@ -115,16 +67,15 @@ export default function Admin() {
         });
       setLinks(updatedLinks);
 
-      const { error } = await supabase
-        .from('urls')
-        .update({ is_pinned: !currentStatus })
-        .eq('id', id);
+      const res = await fetch(`/api/admin/links/${encodeURIComponent(id)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_pinned: !currentStatus }),
+      });
       
-      if (error) {
-        console.error("Pin update failed:", error);
-        // Rollback on error
-        const { data } = await supabase.from('urls').select('*').order('created_at', { ascending: false });
-        if (data) fetchGlobalData();
+      if (!res.ok) {
+        console.error("Pin update failed");
+        fetchGlobalData();
       }
     } catch (e) {
       console.error("Pin failed", e);
@@ -135,14 +86,11 @@ export default function Admin() {
     setSelectedLink(link);
     setIsLoadingAnalytics(true);
     try {
-      const { data, error } = await supabase
-        .from('link_analytics')
-        .select('*')
-        .eq('url_id', link.id)
-        .order('created_at', { ascending: false });
+      const res = await fetch(`/api/analytics?urlId=${encodeURIComponent(link.id)}`);
+      const json = await res.json();
       
-      if (data && !error) {
-        setAnalytics(data);
+      if (res.ok && json.success && json.data) {
+        setAnalytics(json.data);
       }
     } catch (e) {
       console.error(e);
@@ -155,10 +103,15 @@ export default function Admin() {
     if (!confirm('Are you sure you want to delete this link and all its analytics?')) return;
     
     try {
-      await supabase.from('link_analytics').delete().eq('url_id', id);
-      await supabase.from('urls').delete().eq('id', id);
-      setLinks(links.filter(l => l.id !== id));
-      if (selectedLink?.id === id) setSelectedLink(null);
+      const res = await fetch(`/api/admin/links/${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        setLinks(links.filter(l => l.id !== id));
+        if (selectedLink?.id === id) setSelectedLink(null);
+      } else {
+        alert('Delete failed');
+      }
     } catch (e) {
       alert('Delete failed');
     }

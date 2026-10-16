@@ -645,824 +645,772 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#EDEDED] font-sans flex flex-col overflow-hidden">
-      {/* Top Navigation Bar */}
-      <nav className="h-16 border-b border-white/10 flex items-center justify-between px-4 md:px-8 bg-[#0F0F0F] shrink-0">
-        <div className="flex items-center gap-2 md:gap-3">
-          <div className="w-8 h-8 rounded flex items-center justify-center overflow-hidden shrink-0">
-            <img 
-              src="https://ik.imagekit.io/19imy4f1u/lite_1777560977588_frMe1_REC.png" 
-              className="w-full h-full object-cover"
-              alt="Logo"
-              referrerPolicy="no-referrer"
-            />
-          </div>
-          <span className="text-base md:text-lg font-semibold tracking-tight flex items-baseline gap-2">
-            <div>Shorty<span className="text-blue-500 underline decoration-2 underline-offset-4">OS</span></div>
-            <SaqibSignature />
-            <a 
-              href="https://www.whatsapp.com/channel/0029VbBTSK1EquiWrUt5uV1I"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-full border border-emerald-500/20 text-[9px] font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-[0_0_10px_rgba(16,185,129,0.1)] group"
-            >
-              <div className="w-3 h-3 bg-emerald-500 rounded-full flex items-center justify-center p-0.5 group-hover:animate-pulse">
-                <svg viewBox="0 0 24 24" fill="white" className="w-full h-full">
-                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.72.94 3.659 1.437 5.63 1.438h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                </svg>
-              </div>
-              Join Channel
-            </a>
-          </span>
-        </div>
-        <div className="flex items-center gap-3 md:gap-6">
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
-            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
-            <span className="text-[11px] text-emerald-400 font-medium uppercase tracking-wider">Supabase Connected</span>
-          </div>
-          {!isInstalled && (
-            <button 
-              type="button"
-              className={cn(
-                "text-xs font-medium px-3 py-1.5 border rounded-md transition-colors flex items-center gap-2",
-                deferredPrompt 
-                  ? "bg-blue-600 border-blue-500 text-white hover:bg-blue-700" 
-                  : "bg-white/5 border-white/10 text-zinc-400 hover:bg-white/10"
-              )}
-              onClick={async () => {
-                if (deferredPrompt) {
-                  deferredPrompt.prompt();
-                  const { outcome } = await deferredPrompt.userChoice;
-                  if (outcome === 'accepted') {
-                    setDeferredPrompt(null);
-                  }
-                } else {
-                  // If no prompt, it might be because we are in an iframe (AI Studio preview)
-                  if (window.self !== window.top) {
-                    if (confirm("Browser installation prompts often don't work inside iframes. Open app in a new tab to see the 'Install' option?")) {
-                      window.open(window.location.href, '_blank');
-                    }
-                  } else {
-                    alert("Install option not yet available. Please try again after using the app for a moment or check your browser menu.");
-                  }
-                }
-              }}
-            >
-              <Download className={cn("w-3.5 h-3.5", deferredPrompt && "animate-bounce")} />
-              <span className="hidden sm:inline">
-                {deferredPrompt ? "Install Now" : "Install App"}
-              </span>
-            </button>
-          )}
-          <div className="w-8 h-8 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center overflow-hidden shrink-0">
-             <svg className="w-5 h-5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen clay-noise py-3 sm:py-6 px-2 sm:px-4 md:px-6 flex items-center justify-center font-sans">
+      {/* MAIN 3D CLAY BOARD CONTAINER */}
+      <div className="clay-board w-full max-w-[1400px] p-3.5 sm:p-5 lg:p-6 flex flex-col lg:flex-row gap-5 relative">
 
-      <div className="flex flex-1 overflow-hidden flex-col md:flex-row mb-16 md:mb-0">
-        {/* Sidebar: Analytics/Recent */}
+        {/* ==================== LEFT CLAY SIDEBAR ==================== */}
         <aside className={cn(
-          "w-full md:w-80 border-r border-white/10 bg-[#0F0F0F] flex flex-col shrink-0 md:h-auto border-b md:border-b-0 order-last md:order-first relative",
-          mobileTab === 'recent' ? "flex flex-1" : "hidden md:flex"
+          "clay-sidebar w-full lg:w-[270px] shrink-0 p-5 flex flex-col justify-between",
+          mobileTab === 'recent' ? "flex" : "hidden lg:flex"
         )}>
-          <div className="p-6 flex-1 overflow-y-auto custom-scrollbar group/sidebar relative">
-            <div className="flex items-center justify-between mb-4 sticky top-0 bg-[#0F0F0F] z-10 pb-2">
-              <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-[0.2em]">Recent Short Links</h2>
-              <div className="flex items-center gap-3">
-                <button 
-                  onClick={() => setShowApiModal(true)} 
-                  className="text-[10px] text-zinc-500 hover:text-green-400 transition-colors uppercase tracking-widest font-bold flex items-center gap-1"
-                >
-                  <Code className="w-3 h-3" />
-                  API
-                </button>
-                <button 
-                  onClick={() => setShowSyncModal(true)} 
-                  className={cn("text-[10px] transition-colors uppercase tracking-widest font-bold", phoneNumber ? "text-blue-400 hover:text-blue-300" : "text-zinc-500 hover:text-blue-400")}
-                >
-                  {phoneNumber ? 'Synced' : 'Sync'}
-                </button>
-                {history.length > 0 && (
-                  <button onClick={clearHistory} className="text-[10px] text-zinc-500 hover:text-red-400 transition-colors uppercase tracking-widest font-bold">Clear</button>
+          <div>
+            {/* Avatar / Branding Clay Ring */}
+            <div className="flex flex-col items-center pt-1 pb-4">
+              <div className="avatar-clay-ring w-24 h-24 relative group cursor-pointer" title="Muhammad Saqib — Saqib Visuals">
+                <div className="w-full h-full rounded-full overflow-hidden bg-[#1f3144] shadow-inner flex items-center justify-center">
+                  <img 
+                    src="https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png" 
+                    alt="Muhammad Saqib"
+                    className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+                <span className="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-emerald-400 border-[2.5px] border-[#1f3144] shadow-md flex items-center justify-center">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+                </span>
+              </div>
+
+              <div className="mt-3 text-center">
+                <h2 className="text-[17.5px] font-extrabold text-[#eef5fa] tracking-tight flex items-center justify-center gap-1.5">
+                  <span>ShortyOS</span>
+                  <Check className="w-4 h-4 text-[#62c3d4]" />
+                </h2>
+                <div className="inline-flex items-center gap-1.5 mt-1 px-3 py-0.5 rounded-full bg-white/10 border border-white/15 text-[#c6daea] text-[11px] font-bold">
+                  <span>✨ Saqib Visuals</span>
+                  <span className="text-[#7bd3e2]">• 3D Clay</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Sidebar Navigation Menu */}
+            <nav className="space-y-2 mt-1">
+              <button
+                onClick={() => setMobileTab('create')}
+                className={cn(
+                  "w-full flex items-center gap-3.5 px-4 py-2.5 text-[14px] font-bold transition-all",
+                  mobileTab === 'create' ? "nav-pill-active" : "nav-pill-inactive"
+                )}
+              >
+                <Link2 className="w-5 h-5 shrink-0" />
+                <span>Shorten Link</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setMobileTab('analytics');
+                  if (!analyticsLink && history.length > 0) fetchAnalytics(history[0]);
+                }}
+                className={cn(
+                  "w-full flex items-center gap-3.5 px-4 py-2.5 text-[14px] font-bold transition-all",
+                  mobileTab === 'analytics' ? "nav-pill-active" : "nav-pill-inactive"
+                )}
+              >
+                <BarChart3 className="w-5 h-5 shrink-0" />
+                <span>Live Analytics</span>
+              </button>
+
+              <button
+                onClick={() => setMobileTab('media')}
+                className={cn(
+                  "w-full flex items-center gap-3.5 px-4 py-2.5 text-[14px] font-bold transition-all",
+                  mobileTab === 'media' ? "nav-pill-active" : "nav-pill-inactive"
+                )}
+              >
+                <Camera className="w-5 h-5 shrink-0" />
+                <span>Media Studio</span>
+              </button>
+
+              <button
+                onClick={() => setShowApiModal(true)}
+                className="nav-pill-inactive w-full flex items-center gap-3.5 px-4 py-2.5 text-[14px] font-bold"
+              >
+                <Code className="w-5 h-5 shrink-0" />
+                <span>Live API Hub</span>
+              </button>
+            </nav>
+
+            {/* Recent Short Links List in Sidebar */}
+            <div className="mt-5 pt-4 border-t border-white/10">
+              <div className="flex items-center justify-between mb-2.5">
+                <span className="text-[11px] font-extrabold text-[#b3c7d8] uppercase tracking-wider">Recent Links</span>
+                <div className="flex items-center gap-1.5">
+                  {history.length > 0 && (
+                    <button onClick={clearHistory} className="text-[10px] text-zinc-400 hover:text-red-400 font-bold uppercase transition-colors">
+                      Clear
+                    </button>
+                  )}
+                  <span className="clay-small-pill px-2 py-0.5 text-[10px] font-mono-code font-bold text-[#142331]">{history.length}</span>
+                </div>
+              </div>
+
+              <div className="space-y-2 max-h-44 overflow-y-auto clay-scroll pr-1">
+                {history.slice(0, 6).map((item: any) => (
+                  <div key={item.code} className="clay-recessed-dark p-2.5 rounded-xl text-left transition-all hover:bg-white/[0.04]">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-[#7bd3e2] font-mono">/{item.code}</span>
+                      <div className="flex items-center gap-1.5">
+                        <button onClick={() => fetchAnalytics(item)} className="text-zinc-400 hover:text-[#7bd3e2]" title="Analytics">
+                          <BarChart3 className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => copyToClipboard(item.shortUrl)} className="text-zinc-400 hover:text-white" title="Copy">
+                          <Copy className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => handleEditClick(item.code)} className="text-zinc-400 hover:text-blue-400" title="Edit">
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => handleDeleteLink(item.code)} className="text-zinc-400 hover:text-red-400" title="Delete">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-zinc-400 truncate mt-0.5">{item.longUrl}</p>
+                  </div>
+                ))}
+                {history.length === 0 && (
+                  <p className="text-[11px] text-zinc-400 italic">No links generated yet</p>
                 )}
               </div>
             </div>
-            
-            {/* Scroll indicators for mobile */}
-            <div className="md:hidden absolute bottom-2 left-1/2 -translate-x-1/2 pointer-events-none z-20 animate-bounce">
-              <ChevronDown className="w-4 h-4 text-zinc-600 opacity-50" />
-            </div>
-            <div className="md:hidden absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-[#0F0F0F] to-transparent pointer-events-none z-10"></div>
-            
-            <div className="space-y-3 pb-8">
-              {history.length === 0 ? (
-                <p className="text-[11px] text-zinc-600">No recent links.</p>
-              ) : (
-                history.map((item: any, i: number) => (
-                  <div key={i} className="p-3 rounded-lg bg-white/5 border border-white/5 hover:border-blue-500/50 transition-colors group">
-                    <div className="flex justify-between items-start mb-1">
-                      <div className="flex items-center gap-2">
-                        <a href={item.shortUrl} target="_blank" rel="noreferrer" className="text-sm font-medium text-blue-400 hover:underline">
-                          /{item.code}
-                        </a>
-                        {item.hasPassword && <Lock className="w-3 h-3 text-emerald-500" />}
-                        {item.hasSocialGate && <Link2 className="w-3 h-3 text-blue-500" />}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <button 
-                          onClick={() => fetchAnalytics(item)} 
-                          className="p-1.5 rounded-lg text-zinc-400 hover:text-blue-400 hover:bg-blue-400/10 transition-all"
-                          title="Analytics"
-                        >
-                          <BarChart3 className="w-3.5 h-3.5" />
-                        </button>
-                        <button 
-                          onClick={() => handleEditClick(item.code)} 
-                          className="p-1 rounded text-[10px] text-zinc-400 hover:text-white hover:bg-white/10 transition-colors uppercase font-medium tracking-wide flex items-center gap-1"
-                        >
-                          <Edit2 className="w-3 h-3" /> Edit
-                        </button>
-                        <button 
-                          onClick={() => copyToClipboard(item.shortUrl)} 
-                          className="p-1 rounded text-[10px] text-zinc-400 hover:text-white hover:bg-white/10 transition-colors uppercase font-medium tracking-wide flex items-center gap-1"
-                        >
-                          <Copy className="w-3 h-3" /> Copy
-                        </button>
-                        <button 
-                          onClick={() => handleDeleteLink(item.code)} 
-                          className="p-1 rounded text-[10px] text-zinc-400 hover:text-red-400 hover:bg-red-400/10 transition-colors uppercase font-medium tracking-wide flex items-center gap-1"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-end justify-between">
-                      <div className="flex-1 min-w-0 pr-2">
-                        <p className="text-[11px] text-zinc-400 truncate" title={item.longUrl}>{item.longUrl}</p>
-                        <div className="mt-2 flex items-center gap-2">
-                           <span className="text-[9px] text-zinc-600 font-bold uppercase tracking-widest">{new Date(item.date).toLocaleDateString()}</span>
-                           {item.expires_at && <span className="text-[9px] text-red-500/50 font-bold uppercase tracking-widest flex items-center gap-1"><Clock className="w-2.5 h-2.5" /> Expired</span>}
-                        </div>
-                      </div>
-                      <div className="shrink-0 flex flex-col items-center gap-2 group/qr">
-                         <div className="w-12 h-12 bg-white p-1 rounded shadow-lg transition-transform group-hover/qr:scale-105">
-                            <QRCodeSVG 
-                              id={`qr-${item.code}`}
-                              value={item.shortUrl} 
-                              size={44}
-                              level="H"
-                            />
-                         </div>
-                         <button 
-                           onClick={() => downloadQR(item.code)}
-                           className="flex items-center gap-1.5 px-2 py-1 bg-white/5 hover:bg-white/10 rounded text-[9px] text-zinc-400 font-bold uppercase tracking-widest transition-all"
-                         >
-                           <Download className="w-2.5 h-2.5" />
-                           Download
-                         </button>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
           </div>
-          <div className="mt-auto p-6 border-t border-white/10 hidden md:block shrink-0">
-            <div className="bg-zinc-900 rounded-lg p-4 mb-4">
-              <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest mb-2">Project Key</p>
-              <code className="text-[11px] text-blue-400 font-mono break-all leading-tight">
-                {(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY)?.substring(0, 24)}...
-              </code>
-            </div>
-            <p className="text-center text-[10px] text-zinc-600 font-medium tracking-tighter">
-              MADE BY SAQIB
+
+          {/* Sidebar Bottom Promo Card */}
+          <div className="clay-promo-card mt-5 p-3.5 text-center flex flex-col items-center">
+            <h3 className="text-[#f0f6fb] font-bold text-[14px]">Saqib Visuals</h3>
+            <p className="text-[#b3c7d8] text-[11px] mt-0.5 leading-snug">
+              Where Creativity Meets<br/><span className="italic text-[#88dce8] font-semibold">Technology &amp; AI!</span>
             </p>
+            <a 
+              href="https://wa.me/923478936242" 
+              target="_blank" 
+              rel="noreferrer"
+              className="clay-teal-btn mt-3 w-full py-2 px-3 text-[12px] font-bold flex items-center justify-center gap-1.5"
+            >
+              <span>Connect on WhatsApp</span>
+            </a>
           </div>
         </aside>
 
-        {/* Main Content Area */}
-        <main className={cn(
-          "flex-1 flex flex-col items-center justify-center p-4 md:p-20 bg-[radial-gradient(circle_at_top,_#1a1a1a_0%,_#0a0a0a_70%)] overflow-y-auto",
-          (mobileTab === 'create' || mobileTab === 'media' || mobileTab === 'analytics') ? "flex" : "hidden md:flex"
-        )}>
+        {/* ==================== RIGHT MAIN CONTENT AREA ==================== */}
+        <main className="flex-1 flex flex-col gap-5 min-w-0">
+
+          {/* 1. TOP HEADER BAR */}
+          <header className="flex flex-wrap items-center justify-between gap-3 pt-1 px-1">
+            <div>
+              <div className="flex items-center gap-2.5">
+                <h1 className="embossed-title text-[24px] sm:text-[28px] font-extrabold leading-none">
+                  Saqib Visuals
+                </h1>
+                <span className="clay-small-pill px-3 py-1 text-[11px] font-mono-code font-bold text-[#142c38] flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Supabase Connected</span>
+                </span>
+              </div>
+              <p className="text-[#23394d] text-[12px] font-bold mt-1">
+                💎 High-Performance URL Shortener • Camera Verification • Device Intelligence
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2.5 justify-end">
+              {/* Sync Device Button */}
+              <button 
+                onClick={() => setShowSyncModal(true)} 
+                className="clay-circle-grey w-10 h-10 flex items-center justify-center text-[#1d3346]"
+                title={phoneNumber ? `Synced: ${phoneNumber}` : "Sync Device Identity"}
+              >
+                <Smartphone className="w-4 h-4" />
+              </button>
+
+              {/* API Modal Button */}
+              <button 
+                onClick={() => setShowApiModal(true)} 
+                className="clay-circle-grey w-10 h-10 flex items-center justify-center text-[#1d3346]"
+                title="API Hub & Documentation"
+              >
+                <Code className="w-4 h-4" />
+              </button>
+
+              {/* Join Channel Button */}
+              <a 
+                href="https://www.whatsapp.com/channel/0029VbBTSK1EquiWrUt5uV1I"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="clay-teal-btn px-4 py-2 text-xs font-bold flex items-center gap-1.5"
+              >
+                <span>Join Channel</span>
+              </a>
+            </div>
+          </header>
+
+          {/* 2. DYNAMIC TAB CONTENT */}
           {mobileTab === 'media' ? (
-            <ImageConverter />
+            <div className="clay-panel p-5">
+              <ImageConverter />
+            </div>
           ) : mobileTab === 'analytics' ? (
-            <div className="w-full max-w-5xl animate-in fade-in slide-in-from-bottom-4 duration-500">
-               {!analyticsLink ? (
-                  <div className="space-y-8">
-                     <div className="text-center md:text-left">
-                        <h2 className="text-3xl font-light tracking-tight text-white mb-2">Link Analytics</h2>
-                        <p className="text-xs text-zinc-500 uppercase tracking-[0.2em] font-bold">Select a link to view intelligence data</p>
-                     </div>
-
-                     <div className="grid grid-cols-1 gap-4">
-                        {history.map((link: any) => (
-                           <button 
-                             key={link.id || link.code}
-                             onClick={() => fetchAnalytics(link)}
-                             className="w-full text-left bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.05] hover:border-blue-500/30 p-5 rounded-[24px] transition-all flex items-center justify-between group"
-                           >
-                              <div className="flex items-center gap-5 min-w-0">
-                                 <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-blue-500/20 transition-colors">
-                                    <BarChart3 className="w-5 h-5 text-blue-400" />
-                                 </div>
-                                 <div className="min-w-0">
-                                    <h4 className="text-sm font-medium text-white mb-0.5 truncate">{link.longUrl.replace(/^https?:\/\//, '')}</h4>
-                                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest flex items-center gap-2">
-                                       SHORT CODE: <span className="text-blue-400">/{link.code}</span>
-                                    </p>
-                                 </div>
-                              </div>
-                              <div className="flex items-center gap-4 shrink-0">
-                                 <div className="hidden sm:block text-right">
-                                    <p className="text-lg font-light text-white leading-none">{link.clicks || 0}</p>
-                                    <p className="text-[8px] text-zinc-600 font-bold uppercase tracking-widest mt-1">Total Clicks</p>
-                                 </div>
-                                 <ArrowRight className="w-4 h-4 text-zinc-700 group-hover:text-blue-500 transform group-hover:translate-x-1 transition-all" />
-                              </div>
-                           </button>
-                        ))}
-                        {history.length === 0 && (
-                           <div className="text-center py-20 bg-white/[0.01] rounded-[32px] border border-dashed border-white/10">
-                              <Link2 className="w-12 h-12 text-zinc-800 mx-auto mb-4" />
-                              <p className="text-zinc-600 text-xs uppercase tracking-widest font-bold">No links created yet</p>
-                           </div>
-                        )}
-                     </div>
+            <div className="space-y-5 animate-in fade-in duration-300">
+              {!analyticsLink ? (
+                <div className="clay-panel p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-[#152432] font-extrabold text-[18px]">📊 Link Analytics &amp; Intelligence</h3>
+                      <p className="text-[12px] font-semibold text-[#31495e]">Select a link below to view visitor records, GPS and captured images</p>
+                    </div>
                   </div>
-               ) : (
-                  <div className="space-y-6">
-                     <div className="flex items-center justify-between mb-8">
-                        <div>
-                           <h2 className="text-2xl font-light tracking-tight text-white mb-1">Intelligence Dashboard</h2>
-                           <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest flex items-center gap-2">
-                              Tracking <span className="text-blue-400 font-mono">/{analyticsLink.code}</span>
-                           </p>
-                        </div>
-                         <div className="flex items-center gap-3">
-                           <button 
-                             onClick={() => setAnalyticsLink(null)}
-                             className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 text-zinc-400 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all"
-                           >
-                              <RefreshCw className="w-3 h-3" />
-                              Switch Link
-                           </button>
-                           <button 
-                             onClick={() => setMobileTab('create')}
-                             className="p-2 bg-white/5 hover:bg-white/10 text-zinc-400 rounded-full md:hidden"
-                           >
-                              <X className="w-5 h-5"/>
-                           </button>
-                        </div>
-                     </div>
 
-                     {isLoadingAnalytics ? (
-                        <div className="h-64 flex flex-col items-center justify-center gap-4">
-                           <div className="w-8 h-8 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />
-                           <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">Collecting Data...</p>
+                  <div className="grid grid-cols-1 gap-3">
+                    {history.map((link: any) => (
+                      <button
+                        key={link.id || link.code}
+                        onClick={() => fetchAnalytics(link)}
+                        className="clay-recessed p-4 flex items-center justify-between group transition-all hover:-translate-y-0.5 text-left"
+                      >
+                        <div className="flex items-center gap-3.5 min-w-0">
+                          <div className="clay-thumb-frame w-11 h-11 flex items-center justify-center text-white shrink-0 bg-gradient-to-br from-[#4b82bd] to-[#285180]">
+                            <BarChart3 className="w-5 h-5 drop-shadow" />
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="text-sm font-extrabold text-[#122230] truncate">/{link.code}</h4>
+                            <p className="text-[11px] font-semibold text-[#344b5e] truncate">{link.longUrl}</p>
+                          </div>
                         </div>
-                     ) : (
-                        <div className="space-y-6">
-                           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                              {[
-                                { label: 'Clicks', val: analyticsData.length, icon: ArrowUpRight, color: 'text-blue-400' },
-                                { label: 'Uniques', val: new Set(analyticsData.map(d => d.ip_address)).size, icon: Globe, color: 'text-emerald-400' },
-                                { label: 'Top City', val: analyticsData.length > 0 ? Object.entries(analyticsData.reduce((acc, obj) => ({...acc, [obj.city || 'Unknown']: (acc[obj.city || 'Unknown'] || 0) + 1}), {} as any)).sort((a: any, b: any) => b[1] - a[1])[0][0] : 'N/A', icon: MapPin, color: 'text-orange-400' },
-                                { label: 'Intel', val: analyticsData.filter(d => d.captured_image).length, icon: Camera, color: 'text-purple-400' }
-                              ].map((stat, i) => (
-                                <div key={i} className="bg-white/[0.03] border border-white/[0.05] p-5 rounded-2xl">
-                                   <stat.icon className={cn("w-5 h-5 mb-3", stat.color)} />
-                                   <p className="text-xl font-light text-white mb-1">{stat.val}</p>
-                                   <p className="text-[9px] text-zinc-600 font-bold uppercase tracking-widest">{stat.label}</p>
+                        <div className="flex items-center gap-3 shrink-0">
+                          <span className="clay-small-pill px-3 py-1 text-xs font-bold text-[#142331]">View Intel</span>
+                          <ArrowRight className="w-4 h-4 text-[#265e6b] group-hover:translate-x-1 transition-transform" />
+                        </div>
+                      </button>
+                    ))}
+                    {history.length === 0 && (
+                      <div className="text-center py-12 text-[#31495e] font-semibold text-xs">
+                        No links generated yet. Create a link first!
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-5">
+                  {/* Dashboard Header */}
+                  <div className="clay-panel p-5 flex items-center justify-between">
+                    <div>
+                      <h3 className="text-[#152432] font-extrabold text-[18px]">
+                        Intelligence: <span className="font-mono text-[#265e6b]">/{analyticsLink.code}</span>
+                      </h3>
+                      <p className="text-[12px] font-semibold text-[#31495e]">Real-time traffic records from Supabase</p>
+                    </div>
+                    <button 
+                      onClick={() => setAnalyticsLink(null)} 
+                      className="clay-small-pill px-3.5 py-1.5 text-xs font-bold text-[#142331] flex items-center gap-1.5"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" />
+                      <span>Switch Link</span>
+                    </button>
+                  </div>
+
+                  {isLoadingAnalytics ? (
+                    <div className="clay-panel p-16 flex flex-col items-center justify-center gap-3">
+                      <div className="w-8 h-8 border-3 border-[#3a7d8c]/30 border-t-[#3a7d8c] rounded-full animate-spin" />
+                      <p className="text-xs font-bold uppercase tracking-wider text-[#142331]">Collecting Live Logs...</p>
+                    </div>
+                  ) : (
+                    <>
+                      {/* 4 3D Clay KPI Stat Cards */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <div className="clay-stat-teal p-4 flex flex-col justify-between">
+                          <div className="clay-badge-teal w-10 h-10 flex items-center justify-center mb-2">
+                            <ArrowUpRight className="w-5 h-5 text-white" />
+                          </div>
+                          <div>
+                            <p className="text-[#12262e] font-bold text-[12px]">Total Clicks</p>
+                            <h3 className="text-[#0e1e26] font-extrabold text-[24px] leading-tight mt-0.5">{analyticsData.length}</h3>
+                          </div>
+                        </div>
+
+                        <div className="clay-stat-slate p-4 flex flex-col justify-between">
+                          <div className="clay-badge-slate w-10 h-10 flex items-center justify-center mb-2">
+                            <Globe className="w-5 h-5 text-white" />
+                          </div>
+                          <div>
+                            <p className="text-[#162432] font-bold text-[12px]">Unique Visitors</p>
+                            <h3 className="text-[#0e1924] font-extrabold text-[24px] leading-tight mt-0.5">{new Set(analyticsData.map(d => d.ip_address)).size}</h3>
+                          </div>
+                        </div>
+
+                        <div className="clay-stat-ice p-4 flex flex-col justify-between">
+                          <div className="clay-badge-ice w-10 h-10 flex items-center justify-center mb-2">
+                            <MapPin className="w-5 h-5 text-[#24586d]" />
+                          </div>
+                          <div>
+                            <p className="text-[#162636] font-bold text-[12px]">Top Location</p>
+                            <h3 className="text-[#0f1b28] font-extrabold text-[15px] leading-tight mt-0.5 truncate">
+                              {analyticsData.length > 0 && analyticsData[0].location_name ? analyticsData[0].location_name : 'Direct'}
+                            </h3>
+                          </div>
+                        </div>
+
+                        <div className="clay-stat-purple p-4 flex flex-col justify-between">
+                          <div className="clay-badge-purple w-10 h-10 flex items-center justify-center mb-2">
+                            <Camera className="w-5 h-5 text-white" />
+                          </div>
+                          <div>
+                            <p className="text-[#14172b] font-bold text-[12px]">Captured Intel</p>
+                            <h3 className="text-[#0d1021] font-extrabold text-[24px] leading-tight mt-0.5">{analyticsData.filter(d => d.captured_image).length}</h3>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Live Traffic Log Table */}
+                      <div className="clay-panel p-5">
+                        <h4 className="text-[#152432] font-extrabold text-[15px] mb-3">Live Visitor Telemetry</h4>
+                        <div className="space-y-2.5 max-h-[500px] overflow-y-auto clay-scroll pr-1">
+                          {analyticsData.map((log: any, i: number) => (
+                            <div key={i} className="clay-recessed p-3.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+                              <div className="flex items-center gap-3">
+                                {log.device_type?.toLowerCase() === 'mobile' ? (
+                                  <Smartphone className="w-4 h-4 text-[#265e6b]" />
+                                ) : (
+                                  <Monitor className="w-4 h-4 text-[#265e6b]" />
+                                )}
+                                <div>
+                                  <span className="font-mono font-bold text-[#102030]">{log.ip_address}</span>
+                                  <span className="ml-2 px-2 py-0.5 rounded-full bg-white/40 text-[10px] font-bold text-[#142331]">
+                                    {log.location_name || 'Direct'}
+                                  </span>
                                 </div>
-                              ))}
-                           </div>
-
-                           <div className="bg-white/[0.02] border border-white/[0.04] rounded-2xl overflow-hidden">
-                              <div className="p-4 border-b border-white/5 bg-white/[0.02] flex justify-between items-center">
-                                 <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em]">Live Traffic Log</h4>
                               </div>
-                              <div className="divide-y divide-white/[0.03] max-h-[600px] overflow-y-auto custom-scrollbar">
-                                 {analyticsData.map((log, i) => (
-                                   <div key={i} className="p-4 hover:bg-white/[0.02] transition-colors">
-                                      <div className="flex items-center justify-between mb-2">
-                                         <span className="text-xs font-mono text-zinc-400 flex items-center gap-2">
-                                             {log.os?.toLowerCase().includes('android') || log.os?.toLowerCase().includes('ios') || log.device_type?.toLowerCase() === 'mobile' ? (
-                                                <Smartphone className="w-3 h-3 text-blue-400" />
-                                             ) : (
-                                                <Monitor className="w-3 h-3 text-zinc-400" />
-                                             )}
-                                             {log.ip_address}
-                                          </span>
-                                         <span className="text-[9px] text-zinc-600 font-bold">{new Date(log.created_at).toLocaleTimeString()}</span>
-                                      </div>
-                                      <div className="flex flex-wrap gap-2">
-                                         <span className="text-[9px] px-1.5 py-0.5 bg-white/5 rounded text-zinc-500 border border-white/5">{log.browser}</span>
-                                          <span className="text-[9px] px-1.5 py-0.5 bg-emerald-500/5 rounded text-emerald-400 border border-emerald-500/10">
-                                            {log.city || 'Unknown'}, {log.country || 'Unknown'}
-                                          </span>
-                                         <span className="text-[9px] px-1.5 py-0.5 bg-white/5 rounded text-zinc-500 border border-white/5">{log.os || 'OS'}</span>
-                                         {log.captured_image && (
-                                            <button 
-                                              onClick={() => setSelectedImage(log.captured_image)}
-                                              className="text-[9px] px-1.5 py-0.5 bg-blue-500/10 rounded text-blue-400 border border-blue-500/20 font-bold"
-                                            >
-                                               VIEW INTEL
-                                            </button>
-                                         )}
-                                         {log.latitude && (
-                                            <a 
-                                              href={`https://www.google.com/maps?q=${log.latitude},${log.longitude}`}
-                                              target="_blank"
-                                              rel="noreferrer"
-                                              className="text-[9px] px-1.5 py-0.5 bg-emerald-500/10 rounded text-emerald-400 border border-emerald-500/20 font-bold"
-                                            >
-                                               VIEW GEO
-                                            </a>
-                                         )}
-                                      </div>
-                                   </div>
-                                 ))}
-                                 {analyticsData.length === 0 && (
-                                    <div className="p-8 text-center text-zinc-600 italic text-xs">No activity log found.</div>
-                                 )}
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold text-[#31495e]">{log.browser} • {log.os}</span>
+                                {log.captured_image && (
+                                  <button
+                                    onClick={() => setSelectedImage(log.captured_image)}
+                                    className="clay-small-pill px-2.5 py-1 text-[10px] font-bold text-[#142331]"
+                                  >
+                                    View Image
+                                  </button>
+                                )}
+                                {log.latitude && (
+                                  <a
+                                    href={`https://www.google.com/maps?q=${log.latitude},${log.longitude}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="clay-small-pill px-2.5 py-1 text-[10px] font-bold text-emerald-800"
+                                  >
+                                    View Map
+                                  </a>
+                                )}
+                                <span className="text-[10px] font-mono font-bold text-[#31495e]">
+                                  {new Date(log.created_at).toLocaleTimeString()}
+                                </span>
                               </div>
-                           </div>
+                            </div>
+                          ))}
+                          {analyticsData.length === 0 && (
+                            <div className="text-center py-8 text-[#31495e] font-semibold text-xs">
+                              No visitors recorded yet.
+                            </div>
+                          )}
                         </div>
-                     )}
-                  </div>
-               )}
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           ) : (
-            <div className="w-full max-w-2xl mt-4 md:mt-0 mb-auto">
-              <div className="mb-6 md:mb-10 text-center">
-                <h1 className="text-3xl md:text-4xl font-light tracking-tight mb-2">
-                  Simplify your <span className="font-medium text-blue-500">Links</span>.
-                </h1>
-                <p className="text-sm text-zinc-500">Paste a long URL and get a short link instantly.</p>
-              </div>
+            /* ==================== SHORTEN LINK (CREATE TAB) ==================== */
+            <div className="space-y-5">
+              {/* Main Clay Hero Card */}
+              <section className="clay-hero-card p-5 sm:p-7 relative">
+                <div className="mb-5">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[#88e2f2] text-[11px] font-extrabold tracking-wide mb-2">
+                    <span>🚀 URL INTELLIGENCE ENGINE</span>
+                    <span>•</span>
+                    <span>✨ SAQIB VISUALS</span>
+                  </div>
+                  <h2 className="text-[21px] sm:text-[25px] font-extrabold text-[#f1f7fb] tracking-tight leading-tight drop-shadow">
+                    Simplify Your Links &amp; Verify Visitors
+                  </h2>
+                  <p className="text-[#c5d7e6] text-[13px] font-medium mt-1">
+                    Paste any destination URL to create ultra-fast short links with silent selfie camera verification and GPS geolocation.
+                  </p>
+                </div>
 
-              <div className="flex flex-col gap-6">
-                {/* Shortener Tool Form */}
-                <div className="bg-zinc-900/50 border border-white/10 p-6 md:p-8 rounded-[32px] backdrop-blur-xl shadow-2xl">
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* 1. Destination URL Input */}
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <label htmlFor="url" className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
-                          <Link2 className="w-3.5 h-3.5 text-blue-400" /> Destination URL (Target Link)
-                        </label>
-                        <span className="text-[10px] text-zinc-500 font-medium">Required</span>
-                      </div>
-                      <div className="relative">
-                        <input
-                          id="url"
-                          type="text"
-                          value={longUrl}
-                          onChange={(e) => setLongUrl(e.target.value)}
-                          placeholder="https://example.com/very-long-link-with-many-parameters"
-                          className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl py-4 pl-4 pr-12 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-700 transition-all font-sans text-sm"
-                          required
-                        />
-                        {longUrl && (
-                          <button
-                            type="button"
-                            onClick={() => setLongUrl('')}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  {/* 1. Destination URL Input */}
+                  <div>
+                    <label htmlFor="url" className="text-[11px] font-extrabold text-[#d2e2ee] uppercase tracking-wider mb-2 block flex items-center gap-1.5">
+                      <Link2 className="w-3.5 h-3.5 text-[#7bd3e2]" /> Destination URL (Target Link)
+                    </label>
+                    <div className="clay-recessed p-2.5 sm:p-3 flex items-center gap-3">
+                      <Globe className="w-5 h-5 text-[#24525d] ml-1.5 shrink-0" />
+                      <input
+                        id="url"
+                        type="text"
+                        value={longUrl}
+                        onChange={(e) => setLongUrl(e.target.value)}
+                        placeholder="https://example.com/very-long-link-with-many-parameters"
+                        className="bg-transparent border-none outline-none text-[13px] sm:text-[14px] font-semibold text-[#142636] placeholder-[#385368]/70 w-full font-sans"
+                        required
+                      />
+                      {longUrl && (
+                        <button type="button" onClick={() => setLongUrl('')} className="p-1 rounded-full text-[#385368] hover:text-[#102030]">
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* 2. Primary Verification Toggles (Camera & Location side-by-side) */}
+                  <div>
+                    <label className="text-[11px] font-extrabold text-[#d2e2ee] uppercase tracking-wider mb-2.5 block flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-[#7bd3e2]" /> Quick Verification Toggles (Primary)
+                    </label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                      {/* Camera Card */}
+                      <div
+                        onClick={() => setCaptureCamera(!captureCamera)}
+                        className={cn(
+                          "p-4 rounded-2xl cursor-pointer transition-all duration-200 select-none flex items-center justify-between group",
+                          captureCamera 
+                            ? "clay-stat-teal ring-2 ring-[#8be5f5] shadow-lg" 
+                            : "clay-stat-slate opacity-90 hover:opacity-100"
                         )}
-                      </div>
-                    </div>
-
-                    {/* 2. PRIMARY QUICK INTEL ACTIONS (Camera & Location Right Upfront!) */}
-                    <div>
-                      <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-3 block flex items-center gap-2">
-                        <Sparkles className="w-3.5 h-3.5 text-blue-400" /> Quick Verification Actions (Primary)
-                      </label>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                        {/* Camera Toggle Card */}
-                        <div
-                          onClick={() => setCaptureCamera(!captureCamera)}
-                          className={cn(
-                            "p-4 rounded-2xl border cursor-pointer transition-all duration-200 select-none flex items-center justify-between group",
-                            captureCamera 
-                              ? "bg-blue-600/10 border-blue-500/50 shadow-[0_0_20px_rgba(37,99,235,0.15)] ring-1 ring-blue-500/30" 
-                              : "bg-[#0A0A0A] border-white/10 hover:border-white/20 hover:bg-white/[0.02]"
-                          )}
-                        >
-                          <div className="flex items-center gap-3.5">
-                            <div className={cn(
-                              "w-11 h-11 rounded-xl flex items-center justify-center transition-colors shrink-0",
-                              captureCamera ? "bg-blue-500 text-white shadow-lg shadow-blue-500/30" : "bg-white/5 text-zinc-400 group-hover:text-zinc-200"
-                            )}>
-                              <Camera className="w-5 h-5" />
-                            </div>
-                            <div>
-                              <p className={cn("text-xs font-bold uppercase tracking-wider", captureCamera ? "text-blue-400" : "text-zinc-200")}>
-                                Camera Capture
-                              </p>
-                              <p className="text-[10px] text-zinc-500 mt-0.5">Auto-capture selfie photo</p>
-                            </div>
-                          </div>
-                          <div className={cn(
-                            "w-5 h-5 rounded-full border flex items-center justify-center transition-all",
-                            captureCamera ? "bg-blue-500 border-blue-500 text-white" : "border-zinc-700 bg-transparent"
-                          )}>
-                            {captureCamera && <Check className="w-3 h-3 stroke-[3]" />}
-                          </div>
-                        </div>
-
-                        {/* Location Toggle Card */}
-                        <div
-                          onClick={() => setCaptureLocation(!captureLocation)}
-                          className={cn(
-                            "p-4 rounded-2xl border cursor-pointer transition-all duration-200 select-none flex items-center justify-between group",
-                            captureLocation 
-                              ? "bg-emerald-600/10 border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500/30" 
-                              : "bg-[#0A0A0A] border-white/10 hover:border-white/20 hover:bg-white/[0.02]"
-                          )}
-                        >
-                          <div className="flex items-center gap-3.5">
-                            <div className={cn(
-                              "w-11 h-11 rounded-xl flex items-center justify-center transition-colors shrink-0",
-                              captureLocation ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/30" : "bg-white/5 text-zinc-400 group-hover:text-zinc-200"
-                            )}>
-                              <MapPin className="w-5 h-5" />
-                            </div>
-                            <div>
-                              <p className={cn("text-xs font-bold uppercase tracking-wider", captureLocation ? "text-emerald-400" : "text-zinc-200")}>
-                                GPS Location
-                              </p>
-                              <p className="text-[10px] text-zinc-500 mt-0.5">Request exact coordinates</p>
-                            </div>
-                          </div>
-                          <div className={cn(
-                            "w-5 h-5 rounded-full border flex items-center justify-center transition-all",
-                            captureLocation ? "bg-emerald-500 border-emerald-500 text-white" : "border-zinc-700 bg-transparent"
-                          )}>
-                            {captureLocation && <Check className="w-3 h-3 stroke-[3]" />}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* 3. PRIMARY ACTION BUTTON (Shorten & Generate Link) */}
-                    <div>
-                      <button
-                        type="submit"
-                        disabled={isSubmitting || !longUrl.trim()}
-                        className="w-full h-14 bg-blue-600 hover:bg-blue-500 text-white font-bold uppercase tracking-wider text-xs rounded-xl shadow-[0_0_25px_rgba(37,99,235,0.3)] active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                       >
-                        {isSubmitting ? (
-                          <>
-                            <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                            Generating Link...
-                          </>
-                        ) : (
-                          <>
-                            <Sparkles className="w-4 h-4" />
-                            Shorten & Generate Link
-                            <ArrowRight className="w-4 h-4" />
-                          </>
-                        )}
-                      </button>
-                    </div>
-
-                    {/* 4. SEPARATE CUSTOMIZATION ACCORDION (Password, Social Guard, Custom Alias, Expiry) */}
-                    <div className="pt-2 border-t border-white/5">
-                      <button
-                        type="button"
-                        onClick={() => setShowAdvanced(!showAdvanced)}
-                        className="w-full flex items-center justify-between p-3.5 bg-white/[0.02] hover:bg-white/[0.05] border border-white/10 rounded-xl transition-all group"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <Settings2 className="w-4 h-4 text-zinc-400 group-hover:text-blue-400 transition-colors" />
-                          <span className="text-xs font-bold uppercase tracking-wider text-zinc-300 group-hover:text-white">
-                            Add More Customizations
-                          </span>
-                          {(isPasswordEnabled || isSocialGateEnabled || customCode.trim() || expiresAt) && (
-                            <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 border border-blue-500/30 text-[9px] font-bold rounded-full">
-                              Active
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2 text-zinc-500 text-xs">
-                          <span className="text-[10px] hidden sm:inline">Password, Social Guard, Alias</span>
-                          <ChevronDown className={cn("w-4 h-4 transition-transform duration-200", showAdvanced && "rotate-180 text-blue-400")} />
-                        </div>
-                      </button>
-
-                      {/* Expanded Customization Options */}
-                      {showAdvanced && (
-                        <div className="mt-4 p-5 bg-[#0A0A0A] border border-white/10 rounded-2xl space-y-6 animate-in slide-in-from-top-3 fade-in duration-200">
-                          
-                          {/* Custom Alias */}
+                        <div className="flex items-center gap-3.5">
+                          <div className="clay-badge-teal w-11 h-11 flex items-center justify-center shrink-0">
+                            <Camera className="w-5 h-5 text-white drop-shadow" />
+                          </div>
                           <div>
-                            <label htmlFor="customCode" className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2 block">
-                              Custom Alias (Back-Half)
-                            </label>
-                            <div className="flex items-center">
-                              <span className="bg-zinc-900 border-y border-l border-white/10 px-4 py-3.5 rounded-l-xl text-zinc-500 text-xs font-mono">
-                                /
-                              </span>
-                              <input
-                                id="customCode"
-                                type="text"
-                                maxLength={20}
-                                value={customCode}
-                                onChange={(e) => setCustomCode(e.target.value.replace(/[^a-zA-Z0-9_\-]/g, ''))}
-                                placeholder="my-custom-link"
-                                className="w-full bg-[#0F0F0F] border border-white/10 rounded-r-xl py-3.5 px-4 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-700 font-sans text-xs"
-                              />
-                            </div>
+                            <p className="text-xs font-extrabold uppercase tracking-wider text-[#0e1e26]">Camera Capture</p>
+                            <p className="text-[11px] font-semibold text-[#18343d]">Auto-capture selfie photo</p>
                           </div>
+                        </div>
+                        <div className={cn(
+                          "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all",
+                          captureCamera ? "bg-[#25606d] border-[#16434d] text-white shadow-md" : "border-slate-500/40 bg-white/30"
+                        )}>
+                          {captureCamera && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                        </div>
+                      </div>
 
-                          {/* Password Protection */}
-                          <div className="pt-4 border-t border-white/5">
-                            <div className="flex items-center justify-between mb-2">
-                              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
-                                <Lock className="w-3.5 h-3.5 text-blue-400" /> Password Protection
-                              </label>
-                              <button
-                                type="button"
-                                role="switch"
-                                aria-checked={isPasswordEnabled}
-                                onClick={() => setIsPasswordEnabled(!isPasswordEnabled)}
-                                className={cn(
-                                  "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none",
-                                  isPasswordEnabled ? "bg-blue-600" : "bg-neutral-800"
-                                )}
-                              >
-                                <span className={cn(
-                                  "inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm",
-                                  isPasswordEnabled ? "translate-x-6" : "translate-x-1"
-                                )} />
-                              </button>
-                            </div>
-                            
-                            {isPasswordEnabled && (
-                              <div className="mt-3 animate-in slide-in-from-top-2 fade-in duration-200">
-                                <input
-                                  id="password"
-                                  type="password"
-                                  value={password}
-                                  onChange={(e) => setPassword(e.target.value)}
-                                  placeholder="Enter required unlock password..."
-                                  required={isPasswordEnabled}
-                                  className="w-full bg-[#0F0F0F] border border-white/10 rounded-xl py-3.5 px-4 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-700 font-sans text-xs"
-                                />
-                              </div>
-                            )}
+                      {/* Location Card */}
+                      <div
+                        onClick={() => setCaptureLocation(!captureLocation)}
+                        className={cn(
+                          "p-4 rounded-2xl cursor-pointer transition-all duration-200 select-none flex items-center justify-between group",
+                          captureLocation 
+                            ? "clay-stat-teal ring-2 ring-[#8be5f5] shadow-lg" 
+                            : "clay-stat-slate opacity-90 hover:opacity-100"
+                        )}
+                      >
+                        <div className="flex items-center gap-3.5">
+                          <div className="clay-badge-slate w-11 h-11 flex items-center justify-center shrink-0">
+                            <MapPin className="w-5 h-5 text-white drop-shadow" />
                           </div>
-
-                          {/* Social Gate (Sub2Unlock) */}
-                          <div className="pt-4 border-t border-white/5">
-                            <div className="flex items-center justify-between mb-2">
-                              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
-                                <Link2 className="w-3.5 h-3.5 text-emerald-400" /> Social Guard (Sub2Unlock Action)
-                              </label>
-                              <button
-                                type="button"
-                                role="switch"
-                                aria-checked={isSocialGateEnabled}
-                                onClick={() => setIsSocialGateEnabled(!isSocialGateEnabled)}
-                                className={cn(
-                                  "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none",
-                                  isSocialGateEnabled ? "bg-emerald-600" : "bg-neutral-800"
-                                )}
-                              >
-                                <span className={cn(
-                                  "inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm",
-                                  isSocialGateEnabled ? "translate-x-6" : "translate-x-1"
-                                )} />
-                              </button>
-                            </div>
-                            
-                            {isSocialGateEnabled && (
-                              <div className="mt-3 animate-in slide-in-from-top-2 fade-in duration-200 space-y-3.5">
-                                <div>
-                                  <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2 block">Choose Platform Icon</label>
-                                  <div className="flex flex-wrap gap-2">
-                                    {SOCIAL_ICONS.map((item) => (
-                                      <button
-                                        key={item.id}
-                                        type="button"
-                                        onClick={() => setSocialGateIcon(item.id)}
-                                        className={cn(
-                                          "flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all text-xs",
-                                          socialGateIcon === item.id 
-                                            ? "bg-blue-500/15 text-blue-400 ring-1 ring-blue-500/40" 
-                                            : "bg-[#0F0F0F] border border-white/5 text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
-                                        )}
-                                      >
-                                        <SocialIcon id={item.id} className="w-4 h-4" />
-                                        <span>{item.label}</span>
-                                      </button>
-                                    ))}
-                                  </div>
-                                </div>
-                                <input
-                                  type="text"
-                                  value={socialGateTitle}
-                                  onChange={(e) => setSocialGateTitle(e.target.value)}
-                                  placeholder="e.g. Subscribe to my YouTube Channel"
-                                  required={isSocialGateEnabled}
-                                  className="w-full bg-[#0F0F0F] border border-white/10 rounded-xl py-3 px-4 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-700 text-xs"
-                                />
-                                <input
-                                  type="url"
-                                  value={socialGateUrl}
-                                  onChange={(e) => setSocialGateUrl(e.target.value)}
-                                  placeholder="https://youtube.com/@channel or https://t.me/..."
-                                  required={isSocialGateEnabled}
-                                  className="w-full bg-[#0F0F0F] border border-white/10 rounded-xl py-3 px-4 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-700 text-xs"
-                                />
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                  <input
-                                    type="text"
-                                    value={socialGateDescription}
-                                    onChange={(e) => setSocialGateDescription(e.target.value)}
-                                    placeholder="Step instruction..."
-                                    className="w-full bg-[#0F0F0F] border border-white/10 rounded-xl py-3 px-4 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-700 text-xs"
-                                  />
-                                  <input
-                                    type="text"
-                                    value={socialGateButtonText}
-                                    onChange={(e) => setSocialGateButtonText(e.target.value)}
-                                    placeholder="Button text (e.g. Subscribe & Unlock)"
-                                    required={isSocialGateEnabled}
-                                    className="w-full bg-[#0F0F0F] border border-white/10 rounded-xl py-3 px-4 text-zinc-200 focus:outline-none focus:border-blue-500/50 placeholder:text-zinc-700 text-xs"
-                                  />
-                                </div>
-                              </div>
-                            )}
+                          <div>
+                            <p className="text-xs font-extrabold uppercase tracking-wider text-[#0e1e26]">GPS Location</p>
+                            <p className="text-[11px] font-semibold text-[#18343d]">Request exact coordinates</p>
                           </div>
+                        </div>
+                        <div className={cn(
+                          "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all",
+                          captureLocation ? "bg-[#25606d] border-[#16434d] text-white shadow-md" : "border-slate-500/40 bg-white/30"
+                        )}>
+                          {captureLocation && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
-                          {/* Expiration Date */}
-                          <div className="pt-4 border-t border-white/5">
-                            <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2 block flex items-center gap-2">
-                              <Clock className="w-3.5 h-3.5 text-zinc-500" /> Link Expiration Timer (Optional)
-                            </label>
+                  {/* 3. Primary Action Button */}
+                  <div>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting || !longUrl.trim()}
+                      className="clay-teal-btn w-full py-3.5 text-[14px] font-extrabold uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-2xl disabled:opacity-50"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                          Generating Short Link...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-4 h-4" />
+                          <span>Shorten &amp; Generate Link</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* 4. Add More Customizations Accordion */}
+                  <div className="pt-2 border-t border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => setShowAdvanced(!showAdvanced)}
+                      className="w-full flex items-center justify-between p-3.5 clay-small-pill transition-all"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Settings2 className="w-4 h-4 text-[#20404e]" />
+                        <span className="text-[12px] font-extrabold uppercase tracking-wider text-[#122330]">
+                          Add More Customizations
+                        </span>
+                        {(isPasswordEnabled || isSocialGateEnabled || customCode.trim() || expiresAt) && (
+                          <span className="px-2 py-0.5 bg-[#3a7d8c] text-white text-[9px] font-bold rounded-full">
+                            Active
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-[#243c4c] text-xs font-bold">
+                        <span className="text-[11px] hidden sm:inline">Password, Social Gate, Alias</span>
+                        <ChevronDown className={cn("w-4 h-4 transition-transform duration-200", showAdvanced && "rotate-180")} />
+                      </div>
+                    </button>
+
+                    {showAdvanced && (
+                      <div className="mt-3.5 p-4 clay-recessed rounded-2xl space-y-4 animate-in slide-in-from-top-2 fade-in duration-200">
+                        {/* Custom Alias */}
+                        <div>
+                          <label htmlFor="customCode" className="text-[10px] font-extrabold text-[#1a2d3e] uppercase tracking-wider mb-1.5 block">
+                            Custom Alias (Back-Half)
+                          </label>
+                          <div className="flex items-center bg-white/40 border border-white/60 rounded-xl overflow-hidden shadow-inner">
+                            <span className="px-3.5 py-2 text-xs font-mono font-bold text-[#243e54] bg-white/30 border-r border-white/50">
+                              /
+                            </span>
                             <input
-                              type="datetime-local"
-                              value={expiresAt}
-                              onChange={(e) => setExpiresAt(e.target.value)}
-                              className="w-full bg-[#0F0F0F] border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-blue-500/50 transition-colors"
+                              id="customCode"
+                              type="text"
+                              maxLength={20}
+                              value={customCode}
+                              onChange={(e) => setCustomCode(e.target.value.replace(/[^a-zA-Z0-9_\-]/g, ''))}
+                              placeholder="my-custom-code"
+                              className="bg-transparent border-none outline-none py-2 px-3 text-xs font-bold text-[#102030] placeholder-[#405c72]/60 w-full"
                             />
                           </div>
-
                         </div>
-                      )}
+
+                        {/* Password Protection */}
+                        <div className="pt-3 border-t border-[#7690a5]/30">
+                          <div className="flex items-center justify-between mb-2">
+                            <label className="text-[10px] font-extrabold text-[#1a2d3e] uppercase tracking-wider flex items-center gap-1.5">
+                              <Lock className="w-3.5 h-3.5 text-[#245b69]" /> Password Protection
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => setIsPasswordEnabled(!isPasswordEnabled)}
+                              className={cn(
+                                "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
+                                isPasswordEnabled ? "bg-[#3a7d8c]" : "bg-neutral-600"
+                              )}
+                            >
+                              <span className={cn(
+                                "inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm",
+                                isPasswordEnabled ? "translate-x-6" : "translate-x-1"
+                              )} />
+                            </button>
+                          </div>
+                          {isPasswordEnabled && (
+                            <input
+                              id="password"
+                              type="password"
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              placeholder="Enter unlock password..."
+                              required={isPasswordEnabled}
+                              className="w-full bg-white/50 border border-white/60 rounded-xl py-2 px-3 text-xs font-bold text-[#102030] placeholder-[#405c72]/60 outline-none"
+                            />
+                          )}
+                        </div>
+
+                        {/* Social Gate */}
+                        <div className="pt-3 border-t border-[#7690a5]/30">
+                          <div className="flex items-center justify-between mb-2">
+                            <label className="text-[10px] font-extrabold text-[#1a2d3e] uppercase tracking-wider flex items-center gap-1.5">
+                              <Link2 className="w-3.5 h-3.5 text-[#245b69]" /> Social Guard (Sub2Unlock)
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => setIsSocialGateEnabled(!isSocialGateEnabled)}
+                              className={cn(
+                                "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
+                                isSocialGateEnabled ? "bg-[#3a7d8c]" : "bg-neutral-600"
+                              )}
+                            >
+                              <span className={cn(
+                                "inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm",
+                                isSocialGateEnabled ? "translate-x-6" : "translate-x-1"
+                              )} />
+                            </button>
+                          </div>
+                          {isSocialGateEnabled && (
+                            <div className="space-y-2.5">
+                              <div className="flex flex-wrap gap-1.5">
+                                {SOCIAL_ICONS.map((item) => (
+                                  <button
+                                    key={item.id}
+                                    type="button"
+                                    onClick={() => setSocialGateIcon(item.id)}
+                                    className={cn(
+                                      "px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1.5 transition-all",
+                                      socialGateIcon === item.id ? "bg-[#255b68] text-white shadow-sm" : "bg-white/40 text-[#1a2d3e]"
+                                    )}
+                                  >
+                                    <SocialIcon id={item.id} className="w-3.5 h-3.5" />
+                                    <span>{item.label}</span>
+                                  </button>
+                                ))}
+                              </div>
+                              <input
+                                type="text"
+                                value={socialGateTitle}
+                                onChange={(e) => setSocialGateTitle(e.target.value)}
+                                placeholder="Action Title (e.g. Follow my WhatsApp Channel)"
+                                className="w-full bg-white/50 border border-white/60 rounded-xl py-2 px-3 text-xs font-bold text-[#102030] outline-none"
+                              />
+                              <input
+                                type="url"
+                                value={socialGateUrl}
+                                onChange={(e) => setSocialGateUrl(e.target.value)}
+                                placeholder="https://youtube.com/@channel or https://t.me/..."
+                                className="w-full bg-white/50 border border-white/60 rounded-xl py-2 px-3 text-xs font-bold text-[#102030] outline-none"
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Expiration Timer */}
+                        <div className="pt-3 border-t border-[#7690a5]/30">
+                          <label className="text-[10px] font-extrabold text-[#1a2d3e] uppercase tracking-wider mb-1.5 block flex items-center gap-1.5">
+                            <Clock className="w-3.5 h-3.5 text-[#245b69]" /> Expiration Date (Optional)
+                          </label>
+                          <input
+                            type="datetime-local"
+                            value={expiresAt}
+                            onChange={(e) => setExpiresAt(e.target.value)}
+                            className="w-full bg-white/50 border border-white/60 rounded-xl py-2 px-3 text-xs font-bold text-[#102030] outline-none"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {error && (
+                    <div className="p-3 rounded-xl bg-red-900/30 border border-red-500/40 text-red-200 text-xs font-bold flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                      <span>{error}</span>
                     </div>
+                  )}
+                </form>
 
-                {error && (
-                  <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-lg flex items-start gap-3 mt-4">
-                    <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                    <div className="space-y-1">
-                      <p className="font-medium text-sm">{error}</p>
-                      {needsSetup && (
-                        <div className="mt-2 space-y-2">
-                           <p className="text-xs text-red-400/80">
-                             Create the required database table by running this SQL in your Supabase project:
-                           </p>
-                           <div className="relative group">
-                             <pre className="text-[10px] bg-black/50 p-3 rounded-lg overflow-x-auto text-neutral-300 font-mono">
-                               {sqlSetupScript}
-                             </pre>
-                             <button 
-                               type="button"
-                               onClick={() => copyToClipboard(sqlSetupScript)}
-                               className="absolute top-2 right-2 p-1.5 bg-neutral-800 rounded opacity-0 group-hover:opacity-100 transition-opacity text-white"
-                               title="Copy SQL"
-                             >
-                               <Copy className="w-3 h-3" />
-                             </button>
-                           </div>
-                        </div>
-                      )}
+                {/* Result Card */}
+                {shortUrl && (
+                  <div ref={resultRef} className="clay-stat-teal mt-5 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 animate-in slide-in-from-bottom-3 duration-300">
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      <div className="clay-badge-teal w-11 h-11 flex items-center justify-center shrink-0">
+                        <Check className="w-6 h-6 text-white stroke-[3]" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-[#0e2129]">Success! Link Ready</p>
+                        <p className="text-base sm:text-lg font-black text-[#0a181e] font-mono truncate">{shortUrl.replace(/^https?:\/\//, '')}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={() => copyToClipboard(shortUrl)}
+                        className="clay-teal-btn px-4 py-2 text-xs font-extrabold uppercase tracking-wider flex items-center gap-1.5"
+                      >
+                        {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                        <span>{copied ? "Copied!" : "Copy Link"}</span>
+                      </button>
                     </div>
                   </div>
                 )}
-              </form>
-            </div>
+              </section>
 
-            {/* Result Card - Moved back to bottom with auto-scroll */}
-            {shortUrl && mobileTab === 'create' && (
-              <div 
-                ref={resultRef}
-                className="bg-emerald-500/5 border border-emerald-500/20 p-4 md:p-6 rounded-2xl animate-in slide-in-from-bottom-8 duration-500 shadow-[0_0_40px_rgba(16,185,129,0.05)]"
-              >
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3 md:gap-4 min-w-0">
-                    <div className="p-2 bg-emerald-500/20 rounded-xl shrink-0">
-                      <Check className="w-5 h-5 text-emerald-500" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[10px] text-emerald-500/70 font-bold uppercase tracking-widest mb-1 text-[8px] md:text-xs">Success! Link Ready</p>
-                      <p className="text-sm md:text-lg font-medium truncate text-emerald-400">{shortUrl.replace(/^https?:\/\//, '')}</p>
-                    </div>
+              {/* 3. BOTTOM DISCOVER / BUILD TOGETHER BANNER */}
+              <section className="clay-panel px-5 py-3.5 flex flex-wrap items-center justify-between gap-4 relative">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-12 h-12 flex items-center justify-center shrink-0">
+                    <Sparkles className="w-8 h-8 text-[#265e6b]" />
                   </div>
-                  <button
-                    onClick={() => copyToClipboard(shortUrl)}
-                    className="px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-500/20 transition-all shrink-0 flex items-center gap-2"
-                  >
-                    {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                    <span className="hidden sm:inline">{copied ? 'Copied' : 'Copy Link'}</span>
-                  </button>
+                  <div>
+                    <h4 className="text-[#102030] font-extrabold text-[15px] sm:text-[16px] leading-tight">
+                      Let's build something amazing together
+                    </h4>
+                    <p className="text-[#2b4458] font-bold text-[12px]">💼 Saqib Visuals — Where Creativity Meets Technology.</p>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-    </main>
+                <div className="flex items-center gap-2.5">
+                  <a 
+                    href="https://mrsaqib242.vercel.app" 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="clay-small-pill px-4 py-2 text-[12px] font-extrabold text-[#162838] flex items-center gap-1.5"
+                  >
+                    <Globe className="w-3.5 h-3.5 text-[#2b606c]" />
+                    <span>Portfolio</span>
+                  </a>
+                  <a 
+                    href="https://wa.me/923478936242" 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="clay-teal-btn px-5 py-2 text-[12.5px] font-bold flex items-center gap-1.5"
+                  >
+                    <span>WhatsApp Me</span>
+                  </a>
+                </div>
+              </section>
+            </div>
+          )}
+        </main>
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#0F0F0F] border-t border-white/10 flex items-center justify-around z-50">
+      <div className="lg:hidden fixed bottom-3 left-4 right-4 clay-sidebar p-2 flex items-center justify-around z-50 shadow-2xl">
         <button 
           onClick={() => setMobileTab('create')}
           className={cn(
-            "flex flex-col items-center gap-1 transition-all",
-            mobileTab === 'create' ? "text-blue-500" : "text-zinc-500"
+            "px-3 py-1.5 rounded-xl flex items-center gap-1.5 text-xs font-bold transition-all",
+            mobileTab === 'create' ? "bg-white/20 text-[#7bd3e2]" : "text-zinc-400"
           )}
         >
-          <div className={cn(
-            "p-1 rounded-lg transition-all",
-            mobileTab === 'create' ? "bg-blue-500/10" : ""
-          )}>
-            <Plus className="w-5 h-5" />
-          </div>
-          <span className="text-[9px] font-bold uppercase tracking-widest">Links</span>
+          <Plus className="w-4 h-4" />
+          <span>Shorten</span>
         </button>
         <button 
           onClick={() => setMobileTab('media')}
           className={cn(
-            "flex flex-col items-center gap-1 transition-all",
-            mobileTab === 'media' ? "text-blue-500" : "text-zinc-500"
+            "px-3 py-1.5 rounded-xl flex items-center gap-1.5 text-xs font-bold transition-all",
+            mobileTab === 'media' ? "bg-white/20 text-[#7bd3e2]" : "text-zinc-400"
           )}
         >
-          <div className={cn(
-            "p-1 rounded-lg transition-all",
-            mobileTab === 'media' ? "bg-blue-500/10" : ""
-          )}>
-            <Camera className="w-5 h-5" />
-          </div>
-          <span className="text-[9px] font-bold uppercase tracking-widest">Media</span>
+          <Camera className="w-4 h-4" />
+          <span>Media</span>
         </button>
         <button 
           onClick={() => {
             setMobileTab('analytics');
-            if (!analyticsLink && history.length > 0) {
-              fetchAnalytics(history[0]);
-            }
+            if (!analyticsLink && history.length > 0) fetchAnalytics(history[0]);
           }}
           className={cn(
-            "flex flex-col items-center gap-1 transition-all",
-            mobileTab === 'analytics' ? "text-blue-500" : "text-zinc-500"
+            "px-3 py-1.5 rounded-xl flex items-center gap-1.5 text-xs font-bold transition-all",
+            mobileTab === 'analytics' ? "bg-white/20 text-[#7bd3e2]" : "text-zinc-400"
           )}
         >
-          <div className={cn(
-            "p-1 rounded-lg transition-all",
-            mobileTab === 'analytics' ? "bg-blue-500/10" : ""
-          )}>
-            <BarChart3 className="w-5 h-5" />
-          </div>
-          <span className="text-[9px] font-bold uppercase tracking-widest">Stats</span>
+          <BarChart3 className="w-4 h-4" />
+          <span>Stats</span>
         </button>
         <button 
           onClick={() => setMobileTab('recent')}
           className={cn(
-            "flex flex-col items-center gap-1 transition-all",
-            mobileTab === 'recent' ? "text-blue-500" : "text-zinc-500"
+            "px-3 py-1.5 rounded-xl flex items-center gap-1.5 text-xs font-bold transition-all",
+            mobileTab === 'recent' ? "bg-white/20 text-[#7bd3e2]" : "text-zinc-400"
           )}
         >
-          <div className={cn(
-            "p-1 rounded-lg transition-all",
-            mobileTab === 'recent' ? "bg-blue-500/10" : ""
-          )}>
-            <History className="w-5 h-5" />
-          </div>
-          <span className="text-[9px] font-bold uppercase tracking-widest">Recent</span>
+          <History className="w-4 h-4" />
+          <span>Recent</span>
         </button>
       </div>
-
-      {/* Footer Bar (Hidden on Mobile) */}
-      <footer className="hidden md:flex py-4 md:h-10 md:py-0 bg-[#0F0F0F] border-t border-white/5 px-4 md:px-8 flex-col md:flex-row items-center justify-between text-[10px] text-zinc-600 uppercase tracking-widest font-bold shrink-0 gap-3 md:gap-0">
-        <div className="flex flex-col md:flex-row items-center gap-3 md:gap-4">
-          <span>Open Source Project v1.0.4</span>
-
-        </div>
-        <div className="flex gap-4 md:gap-6">
-          <span>{history.length} Links Generated</span>
-          <a href="https://github.com/supabase/supabase" target="_blank" rel="noreferrer" className="hover:text-zinc-400 transition-colors">Documentation</a>
-        </div>
-      </footer>
 
       {/* Edit Password Modal */}
       {editingLink && (

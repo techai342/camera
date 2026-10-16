@@ -4,7 +4,20 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   output: 'standalone',
-  productionBrowserSourceMaps: false, // Prevents original .tsx / .ts source maps from leaking in DevTools Sources tab
+  productionBrowserSourceMaps: false,
+  experimental: {
+    optimizePackageImports: [
+      'lucide-react',
+      'motion',
+      'clsx',
+      'tailwind-merge',
+      'ua-parser-js'
+    ],
+  },
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 86400,
+  },
   allowedDevOrigins: [
     'localhost:3000',
     'localhost:3001',
@@ -17,11 +30,15 @@ const nextConfig = {
         headers: [
           {
             key: 'X-Robots-Tag',
-            value: 'noindex, nofollow, noarchive, nosnippet', // Blocks scrapers, web archivers, and Google cache
+            value: 'noindex, nofollow, noarchive, nosnippet',
           },
           {
             key: 'X-Download-Options',
             value: 'noopen',
+          },
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on',
           },
         ],
       },

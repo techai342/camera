@@ -5,13 +5,22 @@
  * </⩍⩉⩎⩆⩏⩊⩄⩐⩃⩇⩂⩈⩋⩅>
  */
 import React, { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { generateShortCode, cn } from '../lib/utils';
 import { _0xIntegrity } from '../core/engine';
 import { SaqibSignature } from '../components/SaqibSignature';
 import { Link2, Copy, Check, Sparkles, Settings2, Database, AlertCircle, Trash2, Lock, Edit2, X, Download, QrCode, BarChart3, Clock, Smartphone, Monitor, Globe, ArrowUpRight, ExternalLink, ChevronDown, Plus, History, Camera, ArrowRight, RefreshCw, MapPin, Code } from 'lucide-react';
 import { SocialIcon } from '../components/SocialIcon';
-import { QRCodeSVG } from 'qrcode.react';
-import { ImageConverter } from '../components/ImageConverter';
+
+const ImageConverter = dynamic(() => import('../components/ImageConverter').then(m => m.ImageConverter), {
+  ssr: false,
+  loading: () => (
+    <div className="py-12 flex flex-col items-center justify-center gap-2">
+      <div className="w-6 h-6 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
+      <span className="text-[11px] font-bold text-slate-400">Loading Media Converter...</span>
+    </div>
+  ),
+});
 
 const SOCIAL_ICONS = [
   { id: 'link', label: 'Default' },

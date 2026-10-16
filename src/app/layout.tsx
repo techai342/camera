@@ -1,6 +1,23 @@
 import './globals.css';
 import type { Metadata, Viewport } from 'next';
+import { Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
 import { AntiInspectionShield } from '../components/AntiInspectionShield';
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-plus-jakarta',
+  display: 'swap',
+  preload: true,
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '600', '700'],
+  variable: '--font-jetbrains-mono',
+  display: 'swap',
+  preload: false,
+});
 
 export const metadata: Metadata = {
   title: 'Saqib Visuals - ShortyOS 3D Clay',
@@ -32,7 +49,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={`${plusJakartaSans.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
       <body className="antialiased overflow-x-hidden selection:bg-[#3a7d8c]/30 selection:text-white" suppressHydrationWarning>
         <AntiInspectionShield />
         {children}

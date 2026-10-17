@@ -665,33 +665,43 @@ create policy "Allow public delete access" on public.urls for delete using (true
           <div>
             {/* Avatar / Branding 3D Liquid Glass Lens */}
             <div className="flex flex-col items-center pt-1 pb-4">
-              <div className="relative group cursor-pointer" title="Muhammad Saqib — Saqib Visuals">
-                <div className="w-24 h-24 saqib-avatar-crop border-3 border-white shadow-2xl mx-auto hover:scale-105 transition-transform">
+              <div 
+                onClick={() => playBubblePop(560)}
+                className="relative w-24 h-24 mx-auto group cursor-pointer select-none" 
+                title="Muhammad Saqib — Saqib Visuals"
+              >
+                <div className="w-full h-full rounded-full saqib-avatar-crop border-[3px] border-white/95 ring-4 ring-white/60 transition-all duration-300 group-hover:scale-105 group-hover:ring-white/90 shadow-xl overflow-hidden">
                   <img 
                     src="https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png" 
                     alt="Muhammad Saqib"
-                    className="w-full h-full object-cover object-top"
+                    className="w-full h-full object-cover object-[50%_18%]"
+                    loading="eager"
                   />
                 </div>
-                {/* Floating Candy Bubble Orbs */}
-                <span className="glass-orb orb-blue w-7 h-7 text-[10px] text-white absolute -top-1 -left-1 float-badge shadow-md">
+                {/* Floating Candy Bubble Orbs - Snug Anchored to the Avatar Rim */}
+                <span className="glass-orb orb-blue w-7 h-7 text-white absolute -top-1 -left-1 float-badge shadow-lg flex items-center justify-center z-10 pointer-events-none">
                   <Camera className="w-3.5 h-3.5" />
                 </span>
-                <span className="glass-orb orb-green w-7 h-7 text-[10px] text-zinc-950 absolute -bottom-1 -right-1 float-badge shadow-md" style={{ animationDelay: '1.2s' }}>
+                <span className="glass-orb orb-green w-7 h-7 text-zinc-950 absolute -bottom-1 -right-1 float-badge shadow-lg flex items-center justify-center z-10 pointer-events-none" style={{ animationDelay: '1.2s' }}>
                   <MapPin className="w-3.5 h-3.5" />
                 </span>
               </div>
 
-              <div className="mt-3 text-center">
-                <div className="flex items-center justify-center gap-1 text-[24px] leading-none select-none">
-                  <span className="cartoon-letter text-[#2e45b8] -rotate-6">S</span>
-                  <span className="cartoon-letter text-[#e03c28] rotate-3 -ml-0.5">A</span>
-                  <span className="cartoon-letter text-[#f5ecd7] -rotate-3 -ml-0.5">Q</span>
-                  <span className="cartoon-letter text-[#f2b726] rotate-6 -ml-0.5">I</span>
-                  <span className="cartoon-letter text-[#278c68] -rotate-6 -ml-0.5">B</span>
+              <div className="mt-3.5 text-center">
+                <div 
+                  onClick={() => playBubblePop(720)}
+                  className="flex items-center justify-center gap-1 text-[26px] leading-none select-none cursor-pointer group/name"
+                  title="Muhammad Saqib"
+                >
+                  <span className="cartoon-letter text-[#2e45b8] -rotate-6 group-hover/name:-translate-y-1 transition-transform">S</span>
+                  <span className="cartoon-letter text-[#e03c28] rotate-3 -ml-0.5 group-hover/name:-translate-y-1 transition-transform" style={{ transitionDelay: '40ms' }}>A</span>
+                  <span className="cartoon-letter text-[#f5ecd7] -rotate-3 -ml-0.5 group-hover/name:-translate-y-1 transition-transform" style={{ transitionDelay: '80ms' }}>Q</span>
+                  <span className="cartoon-letter text-[#f2b726] rotate-6 -ml-0.5 group-hover/name:-translate-y-1 transition-transform" style={{ transitionDelay: '120ms' }}>I</span>
+                  <span className="cartoon-letter text-[#278c68] -rotate-6 -ml-0.5 group-hover/name:-translate-y-1 transition-transform" style={{ transitionDelay: '160ms' }}>B</span>
                 </div>
-                <div className="inline-flex items-center gap-1.5 mt-1.5 px-3 py-0.5 rounded-full bg-white/70 border border-white/90 text-zinc-900 text-[10px] font-extrabold uppercase tracking-wide shadow-sm">
-                  <span>✨ 3D Liquid Glass OS</span>
+                <div className="inline-flex items-center gap-2 mt-2 px-3 py-1 rounded-full liquid-glass-input text-zinc-800 text-[10px] font-black uppercase tracking-wider shadow-sm">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-sm"></span>
+                  <span>3D Liquid Glass OS</span>
                 </div>
               </div>
             </div>

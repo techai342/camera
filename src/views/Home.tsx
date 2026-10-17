@@ -751,9 +751,9 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
 
   return (
-    <div className="min-h-screen min-h-[100dvh] clay-noise py-1 sm:py-6 px-1.5 sm:px-4 md:px-6 flex items-center justify-center font-sans safe-bottom-padding pb-24 sm:pb-28 lg:pb-6">
+    <div className="min-h-screen min-h-[100dvh] clay-noise py-1 sm:py-6 px-1.5 sm:px-4 md:px-6 flex flex-col items-center justify-start lg:justify-center font-sans safe-bottom-padding pb-28 sm:pb-32 lg:pb-6 w-full max-w-full overflow-x-hidden">
       {/* MAIN 3D CLAY BOARD CONTAINER */}
-      <div className="clay-board w-full max-w-[1400px] p-2.5 sm:p-5 lg:p-6 flex flex-col lg:flex-row gap-3 sm:gap-5 relative">
+      <div className="clay-board w-full max-w-[1400px] min-w-0 mx-auto p-2.5 sm:p-5 lg:p-6 flex flex-col lg:flex-row gap-3 sm:gap-5 relative">
 
         {/* ==================== LEFT CLAY SIDEBAR ==================== */}
         <aside className="clay-sidebar w-full lg:w-[270px] shrink-0 p-5 hidden lg:flex flex-col justify-between">
@@ -929,11 +929,11 @@ create policy "Allow public delete access" on public.urls for delete using (true
         </aside>
 
         {/* ==================== RIGHT MAIN CONTENT AREA ==================== */}
-        <main className="flex-1 flex flex-col gap-3.5 sm:gap-5 min-w-0">
+        <main className="flex-1 flex flex-col gap-3.5 sm:gap-5 min-w-0 w-full max-w-full">
 
           {/* 1. TOP 3D LIQUID GLASS HEADER BAR */}
-          <header className="liquid-glass-box rounded-2xl sm:rounded-full px-2.5 sm:px-5 py-2 sm:py-2.5 flex items-center justify-between gap-1.5 sm:gap-3 shadow-md">
-            <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 shrink-0">
+          <header className="liquid-glass-box rounded-2xl sm:rounded-full px-2 sm:px-5 py-1.5 sm:py-2.5 flex items-center justify-between gap-1 sm:gap-3 shadow-md w-full min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 shrink">
               {/* Mini Avatar Lens for Mobile View (Desktop has full sidebar) */}
               <div 
                 onClick={() => playBubblePop(560)}
@@ -949,11 +949,11 @@ create policy "Allow public delete access" on public.urls for delete using (true
               </div>
 
               <div className="flex items-center gap-0.5 select-none shrink-0">
-                <span className="cartoon-letter text-[#2e45b8] text-[17px] sm:text-[26px] -rotate-6">S</span>
-                <span className="cartoon-letter text-[#e03c28] text-[17px] sm:text-[26px] rotate-3 -ml-0.5">A</span>
-                <span className="cartoon-letter text-[#f5ecd7] text-[17px] sm:text-[26px] -rotate-3 -ml-0.5">Q</span>
-                <span className="cartoon-letter text-[#f2b726] text-[17px] sm:text-[26px] rotate-6 -ml-0.5">I</span>
-                <span className="cartoon-letter text-[#278c68] text-[17px] sm:text-[26px] -rotate-6 -ml-0.5">B</span>
+                <span className="cartoon-letter text-[#2e45b8] text-[16px] sm:text-[26px] -rotate-6">S</span>
+                <span className="cartoon-letter text-[#e03c28] text-[16px] sm:text-[26px] rotate-3 -ml-0.5">A</span>
+                <span className="cartoon-letter text-[#f5ecd7] text-[16px] sm:text-[26px] -rotate-3 -ml-0.5">Q</span>
+                <span className="cartoon-letter text-[#f2b726] text-[16px] sm:text-[26px] rotate-6 -ml-0.5">I</span>
+                <span className="cartoon-letter text-[#278c68] text-[16px] sm:text-[26px] -rotate-6 -ml-0.5">B</span>
               </div>
               <div className="min-w-0 hidden md:block">
                 <div className="flex items-center gap-1.5">
@@ -993,14 +993,14 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
               {/* User Profile / Free Quota Badge */}
               {currentUser ? (
-                <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 rounded-full liquid-glass-input shadow-xs shrink-0 max-w-[110px] xs:max-w-[140px] sm:max-w-none">
-                  <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center text-[10px] font-black shrink-0">
+                <div className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-3 py-1 rounded-full liquid-glass-input shadow-xs shrink-0 max-w-[105px] xs:max-w-[140px] sm:max-w-none">
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center text-[9px] sm:text-[10px] font-black shrink-0">
                     {currentUser.username.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-[10.5px] sm:text-xs font-black text-zinc-900 truncate max-w-[55px] xs:max-w-[85px] sm:max-w-[120px]">
+                  <span className="text-[10px] sm:text-xs font-black text-zinc-900 truncate max-w-[50px] xs:max-w-[85px] sm:max-w-[120px]">
                     @{currentUser.username}
                   </span>
-                  <span className="hidden xs:inline-block px-1.5 py-0.2 rounded-full bg-amber-400 text-amber-950 text-[9px] font-black shadow-xs">
+                  <span className="hidden xs:inline-block px-1.5 py-0.2 rounded-full bg-amber-400 text-amber-950 text-[8.5px] font-black shadow-xs">
                     VIP
                   </span>
                   <button
@@ -1008,7 +1008,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                     className="text-zinc-500 hover:text-red-600 p-0.5 transition-colors cursor-pointer shrink-0"
                     title="Log Out"
                   >
-                    <LogOut className="w-3.5 h-3.5" />
+                    <LogOut className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                   </button>
                 </div>
               ) : (
@@ -1022,7 +1022,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                       setShowAuthModal(true);
                     }}
                     className={cn(
-                      "px-2 sm:px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-black transition-all flex items-center gap-0.5 sm:gap-1 border shadow-xs cursor-pointer active:scale-95 shrink-0",
+                      "px-1.5 sm:px-2.5 py-1 rounded-full text-[9.5px] sm:text-[11px] font-black transition-all flex items-center gap-0.5 sm:gap-1 border shadow-xs cursor-pointer active:scale-95 shrink-0",
                       guestTriesUsed >= 5 
                         ? "bg-rose-100 text-rose-800 border-rose-300 animate-pulse" 
                         : "bg-indigo-50 text-indigo-800 border-indigo-200 hover:bg-indigo-100"
@@ -1041,7 +1041,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                       setAuthModalReason('manual');
                       setShowAuthModal(true);
                     }}
-                    className="glass-orb orb-champagne px-2 py-1 sm:px-3 sm:py-1.5 text-[10.5px] sm:text-xs font-black text-zinc-800 flex items-center gap-1 active:scale-95 transition-transform shrink-0"
+                    className="glass-orb orb-champagne px-1.5 py-1 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-black text-zinc-800 flex items-center gap-1 active:scale-95 transition-transform shrink-0"
                     title="Sign In or Register"
                   >
                     <User className="w-3.5 h-3.5 shrink-0" />
@@ -1073,7 +1073,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => playBubblePop(720)}
-                className="glass-orb orb-green w-7 h-7 sm:w-auto px-1.5 sm:px-3 sm:py-1.5 text-[10.5px] sm:text-xs font-black flex items-center justify-center gap-1 text-white active:scale-95 transition-transform shrink-0 shadow-md"
+                className="glass-orb orb-green w-7 h-7 sm:w-auto px-1.5 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-black flex items-center justify-center gap-1 text-white active:scale-95 transition-transform shrink-0 shadow-md hidden xs:flex"
                 title="Join WhatsApp Channel"
               >
                 <MessageCircle className="w-3.5 h-3.5 shrink-0" />
@@ -1739,7 +1739,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
       </div>
 
       {/* Mobile Bottom Navigation Bar (High-Gloss Liquid Glass) */}
-      <div className="lg:hidden fixed bottom-3 left-2.5 right-2.5 sm:left-6 sm:right-6 liquid-glass-box p-1 sm:p-1.5 flex items-center justify-around z-50 shadow-2xl safe-bottom-bar rounded-full border-2 border-white/90 backdrop-blur-xl">
+      <div className="lg:hidden fixed bottom-3 left-3 right-3 sm:left-6 sm:right-6 max-w-md mx-auto liquid-glass-box p-1 sm:p-1.5 flex items-center justify-around z-50 shadow-2xl safe-bottom-bar rounded-full border-2 border-white/90 backdrop-blur-xl">
         <button 
           onClick={() => {
             playBubblePop(520);

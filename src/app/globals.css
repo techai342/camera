@@ -569,6 +569,15 @@ body {
   will-change: transform;
 }
 
+/* CRITICAL: Fixed overlays, modals, backdrops, and bottom navigation pill MUST NOT inherit translateZ */
+.fixed,
+[class*="fixed"],
+.safe-bottom-bar {
+  transform: none !important;
+  will-change: auto !important;
+  backface-visibility: visible !important;
+}
+
 /* Smooth momentum touch scrolling */
 .clay-scroll {
   -webkit-overflow-scrolling: touch;

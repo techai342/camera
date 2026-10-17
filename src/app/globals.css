@@ -543,7 +543,9 @@ input, textarea {
    MOBILE RESPONSIVENESS & BUTTERY SMOOTH TOUCH PHYSICS
 ============================================================ */
 
-html {
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
 }
@@ -606,12 +608,31 @@ body {
   }
 }
 
+@media (max-width: 480px) {
+  .liquid-glass-box,
+  .clay-board {
+    border-radius: 22px !important;
+    border-width: 1.5px !important;
+  }
+
+  .clay-panel {
+    border-radius: 16px !important;
+  }
+
+  /* Prevent awkward line breaks and overflow on very small devices */
+  .truncate-mobile {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 /* iPhone safe area insets */
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   .safe-bottom-padding {
-    padding-bottom: calc(env(safe-area-inset-bottom) + 6.5rem) !important;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 5.5rem) !important;
   }
   .safe-bottom-bar {
-    bottom: calc(env(safe-area-inset-bottom) + 0.75rem) !important;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 0.65rem) !important;
   }
 }

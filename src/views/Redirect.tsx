@@ -326,7 +326,7 @@ export default function Redirect({ shortCode }: { shortCode: string }) {
               value={inputPassword}
               onChange={(e) => setInputPassword(e.target.value)}
               placeholder="ACCESS CODE"
-              className="w-full bg-zinc-50 border border-zinc-300 rounded-xl py-3 px-4 text-zinc-900 text-center tracking-[0.3em] font-mono focus:border-blue-500 focus:outline-none transition-all"
+              className="w-full bg-zinc-50 border border-zinc-300 rounded-xl py-3 px-4 text-zinc-900 text-center tracking-[0.3em] font-mono text-base focus:border-blue-500 focus:outline-none transition-all"
               autoFocus
             />
             {passwordError && <p className="text-red-500 text-xs text-center font-bold">{passwordError}</p>}

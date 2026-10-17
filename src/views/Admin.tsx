@@ -741,6 +741,28 @@ export function useMyDomainAnalytics() {
             </div>
             <div className="flex items-center gap-1.5 md:hidden">
               <button 
+                onClick={() => {
+                  setAdminTab('coupons');
+                  generateRandomCouponCode();
+                  setShowCreateCouponModal(true);
+                }}
+                className="px-2.5 py-1 text-white bg-gradient-to-r from-emerald-600 to-teal-600 rounded-full text-[11px] font-black shadow-sm flex items-center gap-1 active:scale-95 cursor-pointer"
+                title="Create Coupon"
+              >
+                <Ticket className="w-3 h-3" />
+                <span>+Coupon</span>
+              </button>
+              <button 
+                onClick={() => {
+                  setAdminTab('users');
+                  fetchUsers();
+                }}
+                className="p-1.5 text-indigo-700 hover:text-indigo-900 bg-indigo-500/15 rounded-full border border-indigo-500/30 active:scale-95 shadow-sm cursor-pointer"
+                title="Users"
+              >
+                <Users className="w-3.5 h-3.5" />
+              </button>
+              <button 
                 onClick={openProfileModal}
                 className="p-1.5 text-indigo-700 hover:text-indigo-900 bg-indigo-500/15 rounded-full border border-indigo-500/30 active:scale-95 shadow-sm"
                 title="Profile & Settings"
@@ -810,12 +832,47 @@ export function useMyDomainAnalytics() {
             </div>
             <div className="hidden md:flex items-center gap-2">
               <button 
+                onClick={() => {
+                  setAdminTab('coupons');
+                  generateRandomCouponCode();
+                  setShowCreateCouponModal(true);
+                }}
+                className="text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 px-3.5 py-1.5 rounded-full text-xs font-black shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all"
+                title="Create New Coupon Code"
+              >
+                <Ticket className="w-3.5 h-3.5" />
+                <span>+ Create Coupon</span>
+              </button>
+              <button 
+                onClick={() => {
+                  setAdminTab('users');
+                  fetchUsers();
+                }}
+                className="text-indigo-900 bg-indigo-500/20 hover:bg-indigo-500/30 px-3 py-1.5 rounded-full border border-indigo-500/40 text-xs font-black shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all"
+                title="Manage Users"
+              >
+                <Users className="w-3.5 h-3.5" />
+                <span>Users ({userStats.totalUsers || usersList.length})</span>
+              </button>
+              <button 
+                onClick={() => {
+                  setAdminTab('coupons');
+                  fetchCoupons();
+                }}
+                className="text-amber-950 bg-amber-500/20 hover:bg-amber-500/30 px-3 py-1.5 rounded-full border border-amber-500/40 text-xs font-black shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all"
+                title="Coupon Codes List"
+              >
+                <Ticket className="w-3.5 h-3.5" />
+                <span>Coupons ({couponStats.totalCoupons || couponsList.length})</span>
+              </button>
+              <div className="h-8 md:h-10 w-[1px] bg-zinc-300/60 mx-0.5"></div>
+              <button 
                 onClick={openProfileModal}
                 className="text-indigo-800 hover:text-indigo-950 transition-colors flex items-center gap-1.5 bg-indigo-500/15 hover:bg-indigo-500/25 px-3 py-1.5 rounded-full border border-indigo-500/30 text-xs font-extrabold shadow-sm cursor-pointer"
                 title="Edit DP, Saqib Name, Username & Password"
               >
                 <User className="w-3.5 h-3.5" />
-                <span>Profile &amp; Settings</span>
+                <span>Profile</span>
               </button>
               <button 
                 onClick={downloadFullIntegrationPrompt}

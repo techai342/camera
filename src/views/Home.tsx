@@ -982,6 +982,27 @@ create policy "Allow public delete access" on public.urls for delete using (true
                   </span>
                 )}
               </button>
+              <button
+                onClick={() => {
+                  playBubblePop(660);
+                  if (currentUser) {
+                    setShowUserPlanModal(true);
+                  } else {
+                    setAuthModalMode('login');
+                    setAuthModalReason('manual');
+                    setShowAuthModal(true);
+                  }
+                }}
+                className="w-full flex items-center justify-between px-4 py-2.5 text-[14px] font-bold rounded-full bg-gradient-to-r from-amber-500/20 via-orange-500/15 to-amber-500/20 border border-amber-500/40 hover:bg-amber-500/25 text-amber-950 transition-all cursor-pointer shadow-xs active:scale-98"
+              >
+                <div className="flex items-center gap-3.5">
+                  <Ticket className="w-5 h-5 text-amber-600 shrink-0" />
+                  <span className="font-black">Redeem Coupon</span>
+                </div>
+                <span className="px-2 py-0.5 rounded-full bg-amber-500 text-amber-950 text-[9.5px] font-black uppercase tracking-wider shadow-xs">
+                  PRO / VIP
+                </span>
+              </button>
             </nav>
 
             {/* Recent Short Links List in Sidebar */}
@@ -1205,6 +1226,26 @@ create policy "Allow public delete access" on public.urls for delete using (true
                   </button>
                 </div>
               )}
+
+              {/* Dedicated Coupon Code Button */}
+              <button
+                onClick={() => {
+                  playBubblePop(660);
+                  if (currentUser) {
+                    setShowUserPlanModal(true);
+                  } else {
+                    setAuthModalMode('login');
+                    setAuthModalReason('manual');
+                    setShowAuthModal(true);
+                  }
+                }}
+                className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white text-[10px] sm:text-xs font-black shadow-md flex items-center gap-1 active:scale-95 transition-all cursor-pointer shrink-0"
+                title="Redeem Promo / Coupon Code"
+              >
+                <Ticket className="w-3.5 h-3.5 shrink-0" />
+                <span className="hidden xs:inline">🎟️ Coupon</span>
+                <span className="xs:hidden">🎟️</span>
+              </button>
 
               {/* API Modal Button */}
               <button 
@@ -2039,6 +2080,25 @@ create policy "Allow public delete access" on public.urls for delete using (true
           >
             <History className="w-5 h-5 shrink-0 stroke-[2.2]" />
             <span className="text-[10px] sm:text-[10.5px] font-black uppercase tracking-wider leading-none">Recent</span>
+          </button>
+
+          <button 
+            type="button"
+            onClick={() => {
+              playBubblePop(660);
+              if (currentUser) {
+                setShowUserPlanModal(true);
+              } else {
+                setAuthModalMode('login');
+                setAuthModalReason('manual');
+                setShowAuthModal(true);
+              }
+            }}
+            className="flex-1 dock-nav-btn text-amber-900"
+            title="Redeem Coupon Code & Manage Plan"
+          >
+            <Ticket className="w-5 h-5 shrink-0 stroke-[2.2] text-amber-600" />
+            <span className="text-[10px] sm:text-[10.5px] font-black uppercase tracking-wider leading-none text-amber-900">Coupon</span>
           </button>
         </div>
       </nav>

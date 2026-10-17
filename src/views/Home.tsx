@@ -11,6 +11,7 @@ import { _0xIntegrity } from '../core/engine';
 import { SaqibSignature } from '../components/SaqibSignature';
 import { Link2, Copy, Check, Sparkles, Settings2, Database, AlertCircle, Trash2, Lock, Edit2, X, Download, QrCode, BarChart3, Clock, Smartphone, Monitor, Globe, ArrowUpRight, ExternalLink, ChevronDown, Plus, History, Camera, ArrowRight, RefreshCw, MapPin, Code, Volume2, VolumeX, MessageCircle, LogOut, UserCheck, User } from 'lucide-react';
 import { SocialIcon } from '../components/SocialIcon';
+import { SiWhatsapp } from 'react-icons/si';
 import { playBubblePop, toggleSound, isSoundEnabled } from '../lib/sound';
 import { UserAuthModal } from '../components/UserAuthModal';
 
@@ -28,12 +29,13 @@ const SOCIAL_ICONS = [
   { id: 'link', label: 'Default' },
   { id: 'youtube', label: 'YouTube' },
   { id: 'instagram', label: 'Instagram' },
-  { id: 'twitter', label: 'Twitter' },
+  { id: 'twitter', label: 'Twitter / X' },
   { id: 'facebook', label: 'Facebook' },
-  { id: 'whatsapp', label: 'Chat' },
-  { id: 'linkedin', label: 'LinkedIn' },
-  { id: 'snapchat', label: 'Snapchat' },
+  { id: 'whatsapp', label: 'WhatsApp' },
+  { id: 'telegram', label: 'Telegram' },
   { id: 'tiktok', label: 'TikTok' },
+  { id: 'snapchat', label: 'Snapchat' },
+  { id: 'linkedin', label: 'LinkedIn' },
 ];
 
 const getDeviceId = () => {
@@ -921,8 +923,9 @@ create policy "Allow public delete access" on public.urls for delete using (true
               target="_blank" 
               rel="noreferrer"
               onClick={() => playBubblePop(720)}
-              className="glass-orb orb-green mt-3 w-full py-2 px-3 text-[12px] font-bold flex items-center justify-center gap-1.5 text-white active:scale-95 transition-transform shadow-md"
+              className="glass-orb orb-green mt-3 w-full py-2.5 px-3 text-[12px] font-bold flex items-center justify-center gap-2 text-white active:scale-95 transition-transform shadow-md"
             >
+              <SiWhatsapp className="w-4 h-4 shrink-0" />
               <span>Connect on WhatsApp</span>
             </a>
           </div>
@@ -1073,10 +1076,10 @@ create policy "Allow public delete access" on public.urls for delete using (true
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => playBubblePop(720)}
-                className="glass-orb orb-green w-7 h-7 sm:w-auto px-1.5 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-black flex items-center justify-center gap-1 text-white active:scale-95 transition-transform shrink-0 shadow-md hidden xs:flex"
+                className="glass-orb orb-green w-7 h-7 sm:w-auto px-1.5 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-black flex items-center justify-center gap-1.5 text-white active:scale-95 transition-transform shrink-0 shadow-md hidden xs:flex"
                 title="Join WhatsApp Channel"
               >
-                <MessageCircle className="w-3.5 h-3.5 shrink-0" />
+                <SiWhatsapp className="w-3.5 h-3.5 shrink-0" />
                 <span className="hidden sm:inline">Channel</span>
               </a>
             </div>
@@ -1727,8 +1730,9 @@ create policy "Allow public delete access" on public.urls for delete using (true
                     href="https://wa.me/923478936242" 
                     target="_blank" 
                     rel="noreferrer"
-                    className="flex-1 sm:flex-none clay-teal-btn px-4 sm:px-5 py-2.5 text-[12.5px] font-bold flex items-center justify-center gap-1.5 active:scale-95 transition-transform"
+                    className="flex-1 sm:flex-none clay-teal-btn px-4 sm:px-5 py-2.5 text-[12.5px] font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform"
                   >
+                    <SiWhatsapp className="w-4 h-4 shrink-0 text-white" />
                     <span>WhatsApp</span>
                   </a>
                 </div>

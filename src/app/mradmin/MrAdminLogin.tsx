@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Lock, User, AlertCircle, Loader2 } from 'lucide-react';
 import { SaqibSignature } from '../../components/SaqibSignature';
+import { playBubblePop } from '../../lib/sound';
 
 export default function MrAdminLogin() {
   const [username, setUsername] = useState('admin');
@@ -17,6 +18,7 @@ export default function MrAdminLogin() {
       return;
     }
 
+    playBubblePop(720);
     setError('');
     setIsSubmitting(true);
 
@@ -30,9 +32,10 @@ export default function MrAdminLogin() {
       const data = await res.json();
 
       if (res.ok && data.success) {
-        // Authenticated! Reload page so server sends the full MrAdmin Dashboard
+        playBubblePop(880);
         window.location.reload();
       } else {
+        playBubblePop(380);
         if (res.status === 429) {
           setError(data.error || 'Rate limit exceeded: Too many attempts. Please wait 15 minutes.');
         } else {
@@ -47,21 +50,32 @@ export default function MrAdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070b12] flex items-center justify-center p-4 sm:p-6 flex-col">
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 flex-col relative overflow-hidden">
+      {/* Ambient Refraction Blobs */}
+      <div className="ambient-refraction-blob w-72 h-72 bg-amber-400/40 -top-10 -left-10" />
+      <div className="ambient-refraction-blob w-80 h-80 bg-teal-500/30 -bottom-10 -right-10" />
+
       <motion.div 
         initial={{ opacity: 0, y: 25, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.35, ease: 'easeOut' }}
-        className="w-full max-w-sm clay-board p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden"
+        className="w-full max-w-sm liquid-glass-box rounded-[40px] p-6 sm:p-8 text-center shadow-2xl relative z-10"
       >
-        <div className="clay-circle-grey w-18 h-18 sm:w-20 sm:h-20 flex items-center justify-center mx-auto mb-5 text-[#2c6574]">
-          <Shield className="w-9 h-9 sm:w-10 sm:h-10 text-[#2c6574]" />
+        <div className="glass-orb orb-rainbow w-20 h-20 flex items-center justify-center mx-auto mb-5 text-white shadow-xl">
+          <Shield className="w-10 h-10 drop-shadow" />
         </div>
 
-        <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-[#162736] mb-1">
-          MrAdmin Access
-        </h1>
-        <p className="text-[#3b556b] font-medium text-xs mb-6">
+        <div className="flex items-center justify-center gap-1 text-[24px] sm:text-[28px] leading-none select-none mb-1">
+          <span className="cartoon-letter text-[#2e45b8] -rotate-6">M</span>
+          <span className="cartoon-letter text-[#e03c28] rotate-3 -ml-0.5">R</span>
+          <span className="cartoon-letter text-[#f5ecd7] -rotate-3 -ml-0.5">A</span>
+          <span className="cartoon-letter text-[#f2b726] rotate-6 -ml-0.5">D</span>
+          <span className="cartoon-letter text-[#278c68] -rotate-6 -ml-0.5">M</span>
+          <span className="cartoon-letter text-[#2e45b8] rotate-3 -ml-0.5">I</span>
+          <span className="cartoon-letter text-[#e03c28] -rotate-6 -ml-0.5">N</span>
+        </div>
+
+        <p className="text-zinc-700 font-extrabold text-xs mb-6">
           PBKDF2-SHA256 Protected Terminal • High-Security Vault
         </p>
 
@@ -69,9 +83,9 @@ export default function MrAdminLogin() {
           <motion.div 
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold flex items-center gap-2 text-left"
+            className="mb-4 p-3 rounded-2xl bg-red-500/15 border border-red-500/30 text-red-900 text-xs font-black flex items-center gap-2 text-left"
           >
-            <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
             <span>{error}</span>
           </motion.div>
         )}
@@ -84,10 +98,10 @@ export default function MrAdminLogin() {
               onChange={(e) => setUsername(e.target.value)}
               placeholder="ADMIN USERNAME"
               disabled={isSubmitting}
-              className="w-full clay-search-pill py-3.5 pl-11 pr-4 text-[#162736] text-[15px] sm:text-xs font-mono font-bold focus:outline-none transition-colors"
+              className="w-full liquid-glass-input py-3.5 pl-11 pr-4 text-zinc-900 text-[15px] sm:text-xs font-mono font-bold focus:outline-none transition-colors"
               autoComplete="username"
             />
-            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#436279]" />
+            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
           </div>
 
           <div className="relative">
@@ -97,17 +111,17 @@ export default function MrAdminLogin() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="ENTER ACCESS KEY"
               disabled={isSubmitting}
-              className="w-full clay-search-pill py-3.5 pl-11 pr-4 text-[#162736] text-[15px] sm:text-xs font-mono font-bold focus:outline-none transition-colors"
+              className="w-full liquid-glass-input py-3.5 pl-11 pr-4 text-zinc-900 text-[15px] sm:text-xs font-mono font-bold focus:outline-none transition-colors"
               autoFocus
               autoComplete="current-password"
             />
-            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#436279]" />
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
           </div>
 
           <button 
             type="submit"
             disabled={isSubmitting}
-            className="w-full clay-teal-btn py-3.5 text-white font-extrabold uppercase tracking-widest text-xs shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-70 cursor-pointer"
+            className="w-full glass-orb orb-blue py-3.5 text-white font-black uppercase tracking-widest text-xs shadow-xl transition-all flex items-center justify-center gap-2 disabled:opacity-70 cursor-pointer"
           >
             {isSubmitting ? (
               <>
@@ -121,7 +135,9 @@ export default function MrAdminLogin() {
         </form>
       </motion.div>
 
-      <SaqibSignature className="mt-8" />
+      <div className="relative z-10">
+        <SaqibSignature className="mt-8" />
+      </div>
     </div>
   );
 }

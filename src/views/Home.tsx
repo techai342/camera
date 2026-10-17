@@ -9,8 +9,9 @@ import dynamic from 'next/dynamic';
 import { generateShortCode, cn } from '../lib/utils';
 import { _0xIntegrity } from '../core/engine';
 import { SaqibSignature } from '../components/SaqibSignature';
-import { Link2, Copy, Check, Sparkles, Settings2, Database, AlertCircle, Trash2, Lock, Edit2, X, Download, QrCode, BarChart3, Clock, Smartphone, Monitor, Globe, ArrowUpRight, ExternalLink, ChevronDown, Plus, History, Camera, ArrowRight, RefreshCw, MapPin, Code } from 'lucide-react';
+import { Link2, Copy, Check, Sparkles, Settings2, Database, AlertCircle, Trash2, Lock, Edit2, X, Download, QrCode, BarChart3, Clock, Smartphone, Monitor, Globe, ArrowUpRight, ExternalLink, ChevronDown, Plus, History, Camera, ArrowRight, RefreshCw, MapPin, Code, Volume2, VolumeX } from 'lucide-react';
 import { SocialIcon } from '../components/SocialIcon';
+import { playBubblePop, toggleSound, isSoundEnabled } from '../lib/sound';
 
 const ImageConverter = dynamic(() => import('../components/ImageConverter').then(m => m.ImageConverter), {
   ssr: false,
@@ -51,6 +52,7 @@ const getDeviceId = () => {
 };
 
 export default function Home() {
+  const [soundOn, setSoundOn] = useState(true);
   const [longUrl, setLongUrl] = useState('');
   const [customCode, setCustomCode] = useState('');
   const [isPasswordEnabled, setIsPasswordEnabled] = useState(false);
@@ -661,29 +663,35 @@ create policy "Allow public delete access" on public.urls for delete using (true
         {/* ==================== LEFT CLAY SIDEBAR ==================== */}
         <aside className="clay-sidebar w-full lg:w-[270px] shrink-0 p-5 hidden lg:flex flex-col justify-between">
           <div>
-            {/* Avatar / Branding Clay Ring */}
+            {/* Avatar / Branding 3D Liquid Glass Lens */}
             <div className="flex flex-col items-center pt-1 pb-4">
-              <div className="avatar-clay-ring w-24 h-24 relative group cursor-pointer" title="Muhammad Saqib — Saqib Visuals">
-                <div className="w-full h-full rounded-full overflow-hidden bg-[#1f3144] shadow-inner flex items-center justify-center">
+              <div className="relative group cursor-pointer" title="Muhammad Saqib — Saqib Visuals">
+                <div className="w-24 h-24 saqib-avatar-crop border-3 border-white shadow-2xl mx-auto hover:scale-105 transition-transform">
                   <img 
                     src="https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png" 
                     alt="Muhammad Saqib"
-                    className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
+                    className="w-full h-full object-cover object-top"
                   />
                 </div>
-                <span className="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-emerald-400 border-[2.5px] border-[#1f3144] shadow-md flex items-center justify-center">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+                {/* Floating Candy Bubble Orbs */}
+                <span className="glass-orb orb-blue w-7 h-7 text-[10px] text-white absolute -top-1 -left-1 float-badge shadow-md">
+                  <Camera className="w-3.5 h-3.5" />
+                </span>
+                <span className="glass-orb orb-green w-7 h-7 text-[10px] text-zinc-950 absolute -bottom-1 -right-1 float-badge shadow-md" style={{ animationDelay: '1.2s' }}>
+                  <MapPin className="w-3.5 h-3.5" />
                 </span>
               </div>
 
               <div className="mt-3 text-center">
-                <h2 className="text-[17.5px] font-extrabold text-[#eef5fa] tracking-tight flex items-center justify-center gap-1.5">
-                  <span>ShortyOS</span>
-                  <Check className="w-4 h-4 text-[#62c3d4]" />
-                </h2>
-                <div className="inline-flex items-center gap-1.5 mt-1 px-3 py-0.5 rounded-full bg-white/10 border border-white/15 text-[#c6daea] text-[11px] font-bold">
-                  <span>✨ Saqib Visuals</span>
-                  <span className="text-[#7bd3e2]">• 3D Clay</span>
+                <div className="flex items-center justify-center gap-1 text-[24px] leading-none select-none">
+                  <span className="cartoon-letter text-[#2e45b8] -rotate-6">S</span>
+                  <span className="cartoon-letter text-[#e03c28] rotate-3 -ml-0.5">A</span>
+                  <span className="cartoon-letter text-[#f5ecd7] -rotate-3 -ml-0.5">Q</span>
+                  <span className="cartoon-letter text-[#f2b726] rotate-6 -ml-0.5">I</span>
+                  <span className="cartoon-letter text-[#278c68] -rotate-6 -ml-0.5">B</span>
+                </div>
+                <div className="inline-flex items-center gap-1.5 mt-1.5 px-3 py-0.5 rounded-full bg-white/15 border border-white/25 text-[#f1f5f9] text-[10px] font-extrabold uppercase tracking-wide">
+                  <span>✨ 3D Liquid Glass OS</span>
                 </div>
               </div>
             </div>
@@ -799,28 +807,47 @@ create policy "Allow public delete access" on public.urls for delete using (true
         {/* ==================== RIGHT MAIN CONTENT AREA ==================== */}
         <main className="flex-1 flex flex-col gap-3.5 sm:gap-5 min-w-0">
 
-          {/* 1. TOP HEADER BAR */}
-          <header className="flex items-center justify-between gap-2 pt-1 px-1">
-            <div className="min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="embossed-title text-[18px] sm:text-[28px] font-extrabold leading-tight truncate">
-                  Saqib Visuals
-                </h1>
-                <span className="clay-small-pill px-2 py-0.5 text-[9px] sm:text-[10px] font-mono-code font-bold text-[#142c38] flex items-center gap-1 shrink-0">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>Live</span>
-                </span>
+          {/* 1. TOP 3D LIQUID GLASS HEADER BAR */}
+          <header className="liquid-glass-box rounded-3xl sm:rounded-full px-3.5 sm:px-5 py-2.5 flex items-center justify-between gap-3 shadow-md">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <div className="flex items-center gap-0.5 select-none shrink-0">
+                <span className="cartoon-letter text-[#2e45b8] text-[20px] sm:text-[26px] -rotate-6">S</span>
+                <span className="cartoon-letter text-[#e03c28] text-[20px] sm:text-[26px] rotate-3 -ml-0.5">A</span>
+                <span className="cartoon-letter text-[#f5ecd7] text-[20px] sm:text-[26px] -rotate-3 -ml-0.5">Q</span>
+                <span className="cartoon-letter text-[#f2b726] text-[20px] sm:text-[26px] rotate-6 -ml-0.5">I</span>
+                <span className="cartoon-letter text-[#278c68] text-[20px] sm:text-[26px] -rotate-6 -ml-0.5">B</span>
               </div>
-              <p className="text-[#23394d] text-[10px] sm:text-[12px] font-bold mt-0.5 truncate hidden sm:block">
-                💎 URL Shortener • Camera Verification • Device Intel
-              </p>
+              <div className="min-w-0 hidden xs:block">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[12px] sm:text-[14px] font-black tracking-tight text-zinc-900">VISUALS</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/25 border border-emerald-500/40 text-[9px] font-extrabold text-emerald-950 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping" />
+                    <span>3D OS</span>
+                  </span>
+                </div>
+              </div>
             </div>
 
-            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 z-10">
+              {/* Sound Toggle Bubble Orb */}
+              <button 
+                onClick={() => {
+                  const state = toggleSound();
+                  setSoundOn(state);
+                }} 
+                className={cn("glass-orb w-8 h-8 sm:w-9 sm:h-9 text-xs transition-transform active:scale-90", soundOn ? "orb-clear" : "orb-champagne opacity-70")}
+                title={soundOn ? "Mute Tactile Bubble Audio" : "Enable Tactile Bubble Audio"}
+              >
+                {soundOn ? <Volume2 className="w-3.5 h-3.5 text-zinc-900" /> : <VolumeX className="w-3.5 h-3.5 text-zinc-500" />}
+              </button>
+
               {/* Sync Device Button */}
               <button 
-                onClick={() => setShowSyncModal(true)} 
-                className="clay-circle-grey w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-[#1d3346] active:scale-95 transition-transform"
+                onClick={() => {
+                  playBubblePop(660);
+                  setShowSyncModal(true);
+                }} 
+                className="glass-orb orb-champagne w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-zinc-900 active:scale-95 transition-transform"
                 title={phoneNumber ? `Synced: ${phoneNumber}` : "Sync Device Identity"}
               >
                 <Smartphone className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -828,8 +855,11 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
               {/* API Modal Button */}
               <button 
-                onClick={() => setShowApiModal(true)} 
-                className="clay-circle-grey w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-[#1d3346] active:scale-95 transition-transform"
+                onClick={() => {
+                  playBubblePop(690);
+                  setShowApiModal(true);
+                }} 
+                className="glass-orb orb-amber w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-zinc-950 active:scale-95 transition-transform"
                 title="API Hub & Documentation"
               >
                 <Code className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -840,7 +870,8 @@ create policy "Allow public delete access" on public.urls for delete using (true
                 href="https://www.whatsapp.com/channel/0029VbBTSK1EquiWrUt5uV1I"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="clay-teal-btn px-2.5 py-1.5 sm:px-3.5 sm:py-2 text-[11px] sm:text-xs font-bold flex items-center gap-1 active:scale-95 transition-transform shrink-0"
+                onClick={() => playBubblePop(720)}
+                className="glass-orb orb-green px-3 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-xs font-black flex items-center gap-1 text-white active:scale-95 transition-transform shrink-0 shadow-md"
               >
                 <span>Channel</span>
               </a>
@@ -1104,120 +1135,131 @@ create policy "Allow public delete access" on public.urls for delete using (true
           ) : (
             /* ==================== SHORTEN LINK (CREATE TAB) ==================== */
             <div className="space-y-5">
-              {/* Main Clay Hero Card */}
-              <section className="clay-hero-card p-4 sm:p-7 relative">
-                <div className="mb-3.5 sm:mb-5">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-white/10 border border-white/15 text-[#88e2f2] text-[10px] sm:text-[11px] font-extrabold tracking-wide mb-1.5 sm:mb-2">
-                    <span>🚀 URL INTELLIGENCE</span>
-                    <span>•</span>
-                    <span>✨ SAQIB VISUALS</span>
+              {/* Main Liquid Glass Hero Card */}
+              <section className="liquid-glass-box rounded-[38px] p-5 sm:p-8 relative">
+                <div className="mb-4 sm:mb-6">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900 text-amber-300 text-[10px] sm:text-[11px] font-extrabold tracking-wide uppercase shadow mb-2">
+                    <span>🚀 3D LIQUID GLASS CONTROL CENTER</span>
                   </div>
-                  <h2 className="text-[19px] sm:text-[25px] font-extrabold text-[#f1f7fb] tracking-tight leading-tight drop-shadow">
-                    Simplify Your Links &amp; Verify Visitors
+                  <h2 className="text-[20px] sm:text-[27px] font-black text-zinc-900 tracking-tight leading-tight">
+                    Generate Smart Links &amp; Verify Visitors
                   </h2>
-                  <p className="text-[#c5d7e6] text-[11px] sm:text-[13px] font-medium mt-1 leading-snug">
-                    Paste any destination URL to create ultra-fast short links with selfie verification and GPS intelligence.
+                  <p className="text-zinc-700 text-[11px] sm:text-[13px] font-bold mt-1 leading-snug">
+                    Paste any destination URL to create ultra-fast short links with camera verification, GPS intelligence, and password protection.
                   </p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                   {/* 1. Destination URL Input */}
                   <div>
-                    <label htmlFor="url" className="text-[11px] font-extrabold text-[#d2e2ee] uppercase tracking-wider mb-2 block flex items-center gap-1.5">
-                      <Link2 className="w-3.5 h-3.5 text-[#7bd3e2]" /> Destination URL (Target Link)
+                    <label htmlFor="url" className="text-[11px] font-extrabold text-zinc-800 uppercase tracking-wider mb-2 block flex items-center gap-1.5">
+                      <Link2 className="w-3.5 h-3.5 text-blue-600" /> Destination URL (Target Link)
                     </label>
-                    <div className="clay-recessed p-2.5 sm:p-3 flex items-center gap-3">
-                      <Globe className="w-5 h-5 text-[#24525d] ml-1.5 shrink-0" />
+                    <div className="liquid-glass-input p-3 sm:p-3.5 flex items-center gap-3">
+                      <Globe className="w-5 h-5 text-blue-600 ml-1.5 shrink-0" />
                       <input
                         id="url"
                         type="text"
                         value={longUrl}
                         onChange={(e) => setLongUrl(e.target.value)}
                         placeholder="https://example.com/very-long-link-with-many-parameters"
-                        className="bg-transparent border-none outline-none text-[16px] sm:text-[14px] font-semibold text-[#142636] placeholder-[#385368]/70 w-full font-sans"
+                        className="bg-transparent border-none outline-none text-[16px] sm:text-[14px] font-bold text-zinc-900 placeholder-zinc-500 w-full font-sans"
                         required
                       />
                       {longUrl && (
-                        <button type="button" onClick={() => setLongUrl('')} className="p-1 rounded-full text-[#385368] hover:text-[#102030]">
+                        <button type="button" onClick={() => setLongUrl('')} className="p-1 rounded-full text-zinc-500 hover:text-zinc-900">
                           <X className="w-4 h-4" />
                         </button>
                       )}
                     </div>
                   </div>
 
-                  {/* 2. Primary Verification Toggles (Camera & Location side-by-side) */}
+                  {/* 2. Primary Verification Toggles (Camera & Location 3D Glass Orbs) */}
                   <div>
-                    <label className="text-[11px] font-extrabold text-[#d2e2ee] uppercase tracking-wider mb-2.5 block flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-[#7bd3e2]" /> Quick Verification Toggles (Primary)
+                    <label className="text-[11px] font-extrabold text-zinc-800 uppercase tracking-wider mb-2.5 block flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-600" /> Quick Verification Toggles (Primary)
                     </label>
-                    <div className="grid grid-cols-2 gap-2 sm:gap-3.5">
-                      {/* Camera Card */}
+                    <div className="grid grid-cols-2 gap-2.5 sm:gap-4">
+                      {/* Camera Glass Card */}
                       <div
-                        onClick={() => setCaptureCamera(!captureCamera)}
+                        onClick={() => {
+                          playBubblePop(captureCamera ? 460 : 680);
+                          setCaptureCamera(!captureCamera);
+                        }}
                         className={cn(
-                          "p-2.5 sm:p-4 rounded-2xl cursor-pointer transition-all duration-150 select-none flex flex-col sm:flex-row items-center sm:justify-between text-center sm:text-left gap-2 sm:gap-3.5 group active:scale-[0.98]",
+                          "liquid-glass-box rounded-3xl p-3 sm:p-4 cursor-pointer transition-all duration-200 select-none flex items-center justify-between gap-3 group active:scale-[0.97]",
                           captureCamera 
-                            ? "clay-stat-teal ring-2 ring-[#8be5f5] shadow-lg" 
-                            : "clay-stat-slate opacity-90 hover:opacity-100"
+                            ? "bg-white/80 ring-3 ring-blue-500/50 shadow-xl" 
+                            : "bg-white/40 opacity-85 hover:opacity-100"
                         )}
                       >
-                        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3.5 min-w-0">
-                          <div className="clay-badge-teal w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center shrink-0">
-                            <Camera className="w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow" />
+                        <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+                          <div className={cn(
+                            "glass-orb w-11 h-11 sm:w-12 sm:h-12 shrink-0 shadow-md",
+                            captureCamera ? "orb-rainbow text-white" : "orb-clear text-zinc-800"
+                          )}>
+                            <Camera className="w-5 h-5 drop-shadow" />
                           </div>
                           <div className="min-w-0">
-                            <p className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-[#0e1e26] truncate">Camera</p>
-                            <p className="text-[9px] sm:text-[11px] font-semibold text-[#18343d] truncate hidden xs:block">Selfie Intel</p>
+                            <p className="text-xs sm:text-sm font-extrabold text-zinc-900 truncate">Camera</p>
+                            <p className="text-[10px] font-bold text-zinc-600 truncate hidden xs:block">Selfie Intel</p>
                           </div>
                         </div>
                         <div className={cn(
-                          "w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center transition-all shrink-0",
-                          captureCamera ? "bg-[#25606d] border-[#16434d] text-white shadow-md" : "border-slate-500/40 bg-white/30"
+                          "w-6 h-6 rounded-full flex items-center justify-center transition-all shrink-0",
+                          captureCamera ? "bg-blue-600 text-white shadow" : "bg-zinc-200/60 border border-zinc-300 text-transparent"
                         )}>
-                          {captureCamera && <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 stroke-[3]" />}
+                          <Check className="w-3.5 h-3.5 stroke-[3]" />
                         </div>
                       </div>
 
-                      {/* Location Card */}
+                      {/* Location Glass Card */}
                       <div
-                        onClick={() => setCaptureLocation(!captureLocation)}
+                        onClick={() => {
+                          playBubblePop(captureLocation ? 460 : 680);
+                          setCaptureLocation(!captureLocation);
+                        }}
                         className={cn(
-                          "p-2.5 sm:p-4 rounded-2xl cursor-pointer transition-all duration-150 select-none flex flex-col sm:flex-row items-center sm:justify-between text-center sm:text-left gap-2 sm:gap-3.5 group active:scale-[0.98]",
+                          "liquid-glass-box rounded-3xl p-3 sm:p-4 cursor-pointer transition-all duration-200 select-none flex items-center justify-between gap-3 group active:scale-[0.97]",
                           captureLocation 
-                            ? "clay-stat-teal ring-2 ring-[#8be5f5] shadow-lg" 
-                            : "clay-stat-slate opacity-90 hover:opacity-100"
+                            ? "bg-white/80 ring-3 ring-emerald-500/50 shadow-xl" 
+                            : "bg-white/40 opacity-85 hover:opacity-100"
                         )}
                       >
-                        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3.5 min-w-0">
-                          <div className="clay-badge-slate w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center shrink-0">
-                            <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow" />
+                        <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+                          <div className={cn(
+                            "glass-orb w-11 h-11 sm:w-12 sm:h-12 shrink-0 shadow-md",
+                            captureLocation ? "orb-green text-zinc-950" : "orb-clear text-zinc-800"
+                          )}>
+                            <MapPin className="w-5 h-5 drop-shadow" />
                           </div>
                           <div className="min-w-0">
-                            <p className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-[#0e1e26] truncate">Location</p>
-                            <p className="text-[9px] sm:text-[11px] font-semibold text-[#18343d] truncate hidden xs:block">GPS Intel</p>
+                            <p className="text-xs sm:text-sm font-extrabold text-zinc-900 truncate">Location</p>
+                            <p className="text-[10px] font-bold text-zinc-600 truncate hidden xs:block">GPS Intel</p>
                           </div>
                         </div>
                         <div className={cn(
-                          "w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center transition-all shrink-0",
-                          captureLocation ? "bg-[#25606d] border-[#16434d] text-white shadow-md" : "border-slate-500/40 bg-white/30"
+                          "w-6 h-6 rounded-full flex items-center justify-center transition-all shrink-0",
+                          captureLocation ? "bg-emerald-600 text-white shadow" : "bg-zinc-200/60 border border-zinc-300 text-transparent"
                         )}>
-                          {captureLocation && <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 stroke-[3]" />}
+                          <Check className="w-3.5 h-3.5 stroke-[3]" />
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* 3. Primary Action Button */}
+                  {/* 3. Primary Action Button with 3D Glass Bubble Styling */}
                   <div>
                     <button
                       type="submit"
                       disabled={isSubmitting || !longUrl.trim()}
-                      className="clay-teal-btn w-full min-h-[48px] py-3 sm:py-3.5 text-[14px] sm:text-[15px] font-extrabold uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-2xl active:scale-[0.98] transition-all disabled:opacity-50"
+                      onClick={() => playBubblePop(740)}
+                      className="glass-orb orb-blue w-full min-h-[52px] py-3.5 text-[14px] sm:text-[15px] font-black uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-2xl transition-all disabled:opacity-50 text-white cursor-pointer"
                     >
                       {isSubmitting ? (
                         <>
-                          <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                          Generating Short Link...
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <span>Generating 3D Liquid Link...</span>
                         </>
                       ) : (
                         <>

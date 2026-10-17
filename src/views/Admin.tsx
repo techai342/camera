@@ -372,8 +372,15 @@ export function useMyDomainAnalytics() {
               </button>
               <div className="flex flex-col md:flex-row md:items-center gap-0 md:gap-2">
                 <div className="flex items-center gap-2">
-                  <Database className="w-4 h-4 text-teal-400" />
-                  <h1 className="text-sm md:text-lg font-black uppercase tracking-tighter bg-gradient-to-r from-teal-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">MrAdmin</h1>
+                  <div className="flex items-center gap-0.5 select-none">
+                    <span className="cartoon-letter text-[#2e45b8] text-sm md:text-base -rotate-6">M</span>
+                    <span className="cartoon-letter text-[#e03c28] text-sm md:text-base rotate-3 -ml-0.5">R</span>
+                    <span className="cartoon-letter text-[#f5ecd7] text-sm md:text-base -rotate-3 -ml-0.5">A</span>
+                    <span className="cartoon-letter text-[#f2b726] text-sm md:text-base rotate-6 -ml-0.5">D</span>
+                    <span className="cartoon-letter text-[#278c68] text-sm md:text-base -rotate-6 -ml-0.5">M</span>
+                    <span className="cartoon-letter text-[#2e45b8] text-sm md:text-base rotate-3 -ml-0.5">I</span>
+                    <span className="cartoon-letter text-[#e03c28] text-sm md:text-base -rotate-6 -ml-0.5">N</span>
+                  </div>
                 </div>
                 <span className="text-[10px] md:text-sm text-zinc-500 font-bold uppercase hidden md:inline">• CONSOLE</span>
               </div>

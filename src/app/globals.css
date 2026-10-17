@@ -48,7 +48,8 @@ body::before {
   filter: blur(48px);
   pointer-events: none;
   z-index: 0;
-  transition: all 0.7s ease;
+  contain: strict;
+  transform: translateZ(0);
 }
 
 /* 3D Molded Clear Liquid Glass Container */
@@ -612,22 +613,23 @@ html, body {
 }
 
 body {
-  touch-action: manipulation;
+  touch-action: pan-y pinch-zoom;
   -webkit-tap-highlight-color: transparent;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none;
 }
 
-/* GPU hardware acceleration for smooth 60fps / 120fps animations */
+/* Hardware acceleration without layer explosion (removes will-change to save mobile VRAM) */
 .clay-board,
 .liquid-glass-box,
 .clay-sidebar,
 .clay-panel,
 .glass-orb,
 .clay-small-pill {
-  transform: translateZ(0);
   backface-visibility: hidden;
-  will-change: transform;
+  -webkit-backface-visibility: hidden;
 }
 
 /* CRITICAL: Fixed overlays, modals, backdrops, and bottom navigation pill MUST NOT inherit translateZ */
@@ -637,6 +639,12 @@ body {
   transform: none !important;
   will-change: auto !important;
   backface-visibility: visible !important;
+}
+
+/* Virtualized off-screen rendering optimization for silky smooth 60fps / 120fps scrolling */
+.gpu-virtual-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 88px;
 }
 
 /* Smooth momentum touch scrolling */
@@ -661,20 +669,44 @@ body {
   background: rgba(45, 40, 32, 0.38);
 }
 
-/* Mobile responsive adjustments */
+/* Mobile responsive & GPU performance optimizations */
 @media (max-width: 768px) {
+  /* Reduce blur radius and shadow depth for silky 60fps/120fps mobile scrolling */
   .liquid-glass-box,
-  .clay-board {
+  .clay-board,
+  .clay-panel {
     border-radius: 26px !important;
     border-width: 2px !important;
+    backdrop-filter: blur(10px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(10px) saturate(140%) !important;
+    box-shadow:
+      0 10px 22px -6px rgba(45, 40, 32, 0.18),
+      inset 0 2px 4px rgba(255, 255, 255, 0.90),
+      inset 0 -2px 4px rgba(70, 62, 50, 0.14) !important;
   }
 
+  .liquid-glass-dark,
   .clay-sidebar {
     border-radius: 22px !important;
+    backdrop-filter: blur(12px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+    box-shadow:
+      0 10px 24px -6px rgba(45, 40, 32, 0.18),
+      inset 0 2px 4px rgba(255, 255, 255, 0.92) !important;
   }
 
-  .clay-panel {
-    border-radius: 20px !important;
+  .liquid-glass-dock {
+    backdrop-filter: blur(12px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(150%) !important;
+    box-shadow:
+      0 10px 26px -6px rgba(35, 30, 25, 0.20),
+      inset 0 2px 4px rgba(255, 255, 255, 0.95) !important;
+  }
+
+  /* Prevent background blur overdraw on mobile */
+  .ambient-refraction-blob {
+    filter: blur(20px) !important;
+    opacity: 0.35 !important;
   }
 }
 

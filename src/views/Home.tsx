@@ -1116,7 +1116,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
                 <div className="space-y-2.5">
                   {history.map((link: any) => (
-                    <div key={link.code} className="clay-recessed p-3 sm:p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 transition-transform hover:-translate-y-0.5">
+                    <div key={link.code} className="clay-recessed p-3 sm:p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 transition-transform hover:-translate-y-0.5 gpu-virtual-card">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <span className="text-xs sm:text-sm font-extrabold text-[#0e3b44] font-mono">/{link.code}</span>
@@ -1287,7 +1287,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                         <h4 className="text-[#152432] font-extrabold text-[15px] mb-3">Live Visitor Telemetry</h4>
                         <div className="space-y-2.5 max-h-[500px] overflow-y-auto clay-scroll pr-1">
                           {analyticsData.map((log: any, i: number) => (
-                            <div key={i} className="clay-recessed p-3 sm:p-3.5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
+                            <div key={i} className="clay-recessed p-3 sm:p-3.5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs gpu-virtual-card">
                               <div className="flex items-center justify-between sm:justify-start gap-2.5 min-w-0">
                                 <div className="flex items-center gap-2 min-w-0">
                                   {log.device_type?.toLowerCase() === 'mobile' ? (
@@ -2178,7 +2178,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                          </div>
                          <div className="space-y-3">
                             {analyticsData.map((log, i) => (
-                               <div key={i} className="clay-recessed p-4 rounded-2xl flex flex-col md:grid grid-cols-7 md:items-center gap-4 md:gap-0 transition-transform hover:-translate-y-0.5">
+                               <div key={i} className="clay-recessed p-4 rounded-2xl flex flex-col md:grid grid-cols-7 md:items-center gap-4 md:gap-0 transition-transform hover:-translate-y-0.5 gpu-virtual-card">
                                   {/* Column 1: Details */}
                                   <div className="md:col-span-2">
                                      <div className="flex items-center gap-2 mb-1">

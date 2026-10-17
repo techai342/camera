@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS public.coupons (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     code TEXT NOT NULL UNIQUE,
     plan_tier TEXT NOT NULL DEFAULT 'pro',
+    plan TEXT NOT NULL DEFAULT 'pro',
     duration_days INTEGER NOT NULL DEFAULT 30,
     daily_limit INTEGER NOT NULL DEFAULT 50,
     max_uses INTEGER NOT NULL DEFAULT 50,
@@ -68,6 +69,9 @@ CREATE TABLE IF NOT EXISTS public.coupons (
     is_active BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+ALTER TABLE public.coupons ADD COLUMN IF NOT EXISTS plan_tier TEXT DEFAULT 'pro';
+ALTER TABLE public.coupons ADD COLUMN IF NOT EXISTS plan TEXT DEFAULT 'pro';
 
 ALTER TABLE public.coupons ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow public read coupons" ON public.coupons;
@@ -430,6 +434,9 @@ export default function Admin() {
           setStats(json.stats);
         }
       }
+      // Also automatically populate users and coupons counts
+      fetchUsers();
+      fetchCoupons();
     } catch (e) {
       console.error(e);
     } finally {
@@ -755,20 +762,48 @@ export function useMyDomainAnalytics() {
           </div>
 
           <div className="flex items-center justify-between border-t border-zinc-300/40 md:border-0 pt-3 md:pt-0">
-            <div className="flex items-center gap-4 md:gap-6 flex-1 overflow-x-auto no-scrollbar">
-              <div className="text-left md:text-center group shrink-0">
+            <div className="flex items-center gap-3 sm:gap-5 md:gap-6 flex-1 overflow-x-auto no-scrollbar py-1">
+              <div 
+                onClick={() => setAdminTab('links')} 
+                className="text-left md:text-center group shrink-0 cursor-pointer"
+                title="View Links & Traps"
+              >
                 <p className="text-[7px] md:text-[9px] text-zinc-600 font-black uppercase tracking-widest group-hover:text-blue-600 transition-colors">Links</p>
                 <p className="text-xs md:text-xl font-black text-zinc-950">{stats.totalLinks}</p>
               </div>
-              <div className="text-left md:text-center group border-l border-zinc-300/60 pl-4 md:pl-6 shrink-0">
+              <div className="text-left md:text-center group border-l border-zinc-300/60 pl-3 sm:pl-5 md:pl-6 shrink-0">
                 <p className="text-[7px] md:text-[9px] text-zinc-600 font-black uppercase tracking-widest group-hover:text-emerald-600 transition-colors">Visitors</p>
                 <p className="text-xs md:text-xl font-black text-zinc-950">{stats.totalVisitors}</p>
               </div>
-              <div className="text-left md:text-center group border-l border-zinc-300/60 pl-4 md:pl-6 shrink-0">
-                <p className="text-[7px] md:text-[9px] text-zinc-600 font-black uppercase tracking-widest group-hover:text-amber-600 transition-colors">Admins</p>
-                <p className="text-xs md:text-xl font-black text-zinc-950">{stats.totalAdmins}</p>
+              <div 
+                onClick={() => {
+                  setAdminTab('users');
+                  fetchUsers();
+                }} 
+                className="text-left md:text-center group border-l border-zinc-300/60 pl-3 sm:pl-5 md:pl-6 shrink-0 cursor-pointer"
+                title="Manage User Accounts"
+              >
+                <p className="text-[7px] md:text-[9px] text-zinc-600 font-black uppercase tracking-widest group-hover:text-indigo-600 transition-colors flex items-center gap-1">
+                  <span>Users</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse hidden sm:inline-block" />
+                </p>
+                <p className="text-xs md:text-xl font-black text-indigo-700">{userStats.totalUsers || usersList.length}</p>
               </div>
-              <div className="text-left md:text-center group border-l border-zinc-300/60 pl-4 md:pl-6 shrink-0 pr-4 md:pr-0">
+              <div 
+                onClick={() => {
+                  setAdminTab('coupons');
+                  fetchCoupons();
+                }} 
+                className="text-left md:text-center group border-l border-zinc-300/60 pl-3 sm:pl-5 md:pl-6 shrink-0 cursor-pointer"
+                title="Manage Coupon Codes"
+              >
+                <p className="text-[7px] md:text-[9px] text-zinc-600 font-black uppercase tracking-widest group-hover:text-amber-600 transition-colors flex items-center gap-1">
+                  <span>Coupons</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse hidden sm:inline-block" />
+                </p>
+                <p className="text-xs md:text-xl font-black text-amber-700">{couponStats.totalCoupons || couponsList.length}</p>
+              </div>
+              <div className="text-left md:text-center group border-l border-zinc-300/60 pl-3 sm:pl-5 md:pl-6 shrink-0 pr-4 md:pr-0">
                 <p className="text-[7px] md:text-[9px] text-zinc-600 font-black uppercase tracking-widest group-hover:text-pink-600 transition-colors">Traffic</p>
                 <p className="text-xs md:text-xl font-black text-blue-700">{stats.totalClicks}</p>
               </div>
@@ -811,11 +846,11 @@ export function useMyDomainAnalytics() {
       <div className="max-w-7xl mx-auto p-4 md:p-8">
         {/* Modern 3-Tab Liquid Navigation Bar */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-          <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 liquid-glass-box rounded-2xl shadow-md border-2 border-white/80">
+          <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 liquid-glass-box rounded-2xl shadow-md border-2 border-white/80 overflow-x-auto no-scrollbar">
             <button
               onClick={() => setAdminTab('links')}
               className={cn(
-                "flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer select-none",
+                "flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer select-none shrink-0",
                 adminTab === 'links'
                   ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/25 scale-[1.02]"
                   : "text-zinc-700 hover:text-zinc-950 hover:bg-white/40"
@@ -828,10 +863,10 @@ export function useMyDomainAnalytics() {
             <button
               onClick={() => {
                 setAdminTab('users');
-                if (usersList.length === 0) fetchUsers();
+                fetchUsers();
               }}
               className={cn(
-                "flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer select-none",
+                "flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer select-none shrink-0",
                 adminTab === 'users'
                   ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/25 scale-[1.02]"
                   : "text-zinc-700 hover:text-zinc-950 hover:bg-white/40"
@@ -844,32 +879,31 @@ export function useMyDomainAnalytics() {
             <button
               onClick={() => {
                 setAdminTab('coupons');
-                if (couponsList.length === 0) fetchCoupons();
+                fetchCoupons();
               }}
               className={cn(
-                "flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer select-none",
+                "flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer select-none shrink-0",
                 adminTab === 'coupons'
                   ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/25 scale-[1.02]"
                   : "text-zinc-700 hover:text-zinc-950 hover:bg-white/40"
               )}
             >
               <Ticket className="w-4 h-4" />
-              <span>Coupon Engine ({couponsList.length})</span>
+              <span>Coupon Engine ({couponStats.totalCoupons || couponsList.length})</span>
             </button>
           </div>
 
-          {adminTab === 'coupons' && (
-            <button
-              onClick={() => {
-                generateRandomCouponCode();
-                setShowCreateCouponModal(true);
-              }}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs sm:text-sm font-black shadow-lg shadow-emerald-500/20 active:scale-95 transition-all cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Create Coupon</span>
-            </button>
-          )}
+          <button
+            onClick={() => {
+              setAdminTab('coupons');
+              generateRandomCouponCode();
+              setShowCreateCouponModal(true);
+            }}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs sm:text-sm font-black shadow-lg shadow-emerald-500/20 active:scale-95 transition-all cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>+ Create Coupon Code</span>
+          </button>
         </div>
 
         {adminTab === 'links' && (
@@ -1447,7 +1481,7 @@ export function useMyDomainAnalytics() {
                     {couponsList
                       .filter(c => (c.code || '').toLowerCase().includes(couponSearch.toLowerCase()))
                       .map((c) => {
-                        const isPrem = c.plan_tier === 'premium';
+                        const isPrem = (c.plan_tier || c.plan) === 'premium';
                         const isExpired = c.expires_at && new Date(c.expires_at) < new Date();
                         const isCapped = c.max_uses > 0 && (c.times_used || 0) >= c.max_uses;
 
@@ -1541,7 +1575,7 @@ export function useMyDomainAnalytics() {
               {couponsList
                 .filter(c => (c.code || '').toLowerCase().includes(couponSearch.toLowerCase()))
                 .map((c) => {
-                  const isPrem = c.plan_tier === 'premium';
+                  const isPrem = (c.plan_tier || c.plan) === 'premium';
                   const isExpired = c.expires_at && new Date(c.expires_at) < new Date();
                   const isCapped = c.max_uses > 0 && (c.times_used || 0) >= c.max_uses;
 

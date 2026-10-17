@@ -84,12 +84,18 @@ export async function POST(req: Request) {
       );
     }
 
-    const { data: newCoupon, error: insertErr } = await supabaseAdmin
+    // Resilient insert supporting either plan_tier or plan column name
+    let newCoupon: any = null;
+    let insertErr: any = null;
+
+    // 1. Try with both plan_tier and plan
+    const resBoth = await supabaseAdmin
       .from('coupons')
       .insert([
         {
           code,
           plan_tier: planTier,
+          plan: planTier,
           duration_days: durationDays,
           daily_limit: dailyLimit,
           max_uses: maxUses,
@@ -100,6 +106,56 @@ export async function POST(req: Request) {
       ])
       .select('*')
       .single();
+
+    if (!resBoth.error) {
+      newCoupon = resBoth.data;
+    } else {
+      // 2. Fallback: try with plan_tier only
+      const resTier = await supabaseAdmin
+        .from('coupons')
+        .insert([
+          {
+            code,
+            plan_tier: planTier,
+            duration_days: durationDays,
+            daily_limit: dailyLimit,
+            max_uses: maxUses,
+            times_used: 0,
+            expires_at: expiresAt,
+            is_active: true,
+          },
+        ])
+        .select('*')
+        .single();
+
+      if (!resTier.error) {
+        newCoupon = resTier.data;
+      } else {
+        // 3. Fallback: try with plan only
+        const resPlan = await supabaseAdmin
+          .from('coupons')
+          .insert([
+            {
+              code,
+              plan: planTier,
+              duration_days: durationDays,
+              daily_limit: dailyLimit,
+              max_uses: maxUses,
+              times_used: 0,
+              expires_at: expiresAt,
+              is_active: true,
+            },
+          ])
+          .select('*')
+          .single();
+
+        if (!resPlan.error) {
+          newCoupon = resPlan.data;
+        } else {
+          insertErr = resPlan.error || resTier.error || resBoth.error;
+        }
+      }
+    }
 
     if (insertErr) {
       console.error('Create coupon error:', insertErr);

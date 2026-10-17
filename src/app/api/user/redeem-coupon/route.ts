@@ -108,9 +108,10 @@ export async function POST(req: Request) {
       newExpiresAt = null;
     } else {
       let baseTime = now;
+      const couponPlan = coupon.plan_tier || coupon.plan || 'pro';
       // If user is already on this tier and their plan hasn't expired yet, extend it!
       if (
-        currentUser?.plan === coupon.plan_tier &&
+        currentUser?.plan === couponPlan &&
         currentUser?.plan_expires_at &&
         new Date(currentUser.plan_expires_at).getTime() > now
       ) {
@@ -119,13 +120,14 @@ export async function POST(req: Request) {
       newExpiresAt = new Date(baseTime + durationDays * 86400000).toISOString();
     }
 
-    const dailyLimit = Number(coupon.daily_limit) || (coupon.plan_tier === 'premium' ? 99999 : 50);
+    const couponPlan = coupon.plan_tier || coupon.plan || 'pro';
+    const dailyLimit = Number(coupon.daily_limit) || (couponPlan === 'premium' ? 99999 : 50);
 
     // 8. Atomically upgrade user record
     const { error: userUpdateErr } = await supabaseAdmin
       .from('app_users')
       .update({
-        plan: coupon.plan_tier,
+        plan: couponPlan,
         plan_expires_at: newExpiresAt,
         daily_request_limit: dailyLimit,
         last_coupon_used: coupon.code,

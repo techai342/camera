@@ -123,6 +123,38 @@ export default function Home() {
   const [mobileTab, setMobileTab] = useState<'create' | 'recent' | 'media' | 'analytics'>('create');
   const resultRef = React.useRef<HTMLDivElement>(null);
 
+  // Dynamic Site Branding from Supabase Admin Settings
+  const [siteBranding, setSiteBranding] = useState<{
+    displayName: string;
+    brandName: string;
+    avatarUrl: string;
+  }>({
+    displayName: 'Muhammad Saqib',
+    brandName: 'Saqib Visuals',
+    avatarUrl: 'https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png',
+  });
+
+  const displayLetters = React.useMemo(() => {
+    const parts = (siteBranding.displayName || 'Saqib').trim().split(/\s+/);
+    const targetWord = (parts.length > 1 ? parts[parts.length - 1] : parts[0]).toUpperCase();
+    return targetWord.slice(0, 10).split('');
+  }, [siteBranding.displayName]);
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.success) {
+          setSiteBranding({
+            displayName: data.displayName || 'Muhammad Saqib',
+            brandName: data.brandName || 'Saqib Visuals',
+            avatarUrl: data.avatarUrl || 'https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png',
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   useEffect(() => {
     if (shortUrl && resultRef.current) {
       resultRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -765,12 +797,12 @@ create policy "Allow public delete access" on public.urls for delete using (true
               <div 
                 onClick={() => playBubblePop(560)}
                 className="relative w-24 h-24 mx-auto group cursor-pointer select-none" 
-                title="Muhammad Saqib — Saqib Visuals"
+                title={`${siteBranding.displayName} — ${siteBranding.brandName}`}
               >
-                <div className="w-full h-full rounded-full saqib-avatar-crop border-[3px] border-white/95 ring-4 ring-white/60 transition-all duration-300 group-hover:scale-105 group-hover:ring-white/90 shadow-xl overflow-hidden">
+                <div className="w-full h-full rounded-full saqib-avatar-crop border-[3px] border-white/95 ring-4 ring-white/60 transition-all duration-300 group-hover:scale-105 group-hover:ring-white/90 shadow-xl overflow-hidden bg-slate-900/10">
                   <img 
-                    src="https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png" 
-                    alt="Muhammad Saqib"
+                    src={siteBranding.avatarUrl} 
+                    alt={siteBranding.displayName}
                     className="w-full h-full object-cover object-[50%_18%]"
                     loading="eager"
                   />
@@ -788,13 +820,27 @@ create policy "Allow public delete access" on public.urls for delete using (true
                 <div 
                   onClick={() => playBubblePop(720)}
                   className="flex items-center justify-center gap-1 text-[26px] leading-none select-none cursor-pointer group/name"
-                  title="Muhammad Saqib"
+                  title={siteBranding.displayName}
                 >
-                  <span className="cartoon-letter text-[#2e45b8] -rotate-6 group-hover/name:-translate-y-1 transition-transform">S</span>
-                  <span className="cartoon-letter text-[#e03c28] rotate-3 -ml-0.5 group-hover/name:-translate-y-1 transition-transform" style={{ transitionDelay: '40ms' }}>A</span>
-                  <span className="cartoon-letter text-[#f5ecd7] -rotate-3 -ml-0.5 group-hover/name:-translate-y-1 transition-transform" style={{ transitionDelay: '80ms' }}>Q</span>
-                  <span className="cartoon-letter text-[#f2b726] rotate-6 -ml-0.5 group-hover/name:-translate-y-1 transition-transform" style={{ transitionDelay: '120ms' }}>I</span>
-                  <span className="cartoon-letter text-[#278c68] -rotate-6 -ml-0.5 group-hover/name:-translate-y-1 transition-transform" style={{ transitionDelay: '160ms' }}>B</span>
+                  {displayLetters.map((char, idx) => {
+                    const colors = ['text-[#2e45b8]', 'text-[#e03c28]', 'text-[#f5ecd7]', 'text-[#f2b726]', 'text-[#278c68]'];
+                    const rotations = ['-rotate-6', 'rotate-3', '-rotate-3', 'rotate-6', '-rotate-6'];
+                    return (
+                      <span 
+                        key={idx} 
+                        className={cn(
+                          "cartoon-letter",
+                          colors[idx % colors.length],
+                          rotations[idx % rotations.length],
+                          idx > 0 && "-ml-0.5",
+                          "group-hover/name:-translate-y-1 transition-transform"
+                        )}
+                        style={{ transitionDelay: `${idx * 40}ms` }}
+                      >
+                        {char}
+                      </span>
+                    );
+                  })}
                 </div>
                 <div className="inline-flex items-center gap-2 mt-2 px-3 py-1 rounded-full liquid-glass-input text-zinc-800 text-[10px] font-black uppercase tracking-wider shadow-sm">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-sm"></span>
@@ -914,7 +960,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
           {/* Sidebar Bottom Promo Card */}
           <div className="clay-promo-card mt-5 p-3.5 text-center flex flex-col items-center">
-            <h3 className="text-zinc-900 font-black text-[14px]">Saqib Visuals</h3>
+            <h3 className="text-zinc-900 font-black text-[14px]">{siteBranding.brandName}</h3>
             <p className="text-zinc-600 text-[11px] mt-0.5 leading-snug font-medium">
               Where Creativity Meets<br/><span className="italic text-blue-600 font-bold">Technology &amp; AI!</span>
             </p>
@@ -940,27 +986,41 @@ create policy "Allow public delete access" on public.urls for delete using (true
               {/* Mini Avatar Lens for Mobile View (Desktop has full sidebar) */}
               <div 
                 onClick={() => playBubblePop(560)}
-                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full saqib-avatar-crop border-2 border-white ring-2 ring-white/70 shadow-sm shrink-0 lg:hidden cursor-pointer active:scale-90 transition-transform"
-                title="Muhammad Saqib — Saqib Visuals"
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full saqib-avatar-crop border-2 border-white ring-2 ring-white/70 shadow-sm shrink-0 lg:hidden cursor-pointer active:scale-90 transition-transform overflow-hidden bg-slate-900/10"
+                title={`${siteBranding.displayName} — ${siteBranding.brandName}`}
               >
                 <img 
-                  src="https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png" 
-                  alt="Muhammad Saqib"
+                  src={siteBranding.avatarUrl} 
+                  alt={siteBranding.displayName}
                   className="w-full h-full object-cover object-[50%_18%]"
                   loading="eager"
                 />
               </div>
 
               <div className="flex items-center gap-0.5 select-none shrink-0">
-                <span className="cartoon-letter text-[#2e45b8] text-[16px] sm:text-[26px] -rotate-6">S</span>
-                <span className="cartoon-letter text-[#e03c28] text-[16px] sm:text-[26px] rotate-3 -ml-0.5">A</span>
-                <span className="cartoon-letter text-[#f5ecd7] text-[16px] sm:text-[26px] -rotate-3 -ml-0.5">Q</span>
-                <span className="cartoon-letter text-[#f2b726] text-[16px] sm:text-[26px] rotate-6 -ml-0.5">I</span>
-                <span className="cartoon-letter text-[#278c68] text-[16px] sm:text-[26px] -rotate-6 -ml-0.5">B</span>
+                {displayLetters.map((char, idx) => {
+                  const colors = ['text-[#2e45b8]', 'text-[#e03c28]', 'text-[#f5ecd7]', 'text-[#f2b726]', 'text-[#278c68]'];
+                  const rotations = ['-rotate-6', 'rotate-3', '-rotate-3', 'rotate-6', '-rotate-6'];
+                  return (
+                    <span 
+                      key={idx}
+                      className={cn(
+                        "cartoon-letter text-[16px] sm:text-[26px]",
+                        colors[idx % colors.length],
+                        rotations[idx % rotations.length],
+                        idx > 0 && "-ml-0.5"
+                      )}
+                    >
+                      {char}
+                    </span>
+                  );
+                })}
               </div>
               <div className="min-w-0 hidden md:block">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[12px] sm:text-[14px] font-black tracking-tight text-zinc-900">VISUALS</span>
+                  <span className="text-[12px] sm:text-[14px] font-black tracking-tight text-zinc-900 uppercase">
+                    {siteBranding.brandName.split(/\s+/).slice(1).join(' ') || siteBranding.brandName || 'VISUALS'}
+                  </span>
                   <span className="px-2 py-0.5 rounded-full bg-emerald-500/25 border border-emerald-500/40 text-[9px] font-extrabold text-emerald-950 flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping" />
                     <span>3D OS</span>
@@ -1788,7 +1848,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                     <h4 className="text-[#102030] font-extrabold text-[14px] sm:text-[16px] leading-tight">
                       Let's build something amazing together
                     </h4>
-                    <p className="text-[#2b4458] font-bold text-[11px] sm:text-[12px] truncate">💼 Saqib Visuals — Where Creativity Meets Technology.</p>
+                    <p className="text-[#2b4458] font-bold text-[11px] sm:text-[12px] truncate">💼 {siteBranding.brandName} — Where Creativity Meets Technology.</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 w-full sm:w-auto">

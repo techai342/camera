@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '../../../../../lib/supabase';
+import { supabaseAdmin } from '../../../../../lib/supabase';
 import { verifySessionToken, COOKIE_NAME } from '../../../../../lib/auth';
 
 async function checkAuth(req: Request) {
@@ -26,7 +26,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('urls')
       .update(body)
       .eq('id', id)
@@ -58,10 +58,10 @@ export async function DELETE(
     }
 
     // Cascade delete analytics first
-    await supabase.from('link_analytics').delete().eq('url_id', id);
+    await supabaseAdmin.from('link_analytics').delete().eq('url_id', id);
 
     // Delete url record
-    const { error } = await supabase.from('urls').delete().eq('id', id);
+    const { error } = await supabaseAdmin.from('urls').delete().eq('id', id);
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });

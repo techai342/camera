@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '../../../../lib/supabase';
+import { supabaseAdmin } from '../../../../lib/supabase';
 import { verifySessionToken, COOKIE_NAME } from '../../../../lib/auth';
 
 export async function GET(req: Request) {
@@ -18,7 +18,7 @@ export async function GET(req: Request) {
     }
 
     // 2. Fetch Data
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('urls')
       .select(`
         *,
@@ -39,12 +39,12 @@ export async function GET(req: Request) {
     }
 
     // Fetch Global Total Clicks
-    const { count: globalClicksCount } = await supabase
+    const { count: globalClicksCount } = await supabaseAdmin
       .from('link_analytics')
       .select('*', { count: 'exact', head: true });
 
     // Fetch Unique Visitors
-    const { data: visitorData } = await supabase
+    const { data: visitorData } = await supabaseAdmin
       .from('link_analytics')
       .select('ip_address');
 

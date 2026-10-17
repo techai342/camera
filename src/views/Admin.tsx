@@ -10,11 +10,45 @@ import {
   Database, Shield, Lock, Search, ExternalLink, BarChart3, 
   Trash2, ArrowLeft, RefreshCw, Globe, Smartphone, Monitor,
   MapPin, Camera, Navigation, ArrowUpRight, X, Clock, Pin, PinOff,
-  LogOut, User
+  LogOut, User, Settings, Check, Copy, Sparkles
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+
+const ADMIN_SQL_QUERY = `-- 1. Create admin_settings table in Supabase
+CREATE TABLE IF NOT EXISTS public.admin_settings (
+    id TEXT PRIMARY KEY DEFAULT 'primary',
+    username TEXT NOT NULL DEFAULT 'admin',
+    password_hash TEXT NOT NULL DEFAULT '291bc793dcbaf0596b11612bcc1412d6afaccf726c417a5a6e4cff068326bf56',
+    salt TEXT NOT NULL DEFAULT 'mradmin_super_secure_salt_99',
+    display_name TEXT NOT NULL DEFAULT 'Muhammad Saqib',
+    brand_name TEXT NOT NULL DEFAULT 'Saqib Visuals',
+    avatar_url TEXT NOT NULL DEFAULT 'https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png',
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 2. Insert default admin record
+INSERT INTO public.admin_settings (id, username, password_hash, salt, display_name, brand_name, avatar_url)
+VALUES (
+    'primary',
+    'admin',
+    '291bc793dcbaf0596b11612bcc1412d6afaccf726c417a5a6e4cff068326bf56',
+    'mradmin_super_secure_salt_99',
+    'Muhammad Saqib',
+    'Saqib Visuals',
+    'https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png'
+)
+ON CONFLICT (id) DO NOTHING;
+
+-- 3. Enable Row Level Security (RLS)
+ALTER TABLE public.admin_settings ENABLE ROW LEVEL SECURITY;
+
+-- 4. Allow public read access for branding
+DROP POLICY IF EXISTS "Allow public read admin branding" ON public.admin_settings;
+CREATE POLICY "Allow public read admin branding" ON public.admin_settings 
+    FOR SELECT USING (true);
+`;
 
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(true);
@@ -31,6 +65,74 @@ export default function Admin() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [stats, setStats] = useState({ totalLinks: 0, totalClicks: 0, totalAdmins: 0, totalVisitors: 0 });
   const router = useRouter();
+
+  // Profile & Settings Modal State
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [profileUsername, setProfileUsername] = useState('admin');
+  const [profilePassword, setProfilePassword] = useState('');
+  const [profileDisplayName, setProfileDisplayName] = useState('Muhammad Saqib');
+  const [profileBrandName, setProfileBrandName] = useState('Saqib Visuals');
+  const [profileAvatarUrl, setProfileAvatarUrl] = useState('https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png');
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profileSuccess, setProfileSuccess] = useState('');
+  const [profileError, setProfileError] = useState('');
+  const [sqlCopied, setSqlCopied] = useState(false);
+  const [showSqlAccordion, setShowSqlAccordion] = useState(false);
+
+  const openProfileModal = async () => {
+    setShowProfileModal(true);
+    setProfileSuccess('');
+    setProfileError('');
+    setProfilePassword('');
+    setProfileLoading(true);
+    try {
+      const res = await fetch('/api/admin/profile');
+      const json = await res.json();
+      if (res.ok && json.profile) {
+        setProfileUsername(json.profile.username || 'admin');
+        setProfileDisplayName(json.profile.displayName || 'Muhammad Saqib');
+        setProfileBrandName(json.profile.brandName || 'Saqib Visuals');
+        setProfileAvatarUrl(json.profile.avatarUrl || 'https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png');
+      }
+    } catch {} finally {
+      setProfileLoading(false);
+    }
+  };
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setProfileSaving(true);
+    setProfileSuccess('');
+    setProfileError('');
+    try {
+      const res = await fetch('/api/admin/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: profileUsername,
+          password: profilePassword || undefined,
+          displayName: profileDisplayName,
+          brandName: profileBrandName,
+          avatarUrl: profileAvatarUrl,
+        }),
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setProfileSuccess('Profile & Credentials saved successfully in Supabase!');
+        setProfilePassword('');
+      } else {
+        setProfileError(json.error || 'Failed to save profile');
+        if (json.needsSql) {
+          setShowSqlAccordion(true);
+        }
+      }
+    } catch {
+      setProfileError('Failed to communicate with server');
+    } finally {
+      setProfileSaving(false);
+    }
+  };
 
   useEffect(() => {
     fetchGlobalData();
@@ -385,7 +487,14 @@ export function useMyDomainAnalytics() {
                 <span className="text-[10px] md:text-xs text-zinc-600 font-extrabold uppercase hidden md:inline">• CONSOLE</span>
               </div>
             </div>
-            <div className="flex items-center gap-2 md:hidden">
+            <div className="flex items-center gap-1.5 md:hidden">
+              <button 
+                onClick={openProfileModal}
+                className="p-1.5 text-indigo-700 hover:text-indigo-900 bg-indigo-500/15 rounded-full border border-indigo-500/30 active:scale-95 shadow-sm"
+                title="Profile & Settings"
+              >
+                <User className="w-3.5 h-3.5" />
+              </button>
               <RefreshCw 
                 onClick={fetchGlobalData}
                 className={cn("w-4 h-4 text-zinc-700 cursor-pointer hover:text-zinc-950 transition-colors", loading && "animate-spin")} 
@@ -421,8 +530,16 @@ export function useMyDomainAnalytics() {
             </div>
             <div className="hidden md:flex items-center gap-2">
               <button 
+                onClick={openProfileModal}
+                className="text-indigo-800 hover:text-indigo-950 transition-colors flex items-center gap-1.5 bg-indigo-500/15 hover:bg-indigo-500/25 px-3 py-1.5 rounded-full border border-indigo-500/30 text-xs font-extrabold shadow-sm cursor-pointer"
+                title="Edit DP, Saqib Name, Username & Password"
+              >
+                <User className="w-3.5 h-3.5" />
+                <span>Profile &amp; Settings</span>
+              </button>
+              <button 
                 onClick={downloadFullIntegrationPrompt}
-                className="text-emerald-800 hover:text-emerald-950 transition-colors flex items-center gap-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 px-3 py-1.5 rounded-full border border-emerald-500/30 text-xs font-extrabold shadow-sm"
+                className="text-emerald-800 hover:text-emerald-950 transition-colors flex items-center gap-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 px-3 py-1.5 rounded-full border border-emerald-500/30 text-xs font-extrabold shadow-sm cursor-pointer"
                 title="Download prompt to add tracker and dashboard to another website"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
@@ -1020,6 +1137,228 @@ export function useMyDomainAnalytics() {
                   className="w-full rounded-2xl border border-white/10 shadow-2xl"
                   referrerPolicy="no-referrer"
                 />
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Admin Profile & Settings Modal */}
+        <AnimatePresence>
+          {showProfileModal && (
+            <div className="fixed inset-0 z-[180] flex items-center justify-center p-3 sm:p-4">
+              <motion.div 
+                initial={{ opacity: 0 }} 
+                animate={{ opacity: 1 }} 
+                exit={{ opacity: 0 }}
+                onClick={() => setShowProfileModal(false)}
+                className="absolute inset-0 bg-black/60 backdrop-blur-md"
+              />
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 15 }}
+                className="relative z-10 max-w-xl w-full max-h-[92vh] overflow-y-auto clay-scroll liquid-glass-box rounded-[28px] sm:rounded-[36px] p-5 sm:p-7 shadow-2xl border-2 border-white/95 text-zinc-900"
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-zinc-200/60">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-indigo-600/15 border border-indigo-600/30 flex items-center justify-center text-indigo-700">
+                      <Settings className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-black text-zinc-900 leading-tight">Admin Profile &amp; Settings</h3>
+                      <p className="text-[11px] font-bold text-zinc-600">Customize DP, Saqib Name, Username &amp; Password</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setShowProfileModal(false)}
+                    className="w-8 h-8 rounded-full bg-zinc-200/70 hover:bg-zinc-300/80 flex items-center justify-center text-zinc-700 cursor-pointer transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {profileSuccess && (
+                  <div className="mb-4 p-3 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-900 text-xs font-bold flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>{profileSuccess}</span>
+                  </div>
+                )}
+
+                {profileError && (
+                  <div className="mb-4 p-3 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-900 text-xs font-bold flex items-center gap-2">
+                    <X className="w-4 h-4 text-rose-600 shrink-0" />
+                    <span className="flex-1">{profileError}</span>
+                  </div>
+                )}
+
+                <form onSubmit={handleSaveProfile} className="space-y-4">
+                  {/* 1. Avatar (DP) Preview & Input */}
+                  <div className="p-3.5 rounded-2xl bg-white/60 border border-white/80 shadow-xs">
+                    <label className="text-[11px] font-extrabold text-zinc-800 uppercase tracking-wider mb-2.5 block flex items-center gap-1.5">
+                      <Camera className="w-3.5 h-3.5 text-indigo-600" />
+                      Display Picture (DP Avatar)
+                    </label>
+                    <div className="flex items-center gap-3.5">
+                      <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-full overflow-hidden border-2 border-indigo-600/40 ring-4 ring-white shadow-md shrink-0 bg-zinc-100 flex items-center justify-center">
+                        <img 
+                          src={profileAvatarUrl || 'https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png'} 
+                          alt="DP Preview"
+                          className="w-full h-full object-cover object-[50%_18%]"
+                          onError={(e) => {
+                            (e.target as any).src = 'https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png';
+                          }}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <input 
+                          type="url"
+                          value={profileAvatarUrl}
+                          onChange={(e) => setProfileAvatarUrl(e.target.value)}
+                          placeholder="https://ik.imagekit.io/... (Image URL)"
+                          className="w-full text-xs font-mono font-medium px-3 py-2 rounded-xl bg-white/80 border border-zinc-300/80 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-900"
+                        />
+                        <p className="text-[10px] text-zinc-500 font-semibold mt-1">
+                          Paste your image URL (e.g. from ImageKit, Cloudinary, Imgur, or Media Studio).
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 2. Personal Display Name ("Saqib" Name) & Brand Name */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="p-3 rounded-2xl bg-white/60 border border-white/80 shadow-xs">
+                      <label className="text-[10.5px] font-extrabold text-zinc-800 uppercase tracking-wider mb-1.5 block">
+                        Personal / Saqib Name
+                      </label>
+                      <input 
+                        type="text"
+                        value={profileDisplayName}
+                        onChange={(e) => setProfileDisplayName(e.target.value)}
+                        placeholder="e.g. Muhammad Saqib"
+                        className="w-full text-xs font-bold px-3 py-2 rounded-xl bg-white/80 border border-zinc-300/80 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-900"
+                        required
+                      />
+                      <span className="text-[9.5px] text-zinc-500 font-semibold block mt-1">Displayed across avatar tooltips &amp; branding</span>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-white/60 border border-white/80 shadow-xs">
+                      <label className="text-[10.5px] font-extrabold text-zinc-800 uppercase tracking-wider mb-1.5 block">
+                        Brand / Title Name
+                      </label>
+                      <input 
+                        type="text"
+                        value={profileBrandName}
+                        onChange={(e) => setProfileBrandName(e.target.value)}
+                        placeholder="e.g. Saqib Visuals"
+                        className="w-full text-xs font-bold px-3 py-2 rounded-xl bg-white/80 border border-zinc-300/80 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-900"
+                        required
+                      />
+                      <span className="text-[9.5px] text-zinc-500 font-semibold block mt-1">Displayed on hero headers &amp; footers</span>
+                    </div>
+                  </div>
+
+                  {/* 3. Credentials (Username & Password) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="p-3 rounded-2xl bg-white/60 border border-white/80 shadow-xs">
+                      <label className="text-[10.5px] font-extrabold text-zinc-800 uppercase tracking-wider mb-1.5 block flex items-center gap-1">
+                        <User className="w-3 h-3 text-zinc-700" />
+                        Admin Username
+                      </label>
+                      <input 
+                        type="text"
+                        value={profileUsername}
+                        onChange={(e) => setProfileUsername(e.target.value)}
+                        placeholder="admin"
+                        className="w-full text-xs font-mono font-bold px-3 py-2 rounded-xl bg-white/80 border border-zinc-300/80 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-900"
+                        required
+                      />
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-white/60 border border-white/80 shadow-xs">
+                      <label className="text-[10.5px] font-extrabold text-zinc-800 uppercase tracking-wider mb-1.5 block flex items-center gap-1">
+                        <Lock className="w-3 h-3 text-zinc-700" />
+                        New Password
+                      </label>
+                      <input 
+                        type="password"
+                        value={profilePassword}
+                        onChange={(e) => setProfilePassword(e.target.value)}
+                        placeholder="Leave blank to keep current"
+                        className="w-full text-xs font-mono px-3 py-2 rounded-xl bg-white/80 border border-zinc-300/80 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-900"
+                      />
+                    </div>
+                  </div>
+
+                  {/* 4. Collapsible Supabase SQL Schema Box */}
+                  <div className="rounded-2xl border border-amber-500/30 bg-amber-50/50 p-3">
+                    <div 
+                      onClick={() => setShowSqlAccordion(!showSqlAccordion)}
+                      className="flex items-center justify-between cursor-pointer select-none"
+                    >
+                      <div className="flex items-center gap-1.5 text-amber-900 text-xs font-extrabold">
+                        <Database className="w-3.5 h-3.5 text-amber-700" />
+                        <span>Supabase SQL Setup Query</span>
+                      </div>
+                      <span className="text-[10.5px] text-amber-800 font-bold underline">
+                        {showSqlAccordion ? 'Hide Query' : 'View SQL Query'}
+                      </span>
+                    </div>
+
+                    {showSqlAccordion && (
+                      <div className="mt-2.5 pt-2.5 border-t border-amber-300/50">
+                        <p className="text-[10px] text-zinc-700 font-semibold mb-2 leading-relaxed">
+                          Run this query in your <strong>Supabase Dashboard → SQL Editor</strong> to create the <code>admin_settings</code> table:
+                        </p>
+                        <div className="relative">
+                          <pre className="text-[9.5px] font-mono bg-zinc-900 text-zinc-200 p-2.5 rounded-xl overflow-x-auto max-h-36 leading-tight select-all">
+                            {ADMIN_SQL_QUERY}
+                          </pre>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard.writeText(ADMIN_SQL_QUERY);
+                              setSqlCopied(true);
+                              setTimeout(() => setSqlCopied(false), 2000);
+                            }}
+                            className="absolute top-1.5 right-1.5 px-2 py-1 bg-white/20 hover:bg-white/30 text-white rounded-lg text-[9px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                          >
+                            {sqlCopied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                            <span>{sqlCopied ? 'Copied!' : 'Copy SQL'}</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center justify-end gap-2.5 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowProfileModal(false)}
+                      className="px-4 py-2 rounded-xl text-xs font-bold text-zinc-700 hover:bg-zinc-200/60 transition-colors cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={profileSaving}
+                      className="px-5 py-2 rounded-xl text-xs font-extrabold text-white bg-indigo-600 hover:bg-indigo-700 active:scale-95 shadow-md transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                    >
+                      {profileSaving ? (
+                        <>
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                          <span>Saving Changes...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Check className="w-3.5 h-3.5" />
+                          <span>Save Settings</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
               </motion.div>
             </div>
           )}

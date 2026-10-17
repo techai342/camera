@@ -61,3 +61,19 @@ export const supabase: SupabaseClient = createClient(supabaseUrl, supabaseAnonKe
   },
 });
 
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+export const supabaseAdmin: SupabaseClient = serviceRoleKey
+  ? createClient(supabaseUrl, serviceRoleKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+      },
+    })
+  : supabase;
+
+export function getSupabaseAdmin(): SupabaseClient {
+  return supabaseAdmin;
+}
+

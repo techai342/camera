@@ -56,12 +56,60 @@ export async function hashPasswordPBKDF2(password: string, salt: string = DEFAUL
 }
 
 /**
- * Verify given username & password against configured PBKDF2 hash
+ * Fetch dynamic admin settings from Supabase (with fallback)
+ */
+export async function getAdminSettings(): Promise<any | null> {
+  try {
+    const { supabaseAdmin } = await import('./supabase');
+    const { data, error } = await supabaseAdmin
+      .from('admin_settings')
+      .select('*')
+      .limit(1)
+      .maybeSingle();
+    if (!error && data) {
+      return data;
+    }
+  } catch {}
+  return null;
+}
+
+/**
+ * Verify given username & password against configured PBKDF2 hash (DB or fallback)
  */
 export async function verifyCredentials(username: string, password: string): Promise<boolean> {
-  // Allow either 'admin' or 'mradmin' as valid usernames by default
+  const cleanUser = username.trim().toLowerCase();
+  const settings = await getAdminSettings();
+
+  if (settings && settings.username && settings.password_hash) {
+    const validUsernames = [
+      settings.username.toLowerCase(),
+      DEFAULT_USERNAME.toLowerCase(),
+      'mradmin',
+    ];
+
+    if (!validUsernames.includes(cleanUser)) {
+      await hashPasswordPBKDF2('dummy_string', DEFAULT_SALT);
+      return false;
+    }
+
+    const saltToUse = settings.salt || DEFAULT_SALT;
+    const computedHash = await hashPasswordPBKDF2(password, saltToUse);
+
+    if (timingSafeEqualStr(computedHash, settings.password_hash)) {
+      return true;
+    }
+
+    // Also support default password hash as fallback
+    if (timingSafeEqualStr(computedHash, DEFAULT_PASSWORD_HASH)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  // Fallback to environment variables
   const validUsernames = [DEFAULT_USERNAME.toLowerCase(), 'mradmin'];
-  if (!validUsernames.includes(username.trim().toLowerCase())) {
+  if (!validUsernames.includes(cleanUser)) {
     // Perform fake hash to prevent timing enumeration
     await hashPasswordPBKDF2('dummy_string', DEFAULT_SALT);
     return false;

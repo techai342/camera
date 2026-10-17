@@ -2392,10 +2392,13 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
       {/* API Docs & Standalone Widget Builder Modal */}
       {showApiModal && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 min-h-screen">
-          <div className="liquid-glass-box liquid-glass-modal p-3.5 sm:p-7 w-full max-w-3xl relative max-h-[92vh] flex flex-col shadow-2xl text-zinc-900 rounded-[24px] sm:rounded-[32px] border-2 border-white/95">
+        <div className="fixed inset-0 z-50 bg-black/45 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 min-h-[100dvh] overflow-y-auto clay-scroll">
+          <div className={cn(
+            "liquid-glass-box liquid-glass-modal p-4 sm:p-6 w-full relative max-h-[90dvh] flex flex-col shadow-2xl text-zinc-900 rounded-[28px] sm:rounded-[36px] border-2 border-white/95 my-auto overflow-hidden",
+            currentUser ? "max-w-3xl" : "max-w-lg sm:max-w-xl"
+          )}>
             {/* Clean Non-Colliding Modal Header */}
-            <div className="flex items-center justify-between pb-3 sm:pb-4 mb-3 sm:mb-4 border-b border-zinc-200/60 shrink-0">
+            <div className="flex items-center justify-between pb-3 sm:pb-3.5 mb-2.5 sm:mb-3 border-b border-zinc-200/60 shrink-0">
               <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                 <div className="glass-orb orb-green w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-zinc-950 shadow-md shrink-0">
                   <Code className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-950" />
@@ -2410,7 +2413,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                   playBubblePop(450);
                   setShowApiModal(false);
                 }} 
-                className="glass-orb orb-clear w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-zinc-800 transition-all active:scale-90 shadow shrink-0"
+                className="glass-orb orb-clear w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-zinc-800 transition-all active:scale-90 shadow shrink-0 cursor-pointer"
                 title="Close"
               >
                 <X className="w-4 h-4"/>
@@ -2418,39 +2421,63 @@ create policy "Allow public delete access" on public.urls for delete using (true
             </div>
 
             {!currentUser ? (
-              <div className="py-6 sm:py-8 px-2 sm:px-6 flex flex-col items-center text-center space-y-4">
-                <div className="relative">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-amber-500 via-rose-500 to-indigo-600 flex items-center justify-center text-white shadow-xl animate-pulse">
-                    <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+              <div className="flex-1 overflow-y-auto clay-scroll py-2 px-1 sm:px-3 flex flex-col items-center text-center space-y-3.5 sm:space-y-4">
+                <div className="relative pt-1">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-3xl bg-gradient-to-tr from-amber-500 via-rose-500 to-indigo-600 flex items-center justify-center text-white shadow-xl animate-pulse">
+                    <Lock className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
                   </div>
-                  <span className="glass-orb orb-green w-7 h-7 text-white absolute -bottom-1 -right-1 shadow-md flex items-center justify-center text-[10px] font-black">
+                  <span className="glass-orb orb-green px-2 py-0.5 text-zinc-950 absolute -bottom-1 -right-2 shadow-md text-[9px] font-black uppercase tracking-wider rounded-full border border-white/80">
                     VIP
                   </span>
                 </div>
 
-                <div className="max-w-md space-y-1.5">
-                  <h4 className="text-xl sm:text-2xl font-black text-zinc-900 tracking-tight">
+                <div className="max-w-md space-y-1">
+                  <h4 className="text-xl sm:text-2xl font-black text-zinc-900 tracking-tight leading-tight">
                     Developer API &amp; Bot Hub is Gated
                   </h4>
-                  <p className="text-xs sm:text-sm text-zinc-600 font-medium leading-relaxed">
+                  <p className="text-xs sm:text-[13px] text-zinc-600 font-bold max-w-md leading-relaxed">
                     Access to our HTTP endpoints, bot SDKs, and code generators is reserved for registered members. Create a free account in 5 seconds to unlock everything!
                   </p>
                 </div>
 
-                <div className="w-full max-w-md bg-white/70 backdrop-blur-sm border border-white/90 rounded-2xl p-4 text-left space-y-2 text-xs text-zinc-700 shadow-sm">
-                  <div className="flex items-center gap-2 font-bold text-zinc-900">
+                <div className="w-full max-w-md bg-white/75 backdrop-blur-md border border-white/90 rounded-2xl p-3.5 sm:p-4 text-left shadow-sm space-y-2.5">
+                  <div className="flex items-center gap-2 font-black text-xs text-zinc-900 uppercase tracking-wide">
                     <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
-                    <span>Unlocked with Free Account:</span>
+                    <span>Unlocked with Free Account</span>
                   </div>
-                  <ul className="space-y-1.5 pl-6 list-disc text-[11px] text-zinc-600">
-                    <li><strong className="text-zinc-800">Unlimited Link Creations</strong> (Bypasses guest 5-try limit)</li>
-                    <li><strong className="text-zinc-800">Direct HTTP Endpoints</strong> (<code className="text-indigo-600">POST /api/shorten</code> &amp; GET Telemetry)</li>
-                    <li><strong className="text-zinc-800">Telegram Bot SDK</strong> ready-to-run templates for Node.js and Python</li>
-                    <li><strong className="text-zinc-800">Standalone Client Widget</strong> HTML downloader (<code className="text-indigo-600">index.html</code>)</li>
-                  </ul>
+                  <div className="grid grid-cols-1 gap-2 text-xs text-zinc-700">
+                    <div className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5 stroke-[2.5]" />
+                      <div>
+                        <strong className="text-zinc-900">Unlimited Link Creations</strong>
+                        <p className="text-[11px] text-zinc-500 font-medium">Bypasses guest 5-link limit forever</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5 stroke-[2.5]" />
+                      <div>
+                        <strong className="text-zinc-900">Direct HTTP Endpoints</strong>
+                        <p className="text-[11px] text-zinc-500 font-mono font-medium">POST /api/shorten &amp; Realtime Telemetry</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5 stroke-[2.5]" />
+                      <div>
+                        <strong className="text-zinc-900">Telegram Bot SDK</strong>
+                        <p className="text-[11px] text-zinc-500 font-medium">Ready-to-deploy Node.js and Python bot templates</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5 stroke-[2.5]" />
+                      <div>
+                        <strong className="text-zinc-900">Standalone Client Widget</strong>
+                        <p className="text-[11px] text-zinc-500 font-mono font-medium">Deployable index.html self-hosted source</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full max-w-md pt-2">
+                <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full max-w-md pt-1 pb-1 shrink-0">
                   <button
                     onClick={() => {
                       playBubblePop(660);
@@ -2458,7 +2485,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                       setAuthModalReason('api');
                       setShowAuthModal(true);
                     }}
-                    className="w-full sm:flex-1 py-3.5 px-4 rounded-xl font-black text-xs uppercase tracking-wider text-white glass-orb orb-blue shadow-xl active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                    className="w-full sm:flex-1 py-3 px-4 rounded-full font-black text-xs uppercase tracking-wider text-white glass-orb orb-blue shadow-xl active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
                   >
                     <Sparkles className="w-4 h-4" />
                     <span>Create Free Account</span>
@@ -2470,7 +2497,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                       setAuthModalReason('api');
                       setShowAuthModal(true);
                     }}
-                    className="w-full sm:flex-1 py-3.5 px-4 rounded-xl font-black text-xs uppercase tracking-wider text-zinc-900 glass-orb orb-champagne active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                    className="w-full sm:flex-1 py-3 px-4 rounded-full font-black text-xs uppercase tracking-wider text-zinc-900 glass-orb orb-champagne active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
                   >
                     <User className="w-4 h-4" />
                     <span>Sign In</span>

@@ -89,20 +89,27 @@ body::before {
   pointer-events: none;
 }
 
-/* Top Specular Gloss Arc */
+/* Top Specular Gloss Arc (Delicate 12px Curved Highlight Lip) */
 .liquid-glass-box::before,
 .clay-board::before,
 .clay-panel::before {
   content: '';
   position: absolute;
-  top: 4px;
-  left: 10%;
-  right: 10%;
-  height: 16%;
+  top: 3px;
+  left: 14%;
+  right: 14%;
+  height: 12px;
+  max-height: 14px;
   border-radius: 9999px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0) 100%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0) 100%);
   pointer-events: none;
   z-index: 2;
+}
+
+/* Modals should have clean headers without any floating highlight shapes */
+.liquid-glass-modal::before,
+.glass-modal::before {
+  display: none !important;
 }
 
 /* Warm 3D Liquid Glass Sidebar & Navigation Container (Never Black) */

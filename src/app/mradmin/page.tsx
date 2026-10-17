@@ -3,6 +3,9 @@ import { verifySessionToken, COOKIE_NAME } from '../../lib/auth';
 import MrAdminClient from './MrAdminClient';
 import MrAdminLogin from './MrAdminLogin';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function MrAdminPage() {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;

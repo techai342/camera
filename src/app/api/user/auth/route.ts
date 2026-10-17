@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '../../../../lib/supabase';
+import { supabase, supabaseAdmin } from '../../../../lib/supabase';
 import {
   hashUserPassword,
   verifyUserPassword,
@@ -187,9 +187,9 @@ export async function POST(req: Request) {
       let user: any = null;
 
       // 1. Check by username
-      const { data: userByUsername } = await supabase
+      const { data: userByUsername } = await supabaseAdmin
         .from('app_users')
-        .select('id, username, email, password_hash')
+        .select('id, username, email, password_hash, is_banned')
         .eq('username', identifier)
         .maybeSingle();
 
@@ -198,9 +198,9 @@ export async function POST(req: Request) {
       } else {
         // 2. Check by email if username didn't match
         try {
-          const { data: userByEmail } = await supabase
+          const { data: userByEmail } = await supabaseAdmin
             .from('app_users')
-            .select('id, username, email, password_hash')
+            .select('id, username, email, password_hash, is_banned')
             .eq('email', identifier)
             .maybeSingle();
           if (userByEmail) user = userByEmail;
@@ -213,6 +213,14 @@ export async function POST(req: Request) {
         return NextResponse.json(
           { error: 'Invalid username/email or password.' },
           { status: 401 }
+        );
+      }
+
+      // Check if user is banned
+      if (user.is_banned) {
+        return NextResponse.json(
+          { error: 'Your account has been suspended by the administrator.' },
+          { status: 403 }
         );
       }
 

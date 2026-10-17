@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '../../../lib/supabase';
+import { supabase, supabaseAdmin } from '../../../lib/supabase';
 import { getUserFromRequest } from '../../../lib/userAuth';
 
 export async function OPTIONS() {
@@ -46,12 +46,93 @@ export async function POST(req: Request) {
 
     // 1. Identify User Session
     const activeUser = await getUserFromRequest(req);
-
-    // 2. Guest Usage Quota Enforcement (5 Free Tries)
     let guestUsageCount = 0;
-    if (!activeUser) {
+
+    // 2. Authenticated User Quota & Ban Enforcement
+    if (activeUser) {
+      try {
+        const { data: dbUser } = await supabaseAdmin
+          .from('app_users')
+          .select('id, plan, plan_expires_at, daily_request_limit, daily_requests_used, daily_reset_date, total_requests_used, is_banned')
+          .eq('id', activeUser.id)
+          .maybeSingle();
+
+        if (dbUser) {
+          // Check if user is suspended/banned by Admin
+          if (dbUser.is_banned) {
+            return NextResponse.json(
+              {
+                error: 'ACCOUNT_BANNED',
+                message: 'Your account has been suspended by the administrator.',
+              },
+              {
+                status: 403,
+                headers: { 'Access-Control-Allow-Origin': '*' },
+              }
+            );
+          }
+
+          const now = new Date();
+          const todayStr = now.toISOString().split('T')[0];
+          let plan = dbUser.plan || 'free';
+          let dailyLimit = typeof dbUser.daily_request_limit === 'number' ? dbUser.daily_request_limit : 5;
+          let dailyUsed = typeof dbUser.daily_requests_used === 'number' ? dbUser.daily_requests_used : 0;
+
+          // Check if paid plan expired
+          if (plan !== 'free' && dbUser.plan_expires_at) {
+            if (new Date(dbUser.plan_expires_at) < now) {
+              plan = 'free';
+              dailyLimit = 5;
+              await supabaseAdmin
+                .from('app_users')
+                .update({ plan: 'free', daily_request_limit: 5 })
+                .eq('id', dbUser.id);
+            }
+          }
+
+          // Reset daily count if calendar date changed
+          if (dbUser.daily_reset_date !== todayStr) {
+            dailyUsed = 0;
+            await supabaseAdmin
+              .from('app_users')
+              .update({ daily_requests_used: 0, daily_reset_date: todayStr })
+              .eq('id', dbUser.id);
+          }
+
+          // Enforce daily quota
+          if (dailyUsed >= dailyLimit) {
+            return NextResponse.json(
+              {
+                error: 'DAILY_QUOTA_EXCEEDED',
+                message: `You have reached your daily limit of ${dailyLimit} links for your ${plan.toUpperCase()} Plan today. Please upgrade your plan or redeem a coupon code to continue!`,
+                dailyUsed,
+                dailyLimit,
+                plan,
+              },
+              {
+                status: 403,
+                headers: { 'Access-Control-Allow-Origin': '*' },
+              }
+            );
+          }
+
+          // Increment daily and total requests
+          await supabaseAdmin
+            .from('app_users')
+            .update({
+              daily_requests_used: dailyUsed + 1,
+              total_requests_used: (dbUser.total_requests_used || 0) + 1,
+              daily_reset_date: todayStr,
+            })
+            .eq('id', dbUser.id);
+        }
+      } catch (err) {
+        console.error('Error verifying user plan quota:', err);
+      }
+    } else {
+      // 3. Guest Usage Quota Enforcement (5 Free Tries per device)
       if (deviceId) {
-        const { count, error: countErr } = await supabase
+        const { count, error: countErr } = await supabaseAdmin
           .from('urls')
           .select('id', { count: 'exact', head: true })
           .eq('device_id', deviceId);

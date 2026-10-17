@@ -10,13 +10,16 @@ import {
   Database, Shield, Lock, Search, ExternalLink, BarChart3, 
   Trash2, ArrowLeft, RefreshCw, Globe, Smartphone, Monitor,
   MapPin, Camera, Navigation, ArrowUpRight, X, Clock, Pin, PinOff,
-  LogOut, User, Settings, Check, Copy, Sparkles
+  LogOut, User, Settings, Check, Copy, Sparkles, Ticket, Users, 
+  Plus, Ban, Edit3, Link2, CheckCircle2, AlertTriangle, Key, Tag
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const ADMIN_SQL_QUERY = `-- 1. Create admin_settings table in Supabase
+const ADMIN_SQL_QUERY = `-- =========================================================================
+-- 1. Create admin_settings table in Supabase
+-- =========================================================================
 CREATE TABLE IF NOT EXISTS public.admin_settings (
     id TEXT PRIMARY KEY DEFAULT 'primary',
     username TEXT NOT NULL DEFAULT 'admin',
@@ -28,26 +31,63 @@ CREATE TABLE IF NOT EXISTS public.admin_settings (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 2. Insert default admin record
 INSERT INTO public.admin_settings (id, username, password_hash, salt, display_name, brand_name, avatar_url)
-VALUES (
-    'primary',
-    'admin',
-    '291bc793dcbaf0596b11612bcc1412d6afaccf726c417a5a6e4cff068326bf56',
-    'mradmin_super_secure_salt_99',
-    'Muhammad Saqib',
-    'Saqib Visuals',
-    'https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png'
-)
+VALUES ('primary', 'admin', '291bc793dcbaf0596b11612bcc1412d6afaccf726c417a5a6e4cff068326bf56', 'mradmin_super_secure_salt_99', 'Muhammad Saqib', 'Saqib Visuals', 'https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png')
 ON CONFLICT (id) DO NOTHING;
 
--- 3. Enable Row Level Security (RLS)
 ALTER TABLE public.admin_settings ENABLE ROW LEVEL SECURITY;
-
--- 4. Allow public read access for branding
 DROP POLICY IF EXISTS "Allow public read admin branding" ON public.admin_settings;
-CREATE POLICY "Allow public read admin branding" ON public.admin_settings 
-    FOR SELECT USING (true);
+CREATE POLICY "Allow public read admin branding" ON public.admin_settings FOR SELECT USING (true);
+
+-- =========================================================================
+-- 2. Update app_users Table with Subscription Tiers & Ban Columns
+-- =========================================================================
+ALTER TABLE public.app_users 
+ADD COLUMN IF NOT EXISTS email TEXT,
+ADD COLUMN IF NOT EXISTS plan TEXT NOT NULL DEFAULT 'free',
+ADD COLUMN IF NOT EXISTS plan_expires_at TIMESTAMP WITH TIME ZONE,
+ADD COLUMN IF NOT EXISTS daily_request_limit INTEGER NOT NULL DEFAULT 5,
+ADD COLUMN IF NOT EXISTS daily_requests_used INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN IF NOT EXISTS daily_reset_date DATE NOT NULL DEFAULT CURRENT_DATE,
+ADD COLUMN IF NOT EXISTS total_requests_used INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN IF NOT EXISTS last_coupon_used TEXT,
+ADD COLUMN IF NOT EXISTS is_banned BOOLEAN NOT NULL DEFAULT false;
+
+-- =========================================================================
+-- 3. Create coupons Table
+-- =========================================================================
+CREATE TABLE IF NOT EXISTS public.coupons (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    code TEXT NOT NULL UNIQUE,
+    plan_tier TEXT NOT NULL DEFAULT 'pro',
+    duration_days INTEGER NOT NULL DEFAULT 30,
+    daily_limit INTEGER NOT NULL DEFAULT 50,
+    max_uses INTEGER NOT NULL DEFAULT 50,
+    times_used INTEGER NOT NULL DEFAULT 0,
+    expires_at TIMESTAMP WITH TIME ZONE,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.coupons ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow public read coupons" ON public.coupons;
+CREATE POLICY "Allow public read coupons" ON public.coupons FOR SELECT USING (true);
+
+-- =========================================================================
+-- 4. Create coupon_redemptions Table
+-- =========================================================================
+CREATE TABLE IF NOT EXISTS public.coupon_redemptions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    coupon_id UUID REFERENCES public.coupons(id) ON DELETE CASCADE,
+    coupon_code TEXT NOT NULL,
+    user_id UUID REFERENCES public.app_users(id) ON DELETE CASCADE,
+    user_email TEXT,
+    redeemed_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.coupon_redemptions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow public read redemptions" ON public.coupon_redemptions;
+CREATE POLICY "Allow public read redemptions" ON public.coupon_redemptions FOR SELECT USING (true);
 `;
 
 export default function Admin() {
@@ -66,6 +106,37 @@ export default function Admin() {
   const [stats, setStats] = useState({ totalLinks: 0, totalClicks: 0, totalAdmins: 0, totalVisitors: 0 });
   const router = useRouter();
 
+  // Navigation Tab State
+  const [adminTab, setAdminTab] = useState<'links' | 'users' | 'coupons'>('links');
+
+  // User Accounts State
+  const [usersList, setUsersList] = useState<any[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [userSearch, setUserSearch] = useState('');
+  const [userStats, setUserStats] = useState({ totalUsers: 0, freeUsers: 0, proUsers: 0, premiumUsers: 0, bannedUsers: 0 });
+  const [editingUser, setEditingUser] = useState<any | null>(null);
+  const [userPlanChoice, setUserPlanChoice] = useState<'free' | 'pro' | 'premium'>('pro');
+  const [userExpiryDays, setUserExpiryDays] = useState<number>(30);
+  const [userDailyLimit, setUserDailyLimit] = useState<number>(50);
+  const [savingUserEdit, setSavingUserEdit] = useState(false);
+
+  // Coupon Engine State
+  const [couponsList, setCouponsList] = useState<any[]>([]);
+  const [loadingCoupons, setLoadingCoupons] = useState(false);
+  const [couponSearch, setCouponSearch] = useState('');
+  const [couponStats, setCouponStats] = useState({ totalCoupons: 0, activeCoupons: 0, totalRedemptions: 0 });
+  const [showCreateCouponModal, setShowCreateCouponModal] = useState(false);
+  const [couponCodeInput, setCouponCodeInput] = useState('');
+  const [couponPlanTier, setCouponPlanTier] = useState<'pro' | 'premium'>('pro');
+  const [couponDurationDays, setCouponDurationDays] = useState<number>(30);
+  const [couponDailyLimit, setCouponDailyLimit] = useState<number>(50);
+  const [couponMaxUses, setCouponMaxUses] = useState<number>(50);
+  const [couponExpiresAt, setCouponExpiresAt] = useState<string>('');
+  const [creatingCoupon, setCreatingCoupon] = useState(false);
+  const [couponSuccess, setCouponSuccess] = useState('');
+  const [couponError, setCouponError] = useState('');
+  const [copiedCouponId, setCopiedCouponId] = useState<string | null>(null);
+
   // Profile & Settings Modal State
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [profileUsername, setProfileUsername] = useState('admin');
@@ -79,6 +150,180 @@ export default function Admin() {
   const [profileError, setProfileError] = useState('');
   const [sqlCopied, setSqlCopied] = useState(false);
   const [showSqlAccordion, setShowSqlAccordion] = useState(false);
+
+  const fetchUsers = async () => {
+    setLoadingUsers(true);
+    try {
+      const res = await fetch('/api/admin/users');
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setUsersList(json.users || []);
+        if (json.stats) setUserStats(json.stats);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  const fetchCoupons = async () => {
+    setLoadingCoupons(true);
+    try {
+      const res = await fetch('/api/admin/coupons');
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setCouponsList(json.coupons || []);
+        if (json.stats) setCouponStats(json.stats);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoadingCoupons(false);
+    }
+  };
+
+  const toggleUserBan = async (user: any) => {
+    const action = user.is_banned ? 'Unban' : 'Ban';
+    if (!confirm(`Are you sure you want to ${action} user "${user.username || user.email}"?`)) return;
+    try {
+      const res = await fetch(`/api/admin/users/${encodeURIComponent(user.id)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_banned: !user.is_banned }),
+      });
+      if (res.ok) {
+        setUsersList(prev => prev.map(u => u.id === user.id ? { ...u, is_banned: !user.is_banned } : u));
+        fetchUsers();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const deleteUser = async (id: string, name: string) => {
+    if (!confirm(`Permanently delete account "${name}"? This action cannot be undone.`)) return;
+    try {
+      const res = await fetch(`/api/admin/users/${encodeURIComponent(id)}`, { method: 'DELETE' });
+      if (res.ok) {
+        setUsersList(prev => prev.filter(u => u.id !== id));
+        fetchUsers();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const openEditUserModal = (user: any) => {
+    setEditingUser(user);
+    setUserPlanChoice(user.plan === 'premium' ? 'premium' : (user.plan === 'pro' ? 'pro' : 'free'));
+    setUserExpiryDays(30);
+    setUserDailyLimit(typeof user.daily_request_limit === 'number' ? user.daily_request_limit : (user.plan === 'premium' ? 99999 : (user.plan === 'pro' ? 50 : 5)));
+  };
+
+  const handleSaveUserPlan = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUser) return;
+    setSavingUserEdit(true);
+    try {
+      const expiresAt = userPlanChoice === 'free' 
+        ? null 
+        : (userExpiryDays >= 9999 ? null : new Date(Date.now() + userExpiryDays * 86400000).toISOString());
+
+      const res = await fetch(`/api/admin/users/${encodeURIComponent(editingUser.id)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plan: userPlanChoice,
+          plan_expires_at: expiresAt,
+          daily_request_limit: userDailyLimit,
+          reset_daily_quota: true,
+        }),
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setUsersList(prev => prev.map(u => u.id === editingUser.id ? { ...u, ...json.user } : u));
+        setEditingUser(null);
+        fetchUsers();
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSavingUserEdit(false);
+    }
+  };
+
+  const handleCreateCoupon = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreatingCoupon(true);
+    setCouponError('');
+    setCouponSuccess('');
+    try {
+      const res = await fetch('/api/admin/coupons', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: couponCodeInput,
+          plan_tier: couponPlanTier,
+          duration_days: couponDurationDays,
+          daily_limit: couponDailyLimit,
+          max_uses: couponMaxUses,
+          expires_at: couponExpiresAt || null,
+        }),
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setCouponSuccess(`Coupon ${json.coupon.code} created successfully!`);
+        setCouponsList(prev => [json.coupon, ...prev]);
+        fetchCoupons();
+        setTimeout(() => {
+          setShowCreateCouponModal(false);
+          setCouponSuccess('');
+          setCouponCodeInput('');
+        }, 1200);
+      } else {
+        setCouponError(json.error || 'Failed to create coupon');
+      }
+    } catch (e) {
+      setCouponError('Network error');
+    } finally {
+      setCreatingCoupon(false);
+    }
+  };
+
+  const toggleCouponActive = async (coupon: any) => {
+    try {
+      const res = await fetch(`/api/admin/coupons/${encodeURIComponent(coupon.id)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_active: !coupon.is_active }),
+      });
+      if (res.ok) {
+        setCouponsList(prev => prev.map(c => c.id === coupon.id ? { ...c, is_active: !coupon.is_active } : c));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const deleteCoupon = async (id: string, code: string) => {
+    if (!confirm(`Permanently delete coupon "${code}"?`)) return;
+    try {
+      const res = await fetch(`/api/admin/coupons/${encodeURIComponent(id)}`, { method: 'DELETE' });
+      if (res.ok) {
+        setCouponsList(prev => prev.filter(c => c.id !== id));
+        fetchCoupons();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const generateRandomCouponCode = () => {
+    const prefix = couponPlanTier === 'premium' ? 'VIP' : 'PRO';
+    const rand = Math.random().toString(36).substring(2, 7).toUpperCase();
+    setCouponCodeInput(`${prefix}-${rand}`);
+  };
 
   const openProfileModal = async () => {
     setShowProfileModal(true);
@@ -564,6 +809,70 @@ export function useMyDomainAnalytics() {
       </div>
 
       <div className="max-w-7xl mx-auto p-4 md:p-8">
+        {/* Modern 3-Tab Liquid Navigation Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+          <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 liquid-glass-box rounded-2xl shadow-md border-2 border-white/80">
+            <button
+              onClick={() => setAdminTab('links')}
+              className={cn(
+                "flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer select-none",
+                adminTab === 'links'
+                  ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/25 scale-[1.02]"
+                  : "text-zinc-700 hover:text-zinc-950 hover:bg-white/40"
+              )}
+            >
+              <Link2 className="w-4 h-4" />
+              <span>Links &amp; Traps ({links.length})</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setAdminTab('users');
+                if (usersList.length === 0) fetchUsers();
+              }}
+              className={cn(
+                "flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer select-none",
+                adminTab === 'users'
+                  ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/25 scale-[1.02]"
+                  : "text-zinc-700 hover:text-zinc-950 hover:bg-white/40"
+              )}
+            >
+              <Users className="w-4 h-4" />
+              <span>User Accounts ({userStats.totalUsers || usersList.length})</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setAdminTab('coupons');
+                if (couponsList.length === 0) fetchCoupons();
+              }}
+              className={cn(
+                "flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer select-none",
+                adminTab === 'coupons'
+                  ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/25 scale-[1.02]"
+                  : "text-zinc-700 hover:text-zinc-950 hover:bg-white/40"
+              )}
+            >
+              <Ticket className="w-4 h-4" />
+              <span>Coupon Engine ({couponsList.length})</span>
+            </button>
+          </div>
+
+          {adminTab === 'coupons' && (
+            <button
+              onClick={() => {
+                generateRandomCouponCode();
+                setShowCreateCouponModal(true);
+              }}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs sm:text-sm font-black shadow-lg shadow-emerald-500/20 active:scale-95 transition-all cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Create Coupon</span>
+            </button>
+          )}
+        </div>
+
+        {adminTab === 'links' && (
         <div className="space-y-4 md:space-y-6">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 h-5 text-zinc-500" />
@@ -784,6 +1093,533 @@ export function useMyDomainAnalytics() {
             ))}
           </div>
         </div>
+        )}
+
+        {/* 2. USER ACCOUNTS MANAGEMENT VIEW */}
+        {adminTab === 'users' && (
+          <div className="space-y-4 md:space-y-6">
+            {/* User Stats Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 sm:gap-4">
+              <div className="liquid-glass-box rounded-2xl p-3.5 sm:p-4 text-center border-2 border-white/80 shadow-md">
+                <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">Total Users</p>
+                <p className="text-xl sm:text-2xl font-black text-zinc-950 mt-0.5">{userStats.totalUsers}</p>
+              </div>
+              <div className="liquid-glass-box rounded-2xl p-3.5 sm:p-4 text-center border-2 border-white/80 shadow-md">
+                <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">Free Tier</p>
+                <p className="text-xl sm:text-2xl font-black text-zinc-800 mt-0.5">{userStats.freeUsers}</p>
+              </div>
+              <div className="liquid-glass-box rounded-2xl p-3.5 sm:p-4 text-center border-2 border-cyan-400/50 shadow-md bg-cyan-500/5">
+                <p className="text-[9px] font-black uppercase tracking-wider text-cyan-800">Pro Plan</p>
+                <p className="text-xl sm:text-2xl font-black text-cyan-900 mt-0.5">{userStats.proUsers}</p>
+              </div>
+              <div className="liquid-glass-box rounded-2xl p-3.5 sm:p-4 text-center border-2 border-amber-400/50 shadow-md bg-amber-500/5">
+                <p className="text-[9px] font-black uppercase tracking-wider text-amber-800">Premium VIP</p>
+                <p className="text-xl sm:text-2xl font-black text-amber-950 mt-0.5">{userStats.premiumUsers}</p>
+              </div>
+              <div className="liquid-glass-box rounded-2xl p-3.5 sm:p-4 text-center border-2 border-red-400/50 shadow-md bg-red-500/5 col-span-2 sm:col-span-1">
+                <p className="text-[9px] font-black uppercase tracking-wider text-red-700">Suspended / Banned</p>
+                <p className="text-xl sm:text-2xl font-black text-red-900 mt-0.5">{userStats.bannedUsers}</p>
+              </div>
+            </div>
+
+            {/* Search & Refresh */}
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 h-5 text-zinc-500" />
+                <input
+                  type="text"
+                  placeholder="Search by Gmail or username..."
+                  value={userSearch}
+                  onChange={(e) => setUserSearch(e.target.value)}
+                  className="w-full liquid-glass-input py-3 md:py-3.5 pl-11 pr-4 text-sm font-bold text-zinc-900 placeholder-zinc-500 outline-none transition-all shadow-md"
+                />
+              </div>
+              <button 
+                onClick={fetchUsers}
+                className="glass-orb orb-clear px-4 py-3 rounded-2xl text-xs font-black flex items-center gap-1.5 text-zinc-800 active:scale-95 shadow-md"
+                title="Refresh users"
+              >
+                <RefreshCw className={cn("w-4 h-4", loadingUsers && "animate-spin")} />
+                <span className="hidden sm:inline">Refresh</span>
+              </button>
+            </div>
+
+            {/* Users Desktop Table */}
+            <div className="hidden md:block liquid-glass-box rounded-[32px] overflow-hidden shadow-xl border-2 border-white/90">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-zinc-200/60 bg-white/40 font-mono">
+                      <th className="px-6 py-4 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest">User / Gmail</th>
+                      <th className="px-6 py-4 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest">Active Plan</th>
+                      <th className="px-6 py-4 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest">Plan Validity</th>
+                      <th className="px-6 py-4 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest text-center">Requests Quota</th>
+                      <th className="px-6 py-4 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest text-center">Coupon Used</th>
+                      <th className="px-6 py-4 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest text-center">Status</th>
+                      <th className="px-6 py-4 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-200/50">
+                    {usersList
+                      .filter(u => 
+                        (u.username || '').toLowerCase().includes(userSearch.toLowerCase()) || 
+                        (u.email || '').toLowerCase().includes(userSearch.toLowerCase())
+                      )
+                      .map((u) => {
+                        const isPro = u.plan === 'pro';
+                        const isPrem = u.plan === 'premium';
+                        const isBanned = !!u.is_banned;
+                        const isExpired = u.plan_expires_at && new Date(u.plan_expires_at) < new Date();
+                        const daysRemaining = u.plan_expires_at 
+                          ? Math.max(0, Math.ceil((new Date(u.plan_expires_at).getTime() - Date.now()) / 86400000))
+                          : null;
+
+                        return (
+                          <tr key={u.id} className="hover:bg-white/40 transition-colors">
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 to-blue-500 text-white flex items-center justify-center font-black text-xs shadow-sm">
+                                  {(u.username || u.email || 'U')[0].toUpperCase()}
+                                </div>
+                                <div>
+                                  <p className="font-extrabold text-sm text-zinc-950 flex items-center gap-1.5">
+                                    <span>{u.username}</span>
+                                  </p>
+                                  <p className="text-[11px] font-semibold text-zinc-600">{u.email || 'No email registered'}</p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              {isPrem ? (
+                                <span className="px-3 py-1 rounded-full text-[11px] font-black bg-amber-500/20 text-amber-900 border border-amber-500/40 shadow-sm inline-flex items-center gap-1">
+                                  👑 PREMIUM VIP
+                                </span>
+                              ) : isPro ? (
+                                <span className="px-3 py-1 rounded-full text-[11px] font-black bg-cyan-500/15 text-cyan-900 border border-cyan-500/30 shadow-sm inline-flex items-center gap-1">
+                                  💎 PRO PLAN
+                                </span>
+                              ) : (
+                                <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-zinc-200 text-zinc-800 border border-zinc-300 shadow-sm">
+                                  FREE TIER
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4">
+                              {isExpired ? (
+                                <span className="text-red-700 font-extrabold text-xs">⚠️ Plan Expired</span>
+                              ) : daysRemaining !== null ? (
+                                <div className="text-xs">
+                                  <p className="font-extrabold text-emerald-800">{daysRemaining} days remaining</p>
+                                  <p className="text-[10px] text-zinc-500">{new Date(u.plan_expires_at).toLocaleDateString()}</p>
+                                </div>
+                              ) : (
+                                <span className="text-xs font-semibold text-zinc-600">{u.plan === 'free' ? 'Standard Free Quota' : '👑 Lifetime'}</span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-center">
+                              <div className="inline-block text-center">
+                                <span className="font-mono text-xs font-black text-zinc-900">
+                                  {u.daily_requests_used || 0} / {u.daily_request_limit || 5}
+                                </span>
+                                <p className="text-[9px] text-zinc-500 font-bold uppercase">{u.total_requests_used || 0} total links</p>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 text-center">
+                              {u.last_coupon_used ? (
+                                <span className="font-mono text-xs font-black px-2.5 py-1 rounded-lg bg-indigo-500/15 text-indigo-900 border border-indigo-500/25">
+                                  {u.last_coupon_used}
+                                </span>
+                              ) : (
+                                <span className="text-xs text-zinc-400 italic">—</span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-center">
+                              {isBanned ? (
+                                <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-red-500/20 text-red-900 border border-red-500/30">
+                                  🚫 BANNED
+                                </span>
+                              ) : (
+                                <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-950 border border-emerald-500/30">
+                                  ✅ ACTIVE
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  onClick={() => openEditUserModal(u)}
+                                  className="px-2.5 py-1.5 rounded-xl bg-blue-500/15 hover:bg-blue-500/25 text-blue-900 text-xs font-black border border-blue-500/30 active:scale-95 transition-all flex items-center gap-1 cursor-pointer"
+                                  title="Change Plan & Quota"
+                                >
+                                  <Edit3 className="w-3.5 h-3.5" />
+                                  <span>Plan</span>
+                                </button>
+                                <button
+                                  onClick={() => toggleUserBan(u)}
+                                  className={cn(
+                                    "px-2.5 py-1.5 rounded-xl text-xs font-black border active:scale-95 transition-all flex items-center gap-1 cursor-pointer",
+                                    isBanned 
+                                      ? "bg-emerald-500/15 text-emerald-900 border-emerald-500/30 hover:bg-emerald-500/25"
+                                      : "bg-red-500/15 text-red-900 border-red-500/30 hover:bg-red-500/25"
+                                  )}
+                                  title={isBanned ? "Unban user" : "Ban user"}
+                                >
+                                  <Ban className="w-3.5 h-3.5" />
+                                  <span>{isBanned ? 'Unban' : 'Ban'}</span>
+                                </button>
+                                <button
+                                  onClick={() => deleteUser(u.id, u.username || u.email)}
+                                  className="p-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-700 active:scale-95 transition-all cursor-pointer"
+                                  title="Delete Account"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Users Mobile Card View */}
+            <div className="md:hidden space-y-3">
+              {usersList
+                .filter(u => 
+                  (u.username || '').toLowerCase().includes(userSearch.toLowerCase()) || 
+                  (u.email || '').toLowerCase().includes(userSearch.toLowerCase())
+                )
+                .map((u) => {
+                  const isPro = u.plan === 'pro';
+                  const isPrem = u.plan === 'premium';
+                  const isBanned = !!u.is_banned;
+                  const isExpired = u.plan_expires_at && new Date(u.plan_expires_at) < new Date();
+                  const daysRemaining = u.plan_expires_at 
+                    ? Math.max(0, Math.ceil((new Date(u.plan_expires_at).getTime() - Date.now()) / 86400000))
+                    : null;
+
+                  return (
+                    <div key={u.id} className="liquid-glass-box rounded-2xl p-4 space-y-3 border-2 border-white/90 shadow-md">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-blue-500 text-white flex items-center justify-center font-black text-xs shadow-sm">
+                            {(u.username || u.email || 'U')[0].toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="font-extrabold text-sm text-zinc-950">{u.username}</p>
+                            <p className="text-[10px] text-zinc-600 font-semibold truncate max-w-[180px]">{u.email || 'No email'}</p>
+                          </div>
+                        </div>
+                        {isBanned ? (
+                          <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-red-500/20 text-red-900 border border-red-500/30">
+                            BANNED
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-500/20 text-emerald-950 border border-emerald-500/30">
+                            ACTIVE
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center justify-between py-2 border-y border-zinc-200/50 text-xs">
+                        <div>
+                          <p className="text-[9px] font-black uppercase tracking-wider text-zinc-500">Plan</p>
+                          <p className="font-black text-zinc-900 mt-0.5">
+                            {isPrem ? '👑 PREMIUM VIP' : isPro ? '💎 PRO PLAN' : 'FREE TIER'}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[9px] font-black uppercase tracking-wider text-zinc-500">Daily Quota</p>
+                          <p className="font-mono font-black text-zinc-900 mt-0.5">
+                            {u.daily_requests_used || 0}/{u.daily_request_limit || 5} today
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs pt-1">
+                        <div className="text-[10px] font-semibold text-zinc-600">
+                          {isExpired ? (
+                            <span className="text-red-700 font-black">Expired</span>
+                          ) : daysRemaining !== null ? (
+                            <span className="text-emerald-800 font-bold">{daysRemaining}d remaining</span>
+                          ) : (
+                            <span>{u.plan === 'free' ? 'Free' : 'Lifetime'}</span>
+                          )}
+                          {u.last_coupon_used && (
+                            <span className="ml-2 font-mono px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-900 font-bold">
+                              {u.last_coupon_used}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={() => openEditUserModal(u)}
+                            className="px-2 py-1 rounded-lg bg-blue-500/15 text-blue-900 text-[11px] font-black border border-blue-500/30"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => toggleUserBan(u)}
+                            className={cn(
+                              "px-2 py-1 rounded-lg text-[11px] font-black border",
+                              isBanned ? "bg-emerald-500/15 text-emerald-900 border-emerald-500/30" : "bg-red-500/15 text-red-900 border-red-500/30"
+                            )}
+                          >
+                            {isBanned ? 'Unban' : 'Ban'}
+                          </button>
+                          <button
+                            onClick={() => deleteUser(u.id, u.username || u.email)}
+                            className="p-1 rounded-lg bg-red-500/10 text-red-700"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        )}
+
+        {/* 3. COUPON ENGINE VIEW */}
+        {adminTab === 'coupons' && (
+          <div className="space-y-4 md:space-y-6">
+            {/* Coupon Stats Grid */}
+            <div className="grid grid-cols-3 gap-3 sm:gap-4">
+              <div className="liquid-glass-box rounded-2xl p-3.5 sm:p-4 text-center border-2 border-white/80 shadow-md">
+                <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">Total Codes</p>
+                <p className="text-xl sm:text-2xl font-black text-zinc-950 mt-0.5">{couponStats.totalCoupons}</p>
+              </div>
+              <div className="liquid-glass-box rounded-2xl p-3.5 sm:p-4 text-center border-2 border-emerald-400/50 shadow-md bg-emerald-500/5">
+                <p className="text-[9px] font-black uppercase tracking-wider text-emerald-800">Active Codes</p>
+                <p className="text-xl sm:text-2xl font-black text-emerald-950 mt-0.5">{couponStats.activeCoupons}</p>
+              </div>
+              <div className="liquid-glass-box rounded-2xl p-3.5 sm:p-4 text-center border-2 border-indigo-400/50 shadow-md bg-indigo-500/5">
+                <p className="text-[9px] font-black uppercase tracking-wider text-indigo-800">Total Redemptions</p>
+                <p className="text-xl sm:text-2xl font-black text-indigo-950 mt-0.5">{couponStats.totalRedemptions}</p>
+              </div>
+            </div>
+
+            {/* Search & Action bar */}
+            <div className="flex items-center justify-between gap-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 h-5 text-zinc-500" />
+                <input
+                  type="text"
+                  placeholder="Filter coupon codes..."
+                  value={couponSearch}
+                  onChange={(e) => setCouponSearch(e.target.value)}
+                  className="w-full liquid-glass-input py-3 md:py-3.5 pl-11 pr-4 text-sm font-bold text-zinc-900 placeholder-zinc-500 outline-none transition-all shadow-md"
+                />
+              </div>
+              <button
+                onClick={() => {
+                  generateRandomCouponCode();
+                  setShowCreateCouponModal(true);
+                }}
+                className="px-4 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs sm:text-sm font-black shadow-lg shadow-emerald-500/25 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+              >
+                <Plus className="w-4 h-4" />
+                <span className="hidden sm:inline">New Coupon</span>
+              </button>
+            </div>
+
+            {/* Coupons Desktop Table */}
+            <div className="hidden md:block liquid-glass-box rounded-[32px] overflow-hidden shadow-xl border-2 border-white/90">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-zinc-200/60 bg-white/40 font-mono">
+                      <th className="px-6 py-4 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest">Coupon Code</th>
+                      <th className="px-6 py-4 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest">Plan Tier</th>
+                      <th className="px-6 py-4 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest">Validity Duration</th>
+                      <th className="px-6 py-4 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest">Daily Limit</th>
+                      <th className="px-6 py-4 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest text-center">Accounts Cap</th>
+                      <th className="px-6 py-4 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest text-center">Status</th>
+                      <th className="px-6 py-4 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-200/50">
+                    {couponsList
+                      .filter(c => (c.code || '').toLowerCase().includes(couponSearch.toLowerCase()))
+                      .map((c) => {
+                        const isPrem = c.plan_tier === 'premium';
+                        const isExpired = c.expires_at && new Date(c.expires_at) < new Date();
+                        const isCapped = c.max_uses > 0 && (c.times_used || 0) >= c.max_uses;
+
+                        return (
+                          <tr key={c.id} className="hover:bg-white/40 transition-colors">
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono text-sm font-black text-zinc-950 px-2.5 py-1 rounded-xl bg-white/60 border border-zinc-300 shadow-sm">
+                                  {c.code}
+                                </span>
+                                <button
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(c.code);
+                                    setCopiedCouponId(c.id);
+                                    setTimeout(() => setCopiedCouponId(null), 2000);
+                                  }}
+                                  className="p-1 rounded-lg hover:bg-zinc-200/60 text-zinc-600 transition-colors cursor-pointer"
+                                  title="Copy Code"
+                                >
+                                  {copiedCouponId === c.id ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                                </button>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              {isPrem ? (
+                                <span className="px-3 py-1 rounded-full text-[11px] font-black bg-amber-500/20 text-amber-900 border border-amber-500/40 shadow-sm">
+                                  👑 PREMIUM VIP
+                                </span>
+                              ) : (
+                                <span className="px-3 py-1 rounded-full text-[11px] font-black bg-cyan-500/15 text-cyan-900 border border-cyan-500/30 shadow-sm">
+                                  💎 PRO PLAN
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-xs font-bold text-zinc-800">
+                              {c.duration_days >= 9999 ? '👑 Lifetime' : `${c.duration_days} Days (${Math.round(c.duration_days / 30)} Mo)`}
+                            </td>
+                            <td className="px-6 py-4 text-xs font-black text-zinc-900 font-mono">
+                              {c.daily_limit >= 9999 ? 'Unlimited' : `${c.daily_limit}/day`}
+                            </td>
+                            <td className="px-6 py-4 text-center">
+                              <div className="inline-block text-center">
+                                <span className="font-mono text-xs font-black text-zinc-900">
+                                  {c.times_used || 0} / {c.max_uses > 0 ? c.max_uses : '∞'}
+                                </span>
+                                {isCapped && <p className="text-[9px] text-red-600 font-black uppercase">Cap Reached</p>}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 text-center">
+                              {isExpired ? (
+                                <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-red-500/15 text-red-800 border border-red-500/25">
+                                  EXPIRED
+                                </span>
+                              ) : c.is_active ? (
+                                <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-500/15 text-emerald-900 border border-emerald-500/25">
+                                  ACTIVE
+                                </span>
+                              ) : (
+                                <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-amber-500/15 text-amber-900 border border-amber-500/25">
+                                  PAUSED
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  onClick={() => toggleCouponActive(c)}
+                                  className="px-2.5 py-1.5 rounded-xl text-xs font-extrabold border bg-zinc-100 hover:bg-zinc-200 text-zinc-800 active:scale-95 transition-all cursor-pointer"
+                                >
+                                  {c.is_active ? 'Pause' : 'Activate'}
+                                </button>
+                                <button
+                                  onClick={() => deleteCoupon(c.id, c.code)}
+                                  className="p-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-700 active:scale-95 transition-all cursor-pointer"
+                                  title="Delete Coupon"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Coupons Mobile Cards */}
+            <div className="md:hidden space-y-3">
+              {couponsList
+                .filter(c => (c.code || '').toLowerCase().includes(couponSearch.toLowerCase()))
+                .map((c) => {
+                  const isPrem = c.plan_tier === 'premium';
+                  const isExpired = c.expires_at && new Date(c.expires_at) < new Date();
+                  const isCapped = c.max_uses > 0 && (c.times_used || 0) >= c.max_uses;
+
+                  return (
+                    <div key={c.id} className="liquid-glass-box rounded-2xl p-4 space-y-3 border-2 border-white/90 shadow-md">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-sm font-black text-zinc-950 px-2 py-0.5 rounded-lg bg-white/70 border border-zinc-300">
+                            {c.code}
+                          </span>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(c.code);
+                              setCopiedCouponId(c.id);
+                              setTimeout(() => setCopiedCouponId(null), 2000);
+                            }}
+                            className="p-1 text-zinc-600"
+                          >
+                            {copiedCouponId === c.id ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                          </button>
+                        </div>
+                        {isExpired ? (
+                          <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-red-500/15 text-red-800">
+                            EXPIRED
+                          </span>
+                        ) : c.is_active ? (
+                          <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-500/15 text-emerald-900">
+                            ACTIVE
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-amber-500/15 text-amber-900">
+                            PAUSED
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center justify-between py-2 border-y border-zinc-200/50 text-xs">
+                        <div>
+                          <p className="text-[9px] font-black uppercase tracking-wider text-zinc-500">Tier</p>
+                          <p className="font-black text-zinc-900 mt-0.5">{isPrem ? '👑 PREMIUM VIP' : '💎 PRO'}</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-[9px] font-black uppercase tracking-wider text-zinc-500">Duration</p>
+                          <p className="font-extrabold text-zinc-900 mt-0.5">
+                            {c.duration_days >= 9999 ? 'Lifetime' : `${c.duration_days}d`}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[9px] font-black uppercase tracking-wider text-zinc-500">Redeemed</p>
+                          <p className="font-mono font-black text-zinc-900 mt-0.5">
+                            {c.times_used || 0}/{c.max_uses > 0 ? c.max_uses : '∞'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-1">
+                        <span className="text-[10px] font-mono text-zinc-600 font-bold">Limit: {c.daily_limit}/day</span>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={() => toggleCouponActive(c)}
+                            className="px-2.5 py-1 rounded-lg text-xs font-black border bg-zinc-100 text-zinc-800"
+                          >
+                            {c.is_active ? 'Pause' : 'Activate'}
+                          </button>
+                          <button
+                            onClick={() => deleteCoupon(c.id, c.code)}
+                            className="p-1 rounded-lg bg-red-500/10 text-red-700"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        )}
 
         <AnimatePresence>
           {selectedLink && (
@@ -1356,6 +2192,360 @@ export function useMyDomainAnalytics() {
                           <span>Save Settings</span>
                         </>
                       )}
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </div>
+          )}
+
+          {/* EDIT USER PLAN & QUOTA MODAL */}
+          {editingUser && (
+            <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+              <motion.div 
+                initial={{ opacity: 0 }} 
+                animate={{ opacity: 1 }} 
+                exit={{ opacity: 0 }}
+                onClick={() => setEditingUser(null)}
+                className="absolute inset-0 bg-black/50 backdrop-blur-md"
+              />
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="relative w-full max-w-md liquid-glass-box rounded-[32px] p-6 shadow-2xl border-2 border-white/95 overflow-hidden z-10"
+              >
+                <div className="flex items-center justify-between pb-4 border-b border-zinc-200/60">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-blue-500/15 text-blue-800 flex items-center justify-center font-black">
+                      <Edit3 className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-black text-zinc-950">Modify User Subscription</h3>
+                      <p className="text-[11px] font-semibold text-zinc-600 truncate max-w-[220px]">
+                        {editingUser.email || editingUser.username}
+                      </p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setEditingUser(null)}
+                    className="p-1.5 rounded-full hover:bg-zinc-200/60 text-zinc-600 transition-colors cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleSaveUserPlan} className="space-y-4 pt-4">
+                  {/* Plan Tier Choice */}
+                  <div>
+                    <label className="text-[10.5px] font-extrabold text-zinc-800 uppercase tracking-wider mb-1.5 block">
+                      Select Plan Tier
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setUserPlanChoice('free');
+                          setUserDailyLimit(5);
+                        }}
+                        className={cn(
+                          "py-2.5 px-3 rounded-xl text-xs font-black border transition-all cursor-pointer text-center",
+                          userPlanChoice === 'free' 
+                            ? "bg-zinc-800 text-white border-zinc-900 shadow-md" 
+                            : "bg-white/60 text-zinc-700 border-zinc-300 hover:bg-white"
+                        )}
+                      >
+                        Free Tier
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setUserPlanChoice('pro');
+                          setUserDailyLimit(50);
+                        }}
+                        className={cn(
+                          "py-2.5 px-3 rounded-xl text-xs font-black border transition-all cursor-pointer text-center",
+                          userPlanChoice === 'pro' 
+                            ? "bg-cyan-600 text-white border-cyan-700 shadow-md" 
+                            : "bg-white/60 text-cyan-800 border-cyan-300 hover:bg-white"
+                        )}
+                      >
+                        💎 Pro Plan
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setUserPlanChoice('premium');
+                          setUserDailyLimit(99999);
+                        }}
+                        className={cn(
+                          "py-2.5 px-3 rounded-xl text-xs font-black border transition-all cursor-pointer text-center",
+                          userPlanChoice === 'premium' 
+                            ? "bg-amber-600 text-white border-amber-700 shadow-md" 
+                            : "bg-white/60 text-amber-800 border-amber-300 hover:bg-white"
+                        )}
+                      >
+                        👑 Premium VIP
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Plan Duration Presets (if not free) */}
+                  {userPlanChoice !== 'free' && (
+                    <div>
+                      <label className="text-[10.5px] font-extrabold text-zinc-800 uppercase tracking-wider mb-1.5 block">
+                        Validity Duration
+                      </label>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {[
+                          { label: '30 Days (1 Mo)', days: 30 },
+                          { label: '60 Days (2 Mo)', days: 60 },
+                          { label: '180 Days (6 Mo)', days: 180 },
+                          { label: '365 Days (1 Yr)', days: 365 },
+                          { label: '👑 Lifetime', days: 99999 },
+                        ].map((p) => (
+                          <button
+                            key={p.days}
+                            type="button"
+                            onClick={() => setUserExpiryDays(p.days)}
+                            className={cn(
+                              "py-1.5 px-2 rounded-lg text-[11px] font-bold border transition-all text-center",
+                              userExpiryDays === p.days
+                                ? "bg-indigo-600 text-white border-indigo-700 shadow-xs"
+                                : "bg-white/60 text-zinc-700 border-zinc-300 hover:bg-white"
+                            )}
+                          >
+                            {p.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Daily Limit Input */}
+                  <div>
+                    <label className="text-[10.5px] font-extrabold text-zinc-800 uppercase tracking-wider mb-1 block">
+                      Daily Request Limit ({userPlanChoice === 'premium' ? 'Unlimited' : `${userDailyLimit} links/day`})
+                    </label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={99999}
+                      value={userDailyLimit}
+                      onChange={(e) => setUserDailyLimit(Number(e.target.value) || 5)}
+                      className="w-full text-xs font-mono font-bold px-3 py-2 rounded-xl bg-white/80 border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-zinc-900"
+                    />
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-200/60">
+                    <button
+                      type="button"
+                      onClick={() => setEditingUser(null)}
+                      className="px-4 py-2 rounded-xl text-xs font-bold text-zinc-700 hover:bg-zinc-200/60 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={savingUserEdit}
+                      className="px-5 py-2 rounded-xl text-xs font-extrabold text-white bg-blue-600 hover:bg-blue-700 active:scale-95 shadow-md transition-all flex items-center gap-1.5 disabled:opacity-50"
+                    >
+                      {savingUserEdit ? 'Saving...' : 'Apply Subscription'}
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </div>
+          )}
+
+          {/* CREATE COUPON CODE MODAL */}
+          {showCreateCouponModal && (
+            <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+              <motion.div 
+                initial={{ opacity: 0 }} 
+                animate={{ opacity: 1 }} 
+                exit={{ opacity: 0 }}
+                onClick={() => setShowCreateCouponModal(false)}
+                className="absolute inset-0 bg-black/50 backdrop-blur-md"
+              />
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="relative w-full max-w-md liquid-glass-box rounded-[32px] p-6 shadow-2xl border-2 border-white/95 overflow-hidden z-10"
+              >
+                <div className="flex items-center justify-between pb-4 border-b border-zinc-200/60">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-emerald-500/15 text-emerald-800 flex items-center justify-center font-black">
+                      <Ticket className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-black text-zinc-950">Generate Coupon Code</h3>
+                      <p className="text-[11px] font-semibold text-zinc-600">Create access codes for users to redeem</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setShowCreateCouponModal(false)}
+                    className="p-1.5 rounded-full hover:bg-zinc-200/60 text-zinc-600 transition-colors cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleCreateCoupon} className="space-y-4 pt-4">
+                  {couponError && (
+                    <div className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-700 text-xs font-bold flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 shrink-0" />
+                      <span>{couponError}</span>
+                    </div>
+                  )}
+
+                  {couponSuccess && (
+                    <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 text-xs font-bold flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 shrink-0" />
+                      <span>{couponSuccess}</span>
+                    </div>
+                  )}
+
+                  {/* Coupon Code Input */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="text-[10.5px] font-extrabold text-zinc-800 uppercase tracking-wider block">
+                        Coupon Code String
+                      </label>
+                      <button
+                        type="button"
+                        onClick={generateRandomCouponCode}
+                        className="text-[10px] font-bold text-blue-600 hover:text-blue-800 underline cursor-pointer"
+                      >
+                        🎲 Random Code
+                      </button>
+                    </div>
+                    <input
+                      type="text"
+                      value={couponCodeInput}
+                      onChange={(e) => setCouponCodeInput(e.target.value.toUpperCase())}
+                      placeholder="e.g. VIP2026, SAQIBPRO2M"
+                      className="w-full text-sm font-mono font-black uppercase px-3.5 py-2.5 rounded-xl bg-white/80 border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-zinc-900 tracking-wider"
+                      required
+                    />
+                  </div>
+
+                  {/* Target Plan Tier */}
+                  <div>
+                    <label className="text-[10.5px] font-extrabold text-zinc-800 uppercase tracking-wider mb-1.5 block">
+                      Target Plan Tier
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCouponPlanTier('pro');
+                          setCouponDailyLimit(50);
+                        }}
+                        className={cn(
+                          "py-2.5 px-3 rounded-xl text-xs font-black border transition-all cursor-pointer text-center",
+                          couponPlanTier === 'pro'
+                            ? "bg-cyan-600 text-white border-cyan-700 shadow-md"
+                            : "bg-white/60 text-cyan-800 border-cyan-300 hover:bg-white"
+                        )}
+                      >
+                        💎 Pro Plan (50/day)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCouponPlanTier('premium');
+                          setCouponDailyLimit(99999);
+                        }}
+                        className={cn(
+                          "py-2.5 px-3 rounded-xl text-xs font-black border transition-all cursor-pointer text-center",
+                          couponPlanTier === 'premium'
+                            ? "bg-amber-600 text-white border-amber-700 shadow-md"
+                            : "bg-white/60 text-amber-800 border-amber-300 hover:bg-white"
+                        )}
+                      >
+                        👑 Premium VIP (Unlimited)
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Duration Presets */}
+                  <div>
+                    <label className="text-[10.5px] font-extrabold text-zinc-800 uppercase tracking-wider mb-1.5 block">
+                      Validity Duration Granted
+                    </label>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {[
+                        { label: '7 Days', days: 7 },
+                        { label: '30 Days (1 Mo)', days: 30 },
+                        { label: '60 Days (2 Mo)', days: 60 },
+                        { label: '180 Days (6 Mo)', days: 180 },
+                        { label: '365 Days (1 Yr)', days: 365 },
+                        { label: '👑 Lifetime', days: 99999 },
+                      ].map((p) => (
+                        <button
+                          key={p.days}
+                          type="button"
+                          onClick={() => setCouponDurationDays(p.days)}
+                          className={cn(
+                            "py-1.5 px-2 rounded-lg text-[10.5px] font-bold border transition-all text-center",
+                            couponDurationDays === p.days
+                              ? "bg-emerald-600 text-white border-emerald-700 shadow-xs"
+                              : "bg-white/60 text-zinc-700 border-zinc-300 hover:bg-white"
+                          )}
+                        >
+                          {p.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Limit & Account Cap */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-[10px] font-extrabold text-zinc-700 uppercase tracking-wider mb-1 block">
+                        Account Uses Cap
+                      </label>
+                      <input
+                        type="number"
+                        min={1}
+                        max={10000}
+                        value={couponMaxUses}
+                        onChange={(e) => setCouponMaxUses(Number(e.target.value) || 50)}
+                        placeholder="50 accounts"
+                        className="w-full text-xs font-mono font-bold px-3 py-2 rounded-xl bg-white/80 border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-zinc-900"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-extrabold text-zinc-700 uppercase tracking-wider mb-1 block">
+                        Code Expiry Date (Optional)
+                      </label>
+                      <input
+                        type="date"
+                        value={couponExpiresAt}
+                        onChange={(e) => setCouponExpiresAt(e.target.value)}
+                        className="w-full text-xs font-mono px-3 py-2 rounded-xl bg-white/80 border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-zinc-900"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-200/60">
+                    <button
+                      type="button"
+                      onClick={() => setShowCreateCouponModal(false)}
+                      className="px-4 py-2 rounded-xl text-xs font-bold text-zinc-700 hover:bg-zinc-200/60 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={creatingCoupon}
+                      className="px-5 py-2 rounded-xl text-xs font-extrabold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 active:scale-95 shadow-md transition-all flex items-center gap-1.5 disabled:opacity-50"
+                    >
+                      {creatingCoupon ? 'Creating...' : 'Create & Activate Coupon'}
                     </button>
                   </div>
                 </form>

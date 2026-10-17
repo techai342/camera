@@ -1487,152 +1487,221 @@ create policy "Allow public delete access" on public.urls for delete using (true
                   </div>
 
                   {/* 4. Add More Customizations Accordion */}
-                  <div className="pt-2 border-t border-white/10">
+                  {/* 4. Add More Customizations Accordion */}
+                  <div className="pt-2 border-t border-white/60">
                     <button
                       type="button"
-                      onClick={() => setShowAdvanced(!showAdvanced)}
-                      className="w-full flex items-center justify-between p-3.5 clay-small-pill transition-all"
+                      onClick={() => {
+                        playBubblePop(showAdvanced ? 480 : 660);
+                        setShowAdvanced(!showAdvanced);
+                      }}
+                      className="w-full flex items-center justify-between p-3 sm:p-3.5 liquid-glass-input rounded-2xl border-2 border-white/95 shadow-sm hover:bg-white/80 transition-all cursor-pointer select-none active:scale-[0.99]"
                     >
-                      <div className="flex items-center gap-2">
-                        <Settings2 className="w-4 h-4 text-[#20404e]" />
-                        <span className="text-[12px] font-extrabold uppercase tracking-wider text-[#122330]">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-700 shadow-xs shrink-0">
+                          <Settings2 className="w-4 h-4" />
+                        </div>
+                        <span className="text-[12px] sm:text-[13px] font-black uppercase tracking-wider text-zinc-900">
                           Add More Customizations
                         </span>
                         {(isPasswordEnabled || isSocialGateEnabled || customCode.trim() || expiresAt) && (
-                          <span className="px-2 py-0.5 bg-[#3a7d8c] text-white text-[9px] font-bold rounded-full">
+                          <span className="px-2.5 py-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[9.5px] font-black uppercase tracking-wider rounded-full shadow-xs">
                             Active
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-2 text-[#243c4c] text-xs font-bold">
-                        <span className="text-[11px] hidden sm:inline">Password, Social Gate, Alias</span>
-                        <ChevronDown className={cn("w-4 h-4 transition-transform duration-200", showAdvanced && "rotate-180")} />
+                      <div className="flex items-center gap-2 text-zinc-600 text-xs font-bold">
+                        <span className="text-[11px] font-bold text-zinc-500 hidden sm:inline">Password, Social Gate, Alias</span>
+                        <div className="w-7 h-7 rounded-full bg-white/80 flex items-center justify-center shadow-xs">
+                          <ChevronDown className={cn("w-4 h-4 text-zinc-800 transition-transform duration-300", showAdvanced && "rotate-180")} />
+                        </div>
                       </div>
                     </button>
 
                     {showAdvanced && (
-                      <div className="mt-3.5 p-4 clay-recessed rounded-2xl space-y-4 animate-in slide-in-from-top-2 fade-in duration-200">
+                      <div className="mt-3 p-4 sm:p-5 liquid-glass-box rounded-[26px] border-2 border-white/95 shadow-xl space-y-4 bg-white/80 backdrop-blur-xl animate-in slide-in-from-top-2 fade-in duration-200">
                         {/* Custom Alias */}
                         <div>
-                          <label htmlFor="customCode" className="text-[10px] font-extrabold text-[#1a2d3e] uppercase tracking-wider mb-1.5 block">
+                          <label htmlFor="customCode" className="text-[11px] font-black text-zinc-800 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-blue-500" />
                             Custom Alias (Back-Half)
                           </label>
-                          <div className="flex items-center bg-white/40 border border-white/60 rounded-xl overflow-hidden shadow-inner">
-                            <span className="px-3.5 py-2 text-xs font-mono font-bold text-[#243e54] bg-white/30 border-r border-white/50">
+                          <div className="liquid-glass-input p-1 flex items-center rounded-2xl border-2 border-white/90 shadow-inner overflow-hidden focus-within:ring-2 focus-within:ring-blue-500/40 transition-all">
+                            <span className="px-3.5 py-2 text-xs font-mono font-black text-blue-700 bg-blue-50/70 border-r border-white/80 rounded-l-xl select-none">
                               /
                             </span>
                             <input
                               id="customCode"
                               type="text"
-                              maxLength={20}
+                              maxLength={25}
                               value={customCode}
                               onChange={(e) => setCustomCode(e.target.value.replace(/[^a-zA-Z0-9_\-]/g, ''))}
-                              placeholder="my-custom-code"
-                              className="bg-transparent border-none outline-none py-2 px-3 text-[16px] sm:text-xs font-bold text-[#102030] placeholder-[#405c72]/60 w-full"
+                              placeholder="e.g. my-custom-link"
+                              className="bg-transparent border-none outline-none py-2 px-3 text-[16px] sm:text-xs font-bold text-zinc-900 placeholder-zinc-400 w-full font-mono"
                             />
+                            {customCode && (
+                              <button type="button" onClick={() => setCustomCode('')} className="p-1.5 mr-1 rounded-full text-zinc-400 hover:text-zinc-800 transition-colors">
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            )}
                           </div>
                         </div>
 
                         {/* Password Protection */}
-                        <div className="pt-3 border-t border-[#7690a5]/30">
+                        <div className="pt-3.5 border-t border-zinc-200/70">
                           <div className="flex items-center justify-between mb-2">
-                            <label className="text-[10px] font-extrabold text-[#1a2d3e] uppercase tracking-wider flex items-center gap-1.5">
-                              <Lock className="w-3.5 h-3.5 text-[#245b69]" /> Password Protection
+                            <label className="text-[11px] font-black text-zinc-800 uppercase tracking-wider flex items-center gap-2">
+                              <div className="w-6 h-6 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-700 shadow-xs">
+                                <Lock className="w-3.5 h-3.5" />
+                              </div>
+                              <span>Password Protection</span>
                             </label>
                             <button
                               type="button"
-                              onClick={() => setIsPasswordEnabled(!isPasswordEnabled)}
+                              onClick={() => {
+                                playBubblePop(isPasswordEnabled ? 480 : 680);
+                                setIsPasswordEnabled(!isPasswordEnabled);
+                              }}
                               className={cn(
-                                "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
-                                isPasswordEnabled ? "bg-[#3a7d8c]" : "bg-neutral-600"
+                                "relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 p-0.5 cursor-pointer shadow-inner border border-white/80 select-none",
+                                isPasswordEnabled 
+                                  ? "bg-gradient-to-r from-blue-500 to-indigo-600 shadow-[0_2px_10px_rgba(37,99,235,0.45)]" 
+                                  : "bg-zinc-200/90 hover:bg-zinc-300/80"
                               )}
+                              title={isPasswordEnabled ? "Password Protection Enabled" : "Enable Password Protection"}
                             >
                               <span className={cn(
-                                "inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm",
-                                isPasswordEnabled ? "translate-x-6" : "translate-x-1"
-                              )} />
+                                "inline-block h-6 w-6 rounded-full bg-white transition-all duration-300 shadow-md border border-white/90 flex items-center justify-center",
+                                isPasswordEnabled ? "translate-x-5" : "translate-x-0"
+                              )}>
+                                {isPasswordEnabled && <Check className="w-3.5 h-3.5 text-blue-600 stroke-[3]" />}
+                              </span>
                             </button>
                           </div>
                           {isPasswordEnabled && (
-                            <input
-                              id="password"
-                              type="password"
-                              value={password}
-                              onChange={(e) => setPassword(e.target.value)}
-                              placeholder="Enter unlock password..."
-                              required={isPasswordEnabled}
-                              className="w-full bg-white/50 border border-white/60 rounded-xl py-2 px-3 text-[16px] sm:text-xs font-bold text-[#102030] placeholder-[#405c72]/60 outline-none"
-                            />
-                          )}
-                        </div>
-
-                        {/* Social Gate */}
-                        <div className="pt-3 border-t border-[#7690a5]/30">
-                          <div className="flex items-center justify-between mb-2">
-                            <label className="text-[10px] font-extrabold text-[#1a2d3e] uppercase tracking-wider flex items-center gap-1.5">
-                              <Link2 className="w-3.5 h-3.5 text-[#245b69]" /> Social Guard (Sub2Unlock)
-                            </label>
-                            <button
-                              type="button"
-                              onClick={() => setIsSocialGateEnabled(!isSocialGateEnabled)}
-                              className={cn(
-                                "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
-                                isSocialGateEnabled ? "bg-[#3a7d8c]" : "bg-neutral-600"
-                              )}
-                            >
-                              <span className={cn(
-                                "inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm",
-                                isSocialGateEnabled ? "translate-x-6" : "translate-x-1"
-                              )} />
-                            </button>
-                          </div>
-                          {isSocialGateEnabled && (
-                            <div className="space-y-2.5">
-                              <div className="flex flex-wrap gap-1.5">
-                                {SOCIAL_ICONS.map((item) => (
-                                  <button
-                                    key={item.id}
-                                    type="button"
-                                    onClick={() => setSocialGateIcon(item.id)}
-                                    className={cn(
-                                      "px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1.5 transition-all",
-                                      socialGateIcon === item.id ? "bg-[#255b68] text-white shadow-sm" : "bg-white/40 text-[#1a2d3e]"
-                                    )}
-                                  >
-                                    <SocialIcon id={item.id} className="w-3.5 h-3.5" />
-                                    <span>{item.label}</span>
-                                  </button>
-                                ))}
-                              </div>
+                            <div className="mt-2.5 liquid-glass-input p-1 flex items-center rounded-2xl border-2 border-white/90 shadow-inner animate-in slide-in-from-top-1 fade-in duration-200">
+                              <Lock className="w-4 h-4 text-blue-600 ml-2.5 shrink-0" />
                               <input
-                                type="text"
-                                value={socialGateTitle}
-                                onChange={(e) => setSocialGateTitle(e.target.value)}
-                                placeholder="Action Title (e.g. Follow my WhatsApp Channel)"
-                                className="w-full bg-white/50 border border-white/60 rounded-xl py-2 px-3 text-xs font-bold text-[#102030] outline-none"
-                              />
-                              <input
-                                type="url"
-                                value={socialGateUrl}
-                                onChange={(e) => setSocialGateUrl(e.target.value)}
-                                placeholder="https://youtube.com/@channel or https://t.me/..."
-                                className="w-full bg-white/50 border border-white/60 rounded-xl py-2 px-3 text-xs font-bold text-[#102030] outline-none"
+                                id="password"
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="Set secret unlock password..."
+                                required={isPasswordEnabled}
+                                className="w-full bg-transparent border-none outline-none py-2 px-2.5 text-[16px] sm:text-xs font-bold text-zinc-900 placeholder-zinc-400 font-sans"
                               />
                             </div>
                           )}
                         </div>
 
+                        {/* Social Gate */}
+                        <div className="pt-3.5 border-t border-zinc-200/70">
+                          <div className="flex items-center justify-between mb-2">
+                            <label className="text-[11px] font-black text-zinc-800 uppercase tracking-wider flex items-center gap-2">
+                              <div className="w-6 h-6 rounded-lg bg-teal-500/15 border border-teal-500/30 flex items-center justify-center text-teal-700 shadow-xs">
+                                <Link2 className="w-3.5 h-3.5" />
+                              </div>
+                              <span>Social Guard (Sub2Unlock)</span>
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                playBubblePop(isSocialGateEnabled ? 480 : 680);
+                                setIsSocialGateEnabled(!isSocialGateEnabled);
+                              }}
+                              className={cn(
+                                "relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 p-0.5 cursor-pointer shadow-inner border border-white/80 select-none",
+                                isSocialGateEnabled 
+                                  ? "bg-gradient-to-r from-blue-500 to-indigo-600 shadow-[0_2px_10px_rgba(37,99,235,0.45)]" 
+                                  : "bg-zinc-200/90 hover:bg-zinc-300/80"
+                              )}
+                              title={isSocialGateEnabled ? "Social Guard Enabled" : "Enable Social Guard"}
+                            >
+                              <span className={cn(
+                                "inline-block h-6 w-6 rounded-full bg-white transition-all duration-300 shadow-md border border-white/90 flex items-center justify-center",
+                                isSocialGateEnabled ? "translate-x-5" : "translate-x-0"
+                              )}>
+                                {isSocialGateEnabled && <Check className="w-3.5 h-3.5 text-blue-600 stroke-[3]" />}
+                              </span>
+                            </button>
+                          </div>
+                          {isSocialGateEnabled && (
+                            <div className="space-y-3 mt-3 animate-in slide-in-from-top-1 fade-in duration-200">
+                              <div>
+                                <span className="text-[10px] font-extrabold text-zinc-600 uppercase tracking-wider mb-1.5 block">Select Platform Icon:</span>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {SOCIAL_ICONS.map((item) => (
+                                    <button
+                                      key={item.id}
+                                      type="button"
+                                      onClick={() => {
+                                        playBubblePop(580);
+                                        setSocialGateIcon(item.id);
+                                      }}
+                                      className={cn(
+                                        "px-2.5 py-1.5 rounded-xl text-[11px] font-black flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 border",
+                                        socialGateIcon === item.id 
+                                          ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-500 shadow-md" 
+                                          : "bg-white/70 hover:bg-white text-zinc-700 border-white/90 shadow-xs"
+                                      )}
+                                    >
+                                      <SocialIcon id={item.id} className="w-3.5 h-3.5" />
+                                      <span>{item.label}</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="liquid-glass-input p-1 flex items-center rounded-2xl border-2 border-white/90 shadow-inner">
+                                <Sparkles className="w-4 h-4 text-amber-500 ml-2.5 shrink-0" />
+                                <input
+                                  type="text"
+                                  value={socialGateTitle}
+                                  onChange={(e) => setSocialGateTitle(e.target.value)}
+                                  placeholder="Action Prompt (e.g. Subscribe to my YouTube Channel)"
+                                  className="w-full bg-transparent border-none outline-none py-2 px-2.5 text-[16px] sm:text-xs font-bold text-zinc-900 placeholder-zinc-400"
+                                />
+                              </div>
+                              <div className="liquid-glass-input p-1 flex items-center rounded-2xl border-2 border-white/90 shadow-inner">
+                                <Globe className="w-4 h-4 text-blue-500 ml-2.5 shrink-0" />
+                                <input
+                                  type="url"
+                                  value={socialGateUrl}
+                                  onChange={(e) => setSocialGateUrl(e.target.value)}
+                                  placeholder="https://youtube.com/@channel or https://t.me/..."
+                                  className="w-full bg-transparent border-none outline-none py-2 px-2.5 text-[16px] sm:text-xs font-bold text-zinc-900 placeholder-zinc-400"
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
                         {/* Expiration Timer */}
-                        <div className="pt-3 border-t border-[#7690a5]/30">
-                          <label className="text-[10px] font-extrabold text-[#1a2d3e] uppercase tracking-wider mb-1.5 block flex items-center gap-1.5">
-                            <Clock className="w-3.5 h-3.5 text-[#245b69]" /> Expiration Date (Optional)
+                        <div className="pt-3.5 border-t border-zinc-200/70">
+                          <label className="text-[11px] font-black text-zinc-800 uppercase tracking-wider mb-2 flex items-center justify-between">
+                            <span className="flex items-center gap-2">
+                              <div className="w-6 h-6 rounded-lg bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-700 shadow-xs">
+                                <Clock className="w-3.5 h-3.5" />
+                              </div>
+                              <span>Expiration Date (Optional)</span>
+                            </span>
+                            {expiresAt && (
+                              <button
+                                type="button"
+                                onClick={() => setExpiresAt('')}
+                                className="text-[10.5px] text-rose-600 font-extrabold hover:underline cursor-pointer flex items-center gap-1"
+                              >
+                                <X className="w-3 h-3" /> Clear Expiry
+                              </button>
+                            )}
                           </label>
-                          <input
-                            type="datetime-local"
-                            value={expiresAt}
-                            onChange={(e) => setExpiresAt(e.target.value)}
-                            className="w-full bg-white/50 border border-white/60 rounded-xl py-2 px-3 text-xs font-bold text-[#102030] outline-none"
-                          />
+                          <div className="liquid-glass-input p-1 flex items-center rounded-2xl border-2 border-white/90 shadow-inner">
+                            <input
+                              type="datetime-local"
+                              value={expiresAt}
+                              onChange={(e) => setExpiresAt(e.target.value)}
+                              className="w-full bg-transparent border-none outline-none py-2 px-2.5 text-[16px] sm:text-xs font-bold text-zinc-900 cursor-pointer"
+                            />
+                          </div>
                         </div>
                       </div>
                     )}

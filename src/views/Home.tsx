@@ -690,7 +690,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                   <span className="cartoon-letter text-[#f2b726] rotate-6 -ml-0.5">I</span>
                   <span className="cartoon-letter text-[#278c68] -rotate-6 -ml-0.5">B</span>
                 </div>
-                <div className="inline-flex items-center gap-1.5 mt-1.5 px-3 py-0.5 rounded-full bg-white/15 border border-white/25 text-[#f1f5f9] text-[10px] font-extrabold uppercase tracking-wide">
+                <div className="inline-flex items-center gap-1.5 mt-1.5 px-3 py-0.5 rounded-full bg-white/70 border border-white/90 text-zinc-900 text-[10px] font-extrabold uppercase tracking-wide shadow-sm">
                   <span>✨ 3D Liquid Glass OS</span>
                 </div>
               </div>
@@ -699,7 +699,10 @@ create policy "Allow public delete access" on public.urls for delete using (true
             {/* Sidebar Navigation Menu */}
             <nav className="space-y-2 mt-1">
               <button
-                onClick={() => setMobileTab('create')}
+                onClick={() => {
+                  playBubblePop(520);
+                  setMobileTab('create');
+                }}
                 className={cn(
                   "w-full flex items-center gap-3.5 px-4 py-2.5 text-[14px] font-bold transition-all",
                   mobileTab === 'create' ? "nav-pill-active" : "nav-pill-inactive"
@@ -711,6 +714,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
               <button
                 onClick={() => {
+                  playBubblePop(560);
                   setMobileTab('analytics');
                   if (!analyticsLink && history.length > 0) fetchAnalytics(history[0]);
                 }}
@@ -724,7 +728,10 @@ create policy "Allow public delete access" on public.urls for delete using (true
               </button>
 
               <button
-                onClick={() => setMobileTab('media')}
+                onClick={() => {
+                  playBubblePop(600);
+                  setMobileTab('media');
+                }}
                 className={cn(
                   "w-full flex items-center gap-3.5 px-4 py-2.5 text-[14px] font-bold transition-all",
                   mobileTab === 'media' ? "nav-pill-active" : "nav-pill-inactive"
@@ -735,7 +742,10 @@ create policy "Allow public delete access" on public.urls for delete using (true
               </button>
 
               <button
-                onClick={() => setShowApiModal(true)}
+                onClick={() => {
+                  playBubblePop(640);
+                  setShowApiModal(true);
+                }}
                 className="nav-pill-inactive w-full flex items-center gap-3.5 px-4 py-2.5 text-[14px] font-bold"
               >
                 <Code className="w-5 h-5 shrink-0" />
@@ -744,44 +754,44 @@ create policy "Allow public delete access" on public.urls for delete using (true
             </nav>
 
             {/* Recent Short Links List in Sidebar */}
-            <div className="mt-5 pt-4 border-t border-white/10">
+            <div className="mt-5 pt-4 border-t border-zinc-300/40">
               <div className="flex items-center justify-between mb-2.5">
-                <span className="text-[11px] font-extrabold text-[#b3c7d8] uppercase tracking-wider">Recent Links</span>
+                <span className="text-[11px] font-extrabold text-zinc-800 uppercase tracking-wider">Recent Links</span>
                 <div className="flex items-center gap-1.5">
                   {history.length > 0 && (
-                    <button onClick={clearHistory} className="text-[10px] text-zinc-400 hover:text-red-400 font-bold uppercase transition-colors">
+                    <button onClick={clearHistory} className="text-[10px] text-zinc-500 hover:text-red-500 font-bold uppercase transition-colors">
                       Clear
                     </button>
                   )}
-                  <span className="clay-small-pill px-2 py-0.5 text-[10px] font-mono-code font-bold text-[#142331]">{history.length}</span>
+                  <span className="clay-small-pill px-2 py-0.5 text-[10px] font-mono-code font-bold text-zinc-900">{history.length}</span>
                 </div>
               </div>
 
               <div className="space-y-2 max-h-44 overflow-y-auto clay-scroll pr-1">
                 {history.slice(0, 6).map((item: any) => (
-                  <div key={item.code} className="clay-recessed-dark p-2.5 rounded-xl text-left transition-all hover:bg-white/[0.04]">
+                  <div key={item.code} className="clay-recessed-dark p-2.5 rounded-xl text-left transition-all hover:bg-white/80">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-[#7bd3e2] font-mono">/{item.code}</span>
+                      <span className="text-xs font-bold text-blue-700 font-mono">/{item.code}</span>
                       <div className="flex items-center gap-1.5">
-                        <button onClick={() => fetchAnalytics(item)} className="text-zinc-400 hover:text-[#7bd3e2]" title="Analytics">
+                        <button onClick={() => { playBubblePop(550); fetchAnalytics(item); }} className="text-zinc-500 hover:text-blue-600 transition-colors" title="Analytics">
                           <BarChart3 className="w-3.5 h-3.5" />
                         </button>
-                        <button onClick={() => copyToClipboard(item.shortUrl)} className="text-zinc-400 hover:text-white" title="Copy">
+                        <button onClick={() => { playBubblePop(600); copyToClipboard(item.shortUrl); }} className="text-zinc-500 hover:text-zinc-900 transition-colors" title="Copy">
                           <Copy className="w-3.5 h-3.5" />
                         </button>
-                        <button onClick={() => handleEditClick(item.code)} className="text-zinc-400 hover:text-blue-400" title="Edit">
+                        <button onClick={() => { playBubblePop(650); handleEditClick(item.code); }} className="text-zinc-500 hover:text-indigo-600 transition-colors" title="Edit">
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
-                        <button onClick={() => handleDeleteLink(item.code)} className="text-zinc-400 hover:text-red-400" title="Delete">
+                        <button onClick={() => { playBubblePop(380); handleDeleteLink(item.code); }} className="text-zinc-500 hover:text-red-600 transition-colors" title="Delete">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>
-                    <p className="text-[10px] text-zinc-400 truncate mt-0.5">{item.longUrl}</p>
+                    <p className="text-[10px] text-zinc-600 truncate mt-0.5">{item.longUrl}</p>
                   </div>
                 ))}
                 {history.length === 0 && (
-                  <p className="text-[11px] text-zinc-400 italic">No links generated yet</p>
+                  <p className="text-[11px] text-zinc-500 italic">No links generated yet</p>
                 )}
               </div>
             </div>
@@ -789,15 +799,16 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
           {/* Sidebar Bottom Promo Card */}
           <div className="clay-promo-card mt-5 p-3.5 text-center flex flex-col items-center">
-            <h3 className="text-[#f0f6fb] font-bold text-[14px]">Saqib Visuals</h3>
-            <p className="text-[#b3c7d8] text-[11px] mt-0.5 leading-snug">
-              Where Creativity Meets<br/><span className="italic text-[#88dce8] font-semibold">Technology &amp; AI!</span>
+            <h3 className="text-zinc-900 font-black text-[14px]">Saqib Visuals</h3>
+            <p className="text-zinc-600 text-[11px] mt-0.5 leading-snug font-medium">
+              Where Creativity Meets<br/><span className="italic text-blue-600 font-bold">Technology &amp; AI!</span>
             </p>
             <a 
               href="https://wa.me/923478936242" 
               target="_blank" 
               rel="noreferrer"
-              className="clay-teal-btn mt-3 w-full py-2 px-3 text-[12px] font-bold flex items-center justify-center gap-1.5"
+              onClick={() => playBubblePop(720)}
+              className="glass-orb orb-green mt-3 w-full py-2 px-3 text-[12px] font-bold flex items-center justify-center gap-1.5 text-white active:scale-95 transition-transform shadow-md"
             >
               <span>Connect on WhatsApp</span>
             </a>
@@ -1138,7 +1149,8 @@ create policy "Allow public delete access" on public.urls for delete using (true
               {/* Main Liquid Glass Hero Card */}
               <section className="liquid-glass-box rounded-[38px] p-5 sm:p-8 relative">
                 <div className="mb-4 sm:mb-6">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900 text-amber-300 text-[10px] sm:text-[11px] font-extrabold tracking-wide uppercase shadow mb-2">
+                  <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/70 border border-white/95 text-zinc-900 text-[10px] sm:text-[11px] font-extrabold tracking-wide uppercase shadow-sm mb-2">
+                    <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
                     <span>🚀 3D LIQUID GLASS CONTROL CENTER</span>
                   </div>
                   <h2 className="text-[20px] sm:text-[27px] font-black text-zinc-900 tracking-tight leading-tight">
@@ -1494,23 +1506,29 @@ create policy "Allow public delete access" on public.urls for delete using (true
         </main>
       </div>
 
-      {/* Mobile Bottom Navigation */}
-      <div className="lg:hidden fixed bottom-3 left-3 right-3 sm:left-6 sm:right-6 clay-sidebar p-1.5 flex items-center justify-around z-50 shadow-2xl safe-bottom-bar border border-white/20">
+      {/* Mobile Bottom Navigation Bar (High-Gloss Liquid Glass) */}
+      <div className="lg:hidden fixed bottom-3 left-3 right-3 sm:left-6 sm:right-6 liquid-glass-box p-1.5 flex items-center justify-around z-50 shadow-2xl safe-bottom-bar rounded-full border-2 border-white/90">
         <button 
-          onClick={() => setMobileTab('create')}
+          onClick={() => {
+            playBubblePop(520);
+            setMobileTab('create');
+          }}
           className={cn(
-            "flex-1 py-2 px-1 rounded-xl flex flex-col xs:flex-row items-center justify-center gap-1 text-[11px] font-bold transition-all active:scale-95",
-            mobileTab === 'create' ? "nav-pill-active shadow-md" : "text-[#b2c8d8] hover:text-white"
+            "flex-1 py-2 px-1 rounded-full flex flex-col xs:flex-row items-center justify-center gap-1 text-[11px] font-extrabold transition-all active:scale-90",
+            mobileTab === 'create' ? "nav-pill-active shadow-md" : "text-zinc-700 hover:text-zinc-950"
           )}
         >
           <Plus className="w-4 h-4 shrink-0" />
           <span>Shorten</span>
         </button>
         <button 
-          onClick={() => setMobileTab('media')}
+          onClick={() => {
+            playBubblePop(560);
+            setMobileTab('media');
+          }}
           className={cn(
-            "flex-1 py-2 px-1 rounded-xl flex flex-col xs:flex-row items-center justify-center gap-1 text-[11px] font-bold transition-all active:scale-95",
-            mobileTab === 'media' ? "nav-pill-active shadow-md" : "text-[#b2c8d8] hover:text-white"
+            "flex-1 py-2 px-1 rounded-full flex flex-col xs:flex-row items-center justify-center gap-1 text-[11px] font-extrabold transition-all active:scale-90",
+            mobileTab === 'media' ? "nav-pill-active shadow-md" : "text-zinc-700 hover:text-zinc-950"
           )}
         >
           <Camera className="w-4 h-4 shrink-0" />
@@ -1518,22 +1536,26 @@ create policy "Allow public delete access" on public.urls for delete using (true
         </button>
         <button 
           onClick={() => {
+            playBubblePop(600);
             setMobileTab('analytics');
             if (!analyticsLink && history.length > 0) fetchAnalytics(history[0]);
           }}
           className={cn(
-            "flex-1 py-2 px-1 rounded-xl flex flex-col xs:flex-row items-center justify-center gap-1 text-[11px] font-bold transition-all active:scale-95",
-            mobileTab === 'analytics' ? "nav-pill-active shadow-md" : "text-[#b2c8d8] hover:text-white"
+            "flex-1 py-2 px-1 rounded-full flex flex-col xs:flex-row items-center justify-center gap-1 text-[11px] font-extrabold transition-all active:scale-90",
+            mobileTab === 'analytics' ? "nav-pill-active shadow-md" : "text-zinc-700 hover:text-zinc-950"
           )}
         >
           <BarChart3 className="w-4 h-4 shrink-0" />
           <span>Stats</span>
         </button>
         <button 
-          onClick={() => setMobileTab('recent')}
+          onClick={() => {
+            playBubblePop(640);
+            setMobileTab('recent');
+          }}
           className={cn(
-            "flex-1 py-2 px-1 rounded-xl flex flex-col xs:flex-row items-center justify-center gap-1 text-[11px] font-bold transition-all active:scale-95",
-            mobileTab === 'recent' ? "nav-pill-active shadow-md" : "text-[#b2c8d8] hover:text-white"
+            "flex-1 py-2 px-1 rounded-full flex flex-col xs:flex-row items-center justify-center gap-1 text-[11px] font-extrabold transition-all active:scale-90",
+            mobileTab === 'recent' ? "nav-pill-active shadow-md" : "text-zinc-700 hover:text-zinc-950"
           )}
         >
           <History className="w-4 h-4 shrink-0" />
@@ -1543,7 +1565,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
       {/* Edit Password Modal */}
       {editingLink && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#14212e]/75 backdrop-blur-md animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-in fade-in duration-200">
           <div className="w-full max-w-md max-h-[90vh] overflow-y-auto clay-board p-6 md:p-7 text-[#162432] clay-scroll shadow-2xl">
             <div className="flex justify-between items-center mb-5">
               <h3 className="text-xl font-extrabold embossed-title">Manage Link</h3>
@@ -1774,7 +1796,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
       {/* Detailed Analytics Modal */}
       {analyticsLink && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#14212e]/75 backdrop-blur-md animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-in fade-in duration-300">
            <div className="w-full max-w-5xl max-h-[88vh] clay-board overflow-hidden flex flex-col shadow-2xl">
               <div className="p-6 md:p-8 border-b border-white/20 flex items-center justify-between shrink-0">
                  <div>
@@ -2051,7 +2073,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
       {/* Sync Modal */}
       {showSyncModal && (
-        <div className="fixed inset-0 z-50 bg-[#14212e]/75 backdrop-blur-md flex items-center justify-center p-4 min-h-screen">
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 min-h-screen">
           <div className="clay-board p-8 w-full max-w-md relative text-[#162432] shadow-2xl">
             <button 
               onClick={() => setShowSyncModal(false)} 
@@ -2104,7 +2126,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
       )}
       {/* API Docs & Standalone Widget Builder Modal */}
       {showApiModal && (
-        <div className="fixed inset-0 z-50 bg-[#14212e]/75 backdrop-blur-md flex items-center justify-center p-4 min-h-screen">
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 min-h-screen">
           <div className="clay-board p-6 md:p-8 w-full max-w-3xl relative max-h-[90vh] flex flex-col shadow-2xl text-[#162432]">
             <button 
               onClick={() => setShowApiModal(false)} 

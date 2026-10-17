@@ -105,24 +105,51 @@ body::before {
   z-index: 2;
 }
 
-/* Dark Navy 3D Liquid Glass Container */
+/* Warm 3D Liquid Glass Sidebar & Navigation Container (Never Black) */
 .liquid-glass-dark,
 .clay-sidebar {
   position: relative;
   background: linear-gradient(
-    165deg,
-    rgba(26, 38, 54, 0.88) 0%,
-    rgba(16, 25, 38, 0.94) 100%
-  );
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 2px solid rgba(255, 255, 255, 0.28);
+    145deg,
+    rgba(255, 255, 255, 0.58) 0%,
+    rgba(244, 239, 230, 0.32) 48%,
+    rgba(255, 255, 255, 0.48) 100%
+  ) !important;
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 2.5px solid rgba(255, 255, 255, 0.92) !important;
   box-shadow:
-    0 22px 45px -8px rgba(8, 14, 22, 0.65),
-    inset 0 2px 5px rgba(255, 255, 255, 0.35),
-    inset 0 -4px 8px rgba(0, 0, 0, 0.65);
+    0 18px 36px -8px rgba(45, 40, 32, 0.22),
+    0 4px 12px rgba(0, 0, 0, 0.05),
+    inset 0 3px 6px rgba(255, 255, 255, 0.95),
+    inset 0 -4px 8px rgba(70, 62, 50, 0.16),
+    inset 3px 0 6px rgba(130, 210, 255, 0.22),
+    inset -3px 0 6px rgba(255, 140, 210, 0.18) !important;
   border-radius: 32px;
   transform: translateZ(0);
+}
+
+.clay-sidebar::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 12%;
+  right: 12%;
+  height: 14%;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.clay-sidebar::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: inherit;
+  border: 1.2px solid rgba(30, 30, 35, 0.12);
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.65);
+  pointer-events: none;
 }
 
 /* 3D Spherical Bubble Orb Base */
@@ -318,6 +345,103 @@ body::before {
   color: #111827 !important;
 }
 
+/* 3D Liquid Glass Subcard (Replacing Dark Recessed) */
+.clay-recessed-dark {
+  background: rgba(255, 255, 255, 0.62) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(255, 255, 255, 0.92) !important;
+  border-radius: 20px;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.04),
+    inset 0 -1px 3px rgba(255, 255, 255, 0.85),
+    0 4px 10px rgba(45, 40, 32, 0.04) !important;
+  color: #1e293b !important;
+}
+
+/* Navigation Pills for Sidebar & Mobile Bottom Bar */
+.nav-pill-inactive {
+  background: rgba(255, 255, 255, 0.52);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(255, 255, 255, 0.88);
+  border-radius: 9999px;
+  color: #1e293b !important;
+  font-weight: 700;
+  box-shadow:
+    0 4px 10px rgba(45, 40, 32, 0.05),
+    inset 0 2px 4px rgba(255, 255, 255, 0.9);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.nav-pill-inactive:hover {
+  background: rgba(255, 255, 255, 0.85);
+  transform: translateY(-1.5px);
+  color: #0f172a !important;
+  box-shadow:
+    0 6px 14px rgba(45, 40, 32, 0.08),
+    inset 0 2px 4px rgba(255, 255, 255, 0.95);
+}
+
+.nav-pill-inactive:active {
+  transform: scale(0.96);
+}
+
+.nav-pill-active {
+  position: relative;
+  background: radial-gradient(circle at 35% 30%, #5b7fff 0%, #2b44b8 62%, #1a297a 100%) !important;
+  border: 2px solid rgba(255, 255, 255, 0.95) !important;
+  border-radius: 9999px;
+  color: #ffffff !important;
+  font-weight: 800;
+  box-shadow:
+    0 10px 22px -3px rgba(37, 60, 175, 0.48),
+    inset 0 4px 8px rgba(255, 255, 255, 0.9),
+    inset 0 -5px 10px rgba(10, 18, 68, 0.65) !important;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+
+.nav-pill-active::before {
+  content: '';
+  position: absolute;
+  top: 6%;
+  left: 14%;
+  width: 56%;
+  height: 32%;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.05) 100%);
+  transform: rotate(-14deg);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.nav-pill-active:hover {
+  transform: translateY(-1.5px) scale(1.02);
+}
+
+.nav-pill-active:active {
+  transform: scale(0.96);
+}
+
+/* Sidebar Promo Card in Warm Champagne Glass */
+.clay-promo-card {
+  position: relative;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.68) 0%,
+    rgba(244, 239, 230, 0.42) 100%
+  ) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 2px solid rgba(255, 255, 255, 0.92) !important;
+  border-radius: 24px;
+  box-shadow:
+    0 10px 22px rgba(45, 40, 32, 0.1),
+    inset 0 2px 5px rgba(255, 255, 255, 0.9),
+    inset 0 -3px 6px rgba(70, 62, 50, 0.12) !important;
+}
+
 /* Liquid Stat Card Badges */
 .clay-stat-blue {
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.18) 0%, rgba(37, 99, 235, 0.08) 100%) !important;
@@ -399,4 +523,81 @@ input, textarea {
 
 .font-mono-code {
   font-family: var(--font-jetbrains-mono), monospace;
+}
+
+/* ============================================================
+   MOBILE RESPONSIVENESS & BUTTERY SMOOTH TOUCH PHYSICS
+============================================================ */
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* GPU hardware acceleration for smooth 60fps / 120fps animations */
+.clay-board,
+.liquid-glass-box,
+.clay-sidebar,
+.clay-panel,
+.glass-orb,
+.clay-small-pill {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+/* Smooth momentum touch scrolling */
+.clay-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.clay-scroll::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.clay-scroll::-webkit-scrollbar-track {
+  background: rgba(45, 40, 32, 0.06);
+  border-radius: 999px;
+}
+.clay-scroll::-webkit-scrollbar-thumb {
+  background: rgba(45, 40, 32, 0.22);
+  border-radius: 999px;
+}
+.clay-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(45, 40, 32, 0.38);
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .liquid-glass-box,
+  .clay-board {
+    border-radius: 26px !important;
+    border-width: 2px !important;
+  }
+
+  .clay-sidebar {
+    border-radius: 22px !important;
+  }
+
+  .clay-panel {
+    border-radius: 20px !important;
+  }
+}
+
+/* iPhone safe area insets */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .safe-bottom-padding {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 6.5rem) !important;
+  }
+  .safe-bottom-bar {
+    bottom: calc(env(safe-area-inset-bottom) + 0.75rem) !important;
+  }
 }

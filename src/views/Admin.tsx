@@ -362,13 +362,13 @@ export function useMyDomainAnalytics() {
   );
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white selection:bg-blue-500/30">
-      <div className="sticky top-0 z-50 bg-[#050505]/80 backdrop-blur-xl border-b border-zinc-900 px-4 py-3 md:px-8 md:py-4">
+    <div className="min-h-screen text-zinc-900 selection:bg-blue-500/30 font-sans">
+      <div className="sticky top-0 z-50 liquid-glass-box border-b-2 border-white/90 px-4 py-3 md:px-8 md:py-4 shadow-md backdrop-blur-xl">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-0">
           <div className="flex items-center justify-between md:justify-start gap-4">
             <div className="flex items-center gap-3">
-              <button onClick={() => router.push('/')} className="p-2 hover:bg-zinc-900 rounded-full transition-colors active:scale-95">
-                <ArrowLeft className="w-4 h-4 md:w-5 h-5 text-zinc-400" />
+              <button onClick={() => router.push('/')} className="glass-orb orb-clear w-9 h-9 flex items-center justify-center transition-all active:scale-95 shadow">
+                <ArrowLeft className="w-4 h-4 text-zinc-800" />
               </button>
               <div className="flex flex-col md:flex-row md:items-center gap-0 md:gap-2">
                 <div className="flex items-center gap-2">
@@ -382,17 +382,17 @@ export function useMyDomainAnalytics() {
                     <span className="cartoon-letter text-[#e03c28] text-sm md:text-base -rotate-6 -ml-0.5">N</span>
                   </div>
                 </div>
-                <span className="text-[10px] md:text-sm text-zinc-500 font-bold uppercase hidden md:inline">• CONSOLE</span>
+                <span className="text-[10px] md:text-xs text-zinc-600 font-extrabold uppercase hidden md:inline">• CONSOLE</span>
               </div>
             </div>
             <div className="flex items-center gap-2 md:hidden">
               <RefreshCw 
                 onClick={fetchGlobalData}
-                className={cn("w-4 h-4 text-zinc-400 cursor-pointer hover:text-white transition-colors", loading && "animate-spin")} 
+                className={cn("w-4 h-4 text-zinc-700 cursor-pointer hover:text-zinc-950 transition-colors", loading && "animate-spin")} 
               />
               <button 
                 onClick={handleLogout}
-                className="p-1 text-red-400 hover:text-white bg-red-500/10 rounded border border-red-500/20 active:scale-95"
+                className="p-1 text-red-600 hover:text-red-700 bg-red-500/10 rounded-full border border-red-500/20 active:scale-95 shadow-sm"
                 title="Logout"
               >
                 <LogOut className="w-3.5 h-3.5" />
@@ -400,42 +400,42 @@ export function useMyDomainAnalytics() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between border-t border-zinc-900 md:border-0 pt-3 md:pt-0">
+          <div className="flex items-center justify-between border-t border-zinc-300/40 md:border-0 pt-3 md:pt-0">
             <div className="flex items-center gap-4 md:gap-6 flex-1 overflow-x-auto no-scrollbar">
               <div className="text-left md:text-center group shrink-0">
-                <p className="text-[7px] md:text-[9px] text-zinc-600 font-black uppercase tracking-widest group-hover:text-blue-500 transition-colors">Links</p>
-                <p className="text-xs md:text-xl font-black text-white">{stats.totalLinks}</p>
+                <p className="text-[7px] md:text-[9px] text-zinc-600 font-black uppercase tracking-widest group-hover:text-blue-600 transition-colors">Links</p>
+                <p className="text-xs md:text-xl font-black text-zinc-950">{stats.totalLinks}</p>
               </div>
-              <div className="text-left md:text-center group border-l border-white/5 pl-4 md:pl-6 shrink-0">
-                <p className="text-[7px] md:text-[9px] text-zinc-600 font-black uppercase tracking-widest group-hover:text-emerald-500 transition-colors">Visitors</p>
-                <p className="text-xs md:text-xl font-black text-white">{stats.totalVisitors}</p>
+              <div className="text-left md:text-center group border-l border-zinc-300/60 pl-4 md:pl-6 shrink-0">
+                <p className="text-[7px] md:text-[9px] text-zinc-600 font-black uppercase tracking-widest group-hover:text-emerald-600 transition-colors">Visitors</p>
+                <p className="text-xs md:text-xl font-black text-zinc-950">{stats.totalVisitors}</p>
               </div>
-              <div className="text-left md:text-center group border-l border-white/5 pl-4 md:pl-6 shrink-0">
-                <p className="text-[7px] md:text-[9px] text-zinc-600 font-black uppercase tracking-widest group-hover:text-orange-500 transition-colors">Admins</p>
-                <p className="text-xs md:text-xl font-black text-white">{stats.totalAdmins}</p>
+              <div className="text-left md:text-center group border-l border-zinc-300/60 pl-4 md:pl-6 shrink-0">
+                <p className="text-[7px] md:text-[9px] text-zinc-600 font-black uppercase tracking-widest group-hover:text-amber-600 transition-colors">Admins</p>
+                <p className="text-xs md:text-xl font-black text-zinc-950">{stats.totalAdmins}</p>
               </div>
-              <div className="text-left md:text-center group border-l border-white/5 pl-4 md:pl-6 shrink-0 pr-4 md:pr-0">
-                <p className="text-[7px] md:text-[9px] text-zinc-600 font-black uppercase tracking-widest group-hover:text-pink-500 transition-colors">Traffic</p>
-                <p className="text-xs md:text-xl font-black text-blue-500">{stats.totalClicks}</p>
+              <div className="text-left md:text-center group border-l border-zinc-300/60 pl-4 md:pl-6 shrink-0 pr-4 md:pr-0">
+                <p className="text-[7px] md:text-[9px] text-zinc-600 font-black uppercase tracking-widest group-hover:text-pink-600 transition-colors">Traffic</p>
+                <p className="text-xs md:text-xl font-black text-blue-700">{stats.totalClicks}</p>
               </div>
             </div>
             <div className="hidden md:flex items-center gap-2">
               <button 
                 onClick={downloadFullIntegrationPrompt}
-                className="text-emerald-500 hover:text-white transition-colors flex items-center gap-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 px-3 py-1.5 rounded-lg border border-emerald-500/20 text-xs font-bold"
+                className="text-emerald-800 hover:text-emerald-950 transition-colors flex items-center gap-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 px-3 py-1.5 rounded-full border border-emerald-500/30 text-xs font-extrabold shadow-sm"
                 title="Download prompt to add tracker and dashboard to another website"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                 AI Integration Prompt
               </button>
-              <div className="h-8 md:h-10 w-[1px] bg-zinc-900 mx-1"></div>
+              <div className="h-8 md:h-10 w-[1px] bg-zinc-300/60 mx-1"></div>
               <RefreshCw 
                 onClick={fetchGlobalData}
-                className={cn("w-5 h-5 text-zinc-400 cursor-pointer hover:text-white transition-colors", loading && "animate-spin")} 
+                className={cn("w-5 h-5 text-zinc-700 cursor-pointer hover:text-zinc-950 transition-colors", loading && "animate-spin")} 
               />
               <button 
                 onClick={handleLogout}
-                className="text-red-400 hover:text-white transition-colors flex items-center gap-1.5 bg-red-500/10 hover:bg-red-500/20 px-3 py-1.5 rounded-lg border border-red-500/20 text-xs font-bold cursor-pointer"
+                className="text-red-700 hover:text-red-900 transition-colors flex items-center gap-1.5 bg-red-500/15 hover:bg-red-500/25 px-3 py-1.5 rounded-full border border-red-500/30 text-xs font-extrabold cursor-pointer shadow-sm"
                 title="Logout from MrAdmin"
               >
                 <LogOut className="w-3.5 h-3.5" />
@@ -449,31 +449,31 @@ export function useMyDomainAnalytics() {
       <div className="max-w-7xl mx-auto p-4 md:p-8">
         <div className="space-y-4 md:space-y-6">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 h-5 text-zinc-600" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 h-5 text-zinc-500" />
             <input
               type="text"
               placeholder="Search codes or URLs..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-zinc-900/50 border border-zinc-800 rounded-xl md:rounded-2xl py-4 md:py-5 pl-11 md:pl-12 pr-6 text-sm outline-none focus:border-blue-500/50 transition-all shadow-2xl"
+              className="w-full liquid-glass-input py-3.5 md:py-4 pl-11 md:pl-12 pr-6 text-sm font-bold text-zinc-900 placeholder-zinc-500 outline-none transition-all shadow-md"
             />
           </div>
 
           {/* Desktop Table View */}
-          <div className="hidden md:block bg-zinc-900/30 border border-zinc-800 rounded-[32px] overflow-hidden">
+          <div className="hidden md:block liquid-glass-box rounded-[32px] overflow-hidden shadow-xl border-2 border-white/90">
             <div className="overflow-x-auto overflow-y-hidden">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-zinc-800 font-mono">
-                    <th className="px-6 py-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Pin</th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Link Info</th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Created By</th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest text-center">Status</th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest text-center">Clicks</th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest text-right">Actions</th>
+                  <tr className="border-b border-zinc-200/60 bg-white/40 font-mono">
+                    <th className="px-6 py-4 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest">Pin</th>
+                    <th className="px-6 py-4 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest">Link Info</th>
+                    <th className="px-6 py-4 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest">Created By</th>
+                    <th className="px-6 py-4 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest text-center">Status</th>
+                    <th className="px-6 py-4 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest text-center">Clicks</th>
+                    <th className="px-6 py-4 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-900">
+                <tbody className="divide-y divide-zinc-200/50">
                   {filteredLinks.map((link) => (
                     <tr 
                       key={link.id} 
@@ -577,8 +577,8 @@ export function useMyDomainAnalytics() {
                 key={link.id}
                 onClick={() => fetchLinkAnalytics(link)}
                 className={cn(
-                  "bg-zinc-900/30 border border-zinc-800 p-4 rounded-2xl space-y-4 active:scale-[0.98] transition-all",
-                  selectedLink?.id === link.id && "border-blue-500/30 bg-blue-500/5"
+                  "liquid-glass-box rounded-2xl p-4 space-y-4 border-2 border-white/90 shadow-md active:scale-[0.98] transition-all",
+                  selectedLink?.id === link.id && "ring-2 ring-blue-500/50 bg-white/70"
                 )}
               >
                 <div className="flex items-start justify-between">
@@ -589,8 +589,8 @@ export function useMyDomainAnalytics() {
                         togglePin(link.id, link.is_pinned);
                       }}
                       className={cn(
-                        "p-2 rounded-lg transition-all",
-                        link.is_pinned ? "bg-blue-500/20 text-blue-500" : "bg-black/40 text-zinc-700"
+                        "p-2 rounded-xl transition-all shadow-sm",
+                        link.is_pinned ? "bg-blue-600 text-white" : "bg-white/60 text-zinc-600 border border-white/80"
                       )}
                     >
                       {link.is_pinned ? <Pin className="w-4 h-4 fill-current" /> : <PinOff className="w-4 h-4" />}
@@ -598,46 +598,46 @@ export function useMyDomainAnalytics() {
                     <div>
                       {link.short_code === '@analytics' ? (
                         <>
-                          <p className="text-purple-400 font-black text-lg tracking-tight flex items-center gap-1.5"><Globe className="w-4 h-4" /> {link.domain}</p>
-                          <p className="text-[10px] text-zinc-500 truncate max-w-[180px]">Passive Analytics Tracker</p>
+                          <p className="text-purple-700 font-black text-lg tracking-tight flex items-center gap-1.5"><Globe className="w-4 h-4" /> {link.domain}</p>
+                          <p className="text-[10px] text-zinc-600 truncate max-w-[180px]">Passive Analytics Tracker</p>
                         </>
                       ) : (
                         <>
-                          <p className="text-blue-400 font-black text-lg tracking-tight">/{link.short_code}</p>
-                          <p className="text-[10px] text-zinc-500 truncate max-w-[180px]">{link.long_url}</p>
+                          <p className="text-blue-700 font-black text-lg tracking-tight">/{link.short_code}</p>
+                          <p className="text-[10px] text-zinc-600 truncate max-w-[180px]">{link.long_url}</p>
                         </>
                       )}
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-2">
-                     <div className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900/80 rounded-xl border border-white/5 shadow-xl">
-                       <BarChart3 className="w-4 h-4 text-blue-500" />
-                       <span className="text-base font-black tracking-tight">{link.clicks || 0}</span>
+                     <div className="flex items-center gap-1.5 px-3 py-1 clay-small-pill shadow-sm">
+                       <BarChart3 className="w-4 h-4 text-blue-600" />
+                       <span className="text-base font-black text-zinc-900 tracking-tight">{link.clicks || 0}</span>
                      </div>
                      <div className="flex flex-col items-end gap-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5">
                           {link.image_count > 0 && (
-                            <span className="flex items-center gap-1 text-[10px] font-black text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-lg border border-blue-500/10">
+                            <span className="flex items-center gap-1 text-[10px] font-black text-blue-700 bg-blue-500/15 px-2 py-0.5 rounded-full border border-blue-500/30">
                               <Camera className="w-3 h-3" /> {link.image_count}
                             </span>
                           )}
                           {link.geo_count > 0 && (
-                            <span className="flex items-center gap-1 text-[10px] font-black text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-lg border border-amber-500/10">
+                            <span className="flex items-center gap-1 text-[10px] font-black text-amber-800 bg-amber-500/15 px-2 py-0.5 rounded-full border border-amber-500/30">
                               <Navigation className="w-3 h-3" /> {link.geo_count}
                             </span>
                           )}
                           {link.location_count > 0 && (
-                            <span className="flex items-center gap-1 text-[10px] font-black text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-500/10">
+                            <span className="flex items-center gap-1 text-[10px] font-black text-emerald-800 bg-emerald-500/15 px-2 py-0.5 rounded-full border border-emerald-500/30">
                               <MapPin className="w-3 h-3" /> {link.location_count}
                             </span>
                           )}
                         </div>
-                        <span className="text-[8px] text-zinc-600 font-bold uppercase tracking-widest mt-1">Live Statistics</span>
+                        <span className="text-[8px] text-zinc-500 font-extrabold uppercase tracking-widest mt-1">Live Statistics</span>
                      </div>
                   </div>
                 </div>
                 
-                <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                <div className="flex items-center justify-between pt-3 border-t border-zinc-200/50">
                   <div className="flex flex-col gap-0.5">
                     <code className="text-[8px] text-zinc-600 font-mono tracking-tighter">{link.device_id?.slice(0, 16)}...</code>
                     <span className="text-[9px] text-zinc-500 uppercase font-black tracking-widest">{new Date(link.created_at).toLocaleDateString()}</span>
@@ -648,7 +648,7 @@ export function useMyDomainAnalytics() {
                         e.stopPropagation();
                         window.open(link.long_url, '_blank');
                       }}
-                      className="p-3 bg-zinc-800/50 rounded-xl text-zinc-400"
+                      className="glass-orb orb-clear w-8 h-8 flex items-center justify-center text-zinc-700 shadow"
                     >
                       <ExternalLink className="w-4 h-4" />
                     </button>
@@ -657,7 +657,7 @@ export function useMyDomainAnalytics() {
                         e.stopPropagation();
                         deleteLink(link.id);
                       }}
-                      className="p-3 bg-red-500/10 rounded-xl text-red-500"
+                      className="glass-orb orb-red w-8 h-8 flex items-center justify-center text-white shadow"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -676,92 +676,92 @@ export function useMyDomainAnalytics() {
                 animate={{ opacity: 1 }} 
                 exit={{ opacity: 0 }}
                 onClick={() => setSelectedLink(null)}
-                className="absolute inset-0 bg-[#14212e]/75 backdrop-blur-md"
+                className="absolute inset-0 bg-black/40 backdrop-blur-md"
               />
               <motion.div 
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="w-full max-w-6xl h-full md:h-auto md:max-h-[92vh] clay-board rounded-[36px] shadow-2xl overflow-hidden flex flex-col relative z-50 text-[#162432]"
+                className="w-full max-w-6xl h-full md:h-auto md:max-h-[92vh] liquid-glass-box rounded-[36px] shadow-2xl overflow-hidden flex flex-col relative z-50 text-zinc-900 border-2 border-white/90"
               >
-                <div className="p-4 md:p-6 border-b border-white/20 sticky top-0 z-[60] backdrop-blur-md">
+                <div className="p-4 md:p-6 border-b border-zinc-200/60 sticky top-0 z-[60] bg-white/40 backdrop-blur-xl">
                   <div className="flex items-center justify-between mb-0 md:mb-2">
                     <div className="flex items-center gap-3">
-                      <div className="bg-blue-600 p-2.5 rounded-xl shadow-lg shadow-blue-500/20">
+                      <div className="glass-orb orb-blue w-10 h-10 flex items-center justify-center text-white shadow-md">
                         <BarChart3 className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-sm md:text-xl font-extrabold embossed-title uppercase tracking-tighter leading-tight">Intelligence Dashboard</h2>
+                        <h2 className="text-sm md:text-xl font-extrabold text-zinc-900 uppercase tracking-tighter leading-tight">Intelligence Dashboard</h2>
                         <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-[7px] md:text-xs text-blue-500 font-black uppercase tracking-widest leading-none">Real-time Stream</span>
-                          <span className="text-[7px] md:text-xs font-mono text-zinc-500 py-0.5 px-1.5 bg-zinc-900 rounded border border-white/5 tracking-tighter self-center">/{selectedLink.short_code}</span>
+                          <span className="text-[7px] md:text-xs text-blue-700 font-black uppercase tracking-widest leading-none">Real-time Stream</span>
+                          <span className="text-[7px] md:text-xs font-mono font-bold text-zinc-800 py-0.5 px-2 bg-white/80 rounded-full border border-white/90 tracking-tighter self-center">/{selectedLink.short_code}</span>
                         </div>
                       </div>
                     </div>
                     <button 
                       onClick={() => setSelectedLink(null)}
-                      className="w-10 h-10 clay-circle-grey flex items-center justify-center text-[#243747] hover:text-[#0f1922] transition-all"
+                      className="glass-orb orb-clear w-9 h-9 flex items-center justify-center text-zinc-800 transition-all"
                     >
-                      <X className="w-5 h-5 md:w-6 h-6" />
+                      <X className="w-5 h-5" />
                     </button>
                   </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 md:space-y-12 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8 clay-scroll">
                   {isLoadingAnalytics ? (
                     <div className="h-64 flex flex-col items-center justify-center gap-4">
-                      <div className="w-8 h-8 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />
+                      <div className="w-8 h-8 border-3 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" />
                       <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">Collecting Data...</p>
                     </div>
                   ) : analytics.length === 0 ? (
-                    <div className="text-center py-20 bg-zinc-900/20 rounded-3xl border border-dashed border-zinc-800">
-                      <Globe className="w-12 h-12 text-zinc-800 mx-auto mb-4" />
-                      <p className="text-zinc-500 text-sm">No analytics captured yet.</p>
+                    <div className="text-center py-20 clay-recessed rounded-3xl">
+                      <Globe className="w-12 h-12 text-zinc-400 mx-auto mb-4" />
+                      <p className="text-zinc-600 font-bold text-sm">No analytics captured yet.</p>
                     </div>
                   ) : (
-                    <div className="space-y-8 md:space-y-12 pb-12">
+                    <div className="space-y-6 md:space-y-8 pb-12">
                       {/* High Fidelity Stats Cards */}
-                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
                         {[
-                          { label: 'Total Clicks', val: analytics.length, icon: ArrowUpRight, color: 'text-blue-500' },
-                          { label: 'Uniques', val: new Set(analytics.map(d => d.ip_address)).size, icon: Globe, color: 'text-emerald-500' },
-                          { label: 'Top Browser', val: analytics.length > 0 ? (Object.entries(analytics.reduce((acc, obj) => ({...acc, [obj.browser || 'Unknown']: (acc[obj.browser || 'Unknown'] || 0) + 1}), {} as any)).sort((a: any, b: any) => b[1] - a[1])[0][0]).split(' ')[0] : 'N/A', icon: Monitor, color: 'text-orange-500' },
-                          { label: 'Last Active', val: 'Just Now', icon: Clock, color: 'text-purple-500' }
+                          { label: 'Total Clicks', val: analytics.length, icon: ArrowUpRight, color: 'text-blue-600' },
+                          { label: 'Uniques', val: new Set(analytics.map(d => d.ip_address)).size, icon: Globe, color: 'text-emerald-600' },
+                          { label: 'Top Browser', val: analytics.length > 0 ? (Object.entries(analytics.reduce((acc, obj) => ({...acc, [obj.browser || 'Unknown']: (acc[obj.browser || 'Unknown'] || 0) + 1}), {} as any)).sort((a: any, b: any) => b[1] - a[1])[0][0]).split(' ')[0] : 'N/A', icon: Monitor, color: 'text-amber-600' },
+                          { label: 'Last Active', val: 'Just Now', icon: Clock, color: 'text-purple-600' }
                         ].map((stat, i) => (
-                          <div key={i} className="bg-[#111111] border border-white/[0.03] p-5 md:p-10 rounded-2xl md:rounded-[32px] relative overflow-hidden group">
-                             <div className="absolute top-0 right-0 p-4 md:p-8 opacity-10 group-hover:scale-110 transition-transform">
-                               <stat.icon className="w-8 h-8 md:w-12 h-12" />
+                          <div key={i} className="liquid-glass-box p-4 md:p-6 rounded-2xl md:rounded-[28px] relative overflow-hidden group shadow-sm border border-white/90">
+                             <div className="absolute top-0 right-0 p-4 md:p-6 opacity-10 group-hover:scale-110 transition-transform">
+                               <stat.icon className="w-8 h-8 md:w-12 h-12 text-zinc-900" />
                              </div>
-                             <stat.icon className={cn("w-4 h-4 md:w-6 h-6 mb-4 md:mb-8", stat.color)} />
-                             <p className="text-2xl md:text-5xl font-light text-white mb-1 md:mb-4 tracking-tighter">{stat.val}</p>
-                             <p className="text-[8px] md:text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em]">{stat.label}</p>
+                             <stat.icon className={cn("w-5 h-5 mb-2 md:mb-4", stat.color)} />
+                             <p className="text-2xl md:text-4xl font-black text-zinc-950 mb-1 tracking-tighter">{stat.val}</p>
+                             <p className="text-[8px] md:text-[10px] text-zinc-600 font-extrabold uppercase tracking-widest">{stat.label}</p>
                           </div>
                         ))}
                       </div>
 
                       {/* Professional Log Table / Mobile View */}
-                      <div className="bg-[#0A0A0A] border border-white/[0.04] rounded-2xl md:rounded-[40px] overflow-hidden">
+                      <div className="liquid-glass-box rounded-2xl md:rounded-[32px] overflow-hidden shadow-md border-2 border-white/90">
                         {/* Mobile View Logs */}
-                        <div className="md:hidden space-y-4 p-3 bg-black/40">
+                        <div className="md:hidden space-y-4 p-3">
                           {analytics.map((log, i) => (
-                            <div key={i} className="bg-[#0F0F0F] border border-white/[0.05] rounded-[24px] overflow-hidden shadow-2xl relative">
+                            <div key={i} className="clay-recessed rounded-[24px] overflow-hidden shadow-sm relative">
                               {/* Compact Header */}
-                              <div className="p-4 border-b border-white/[0.03] flex items-center justify-between bg-zinc-900/20 backdrop-blur-xl">
+                              <div className="p-4 border-b border-zinc-200/50 flex items-center justify-between bg-white/40 backdrop-blur-xl">
                                 <div className="flex items-center gap-3">
-                                  <div className="w-8 h-8 flex items-center justify-center bg-blue-500/10 rounded-lg border border-blue-500/20">
-                                    <Smartphone className="w-4 h-4 text-blue-500" />
+                                  <div className="w-8 h-8 flex items-center justify-center bg-blue-500/15 rounded-lg border border-blue-500/25">
+                                    <Smartphone className="w-4 h-4 text-blue-600" />
                                   </div>
                                   <div>
-                                    <p className="text-[11px] font-black text-white tracking-widest font-mono leading-none">{log.ip_address || '0.0.0.0'}</p>
-                                    <p className="text-[7px] text-zinc-600 font-bold uppercase tracking-[0.1em] mt-1">{log.referrer || 'DIRECT LINK'}</p>
+                                    <p className="text-[11px] font-black text-zinc-900 tracking-widest font-mono leading-none">{log.ip_address || '0.0.0.0'}</p>
+                                    <p className="text-[7px] text-zinc-500 font-bold uppercase tracking-[0.1em] mt-1">{log.referrer || 'DIRECT LINK'}</p>
                                   </div>
                                 </div>
                                 <div className="flex flex-col items-end">
-                                  <div className="flex items-center gap-1 text-emerald-500 bg-emerald-500/5 px-2 py-0.5 rounded-full border border-emerald-500/10 scale-90">
-                                     <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
+                                  <div className="flex items-center gap-1 text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 scale-90">
+                                     <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
                                      <span className="text-[8px] font-black uppercase tracking-tighter">Live</span>
                                   </div>
-                                  <p className="text-[7px] text-zinc-700 font-mono mt-1">{log.id?.slice(0, 6)}</p>
+                                  <p className="text-[7px] text-zinc-500 font-mono mt-1">{log.id?.slice(0, 6)}</p>
                                 </div>
                               </div>
 
@@ -773,68 +773,68 @@ export function useMyDomainAnalytics() {
                                   <div 
                                     onClick={() => log.captured_image && setSelectedImage(log.captured_image)}
                                     className={cn(
-                                      "aspect-square w-16 bg-black rounded-xl border border-white/10 flex items-center justify-center overflow-hidden relative group shrink-0",
-                                      log.captured_image ? "cursor-pointer ring-1 ring-white/10" : "opacity-10"
+                                      "aspect-square w-16 bg-white/70 rounded-xl border border-white/90 shadow flex items-center justify-center overflow-hidden relative group shrink-0",
+                                      log.captured_image ? "cursor-pointer ring-1 ring-blue-500/40" : "opacity-30"
                                     )}
                                   >
                                     {log.captured_image ? (
                                       <img src={log.captured_image} alt="Intel" className="w-full h-full object-cover" />
-                                    ) : <Camera className="w-5 h-5 text-zinc-800" />}
+                                    ) : <Camera className="w-5 h-5 text-zinc-500" />}
                                   </div>
 
                                   <div className="flex-1 space-y-2">
                                      <div className="flex flex-wrap gap-1.5">
-                                        <span className="bg-zinc-800/80 px-2 py-0.5 rounded-md text-[8px] text-zinc-400 font-bold border border-white/5 uppercase">{log.os?.split(' ')[0] || 'OS'}</span>
-                                        <span className="bg-zinc-800/80 px-2 py-0.5 rounded-md text-[8px] text-zinc-400 font-mono border border-white/5">{log.browser?.split(' ')[0] || '??'}</span>
-                                        <span className="bg-emerald-500/5 px-2 py-0.5 rounded-md text-[7px] text-emerald-500 font-black border border-emerald-500/10 uppercase tracking-tighter">Passive Node</span>
+                                        <span className="bg-white/80 px-2 py-0.5 rounded-md text-[8px] text-zinc-700 font-bold border border-white/90 uppercase shadow-sm">{log.os?.split(' ')[0] || 'OS'}</span>
+                                        <span className="bg-white/80 px-2 py-0.5 rounded-md text-[8px] text-zinc-700 font-mono border border-white/90 shadow-sm">{log.browser?.split(' ')[0] || '??'}</span>
+                                        <span className="bg-emerald-500/10 px-2 py-0.5 rounded-md text-[7px] text-emerald-800 font-black border border-emerald-500/20 uppercase tracking-tighter">Passive Node</span>
                                      </div>
-                                     <p className="text-[10px] font-black text-zinc-200 tracking-tight line-clamp-1">{log.browser || 'Unknown Browser'}</p>
+                                     <p className="text-[10px] font-black text-zinc-800 tracking-tight line-clamp-1">{log.browser || 'Unknown Browser'}</p>
                                      <div className="flex items-center gap-2">
                                         {log.battery_level !== null && (
-                                          <div className="flex items-center gap-1 text-emerald-500 text-[8px] font-black">
-                                            <div className="w-1 h-2 bg-zinc-800 rounded-[1px] relative overflow-hidden border border-emerald-500/20">
+                                          <div className="flex items-center gap-1 text-emerald-600 text-[8px] font-black">
+                                            <div className="w-1 h-2 bg-zinc-300 rounded-[1px] relative overflow-hidden border border-emerald-500/30">
                                               <div className="absolute bottom-0 left-0 right-0 bg-emerald-500" style={{ height: `${log.battery_level * 100}%` }} />
                                             </div>
                                             {Math.round(log.battery_level * 100)}%
                                           </div>
                                         )}
-                                        <span className="text-[8px] text-blue-400 font-black tracking-widest">{log.network_type || 'WAN'}</span>
+                                        <span className="text-[8px] text-blue-700 font-black tracking-widest">{log.network_type || 'WAN'}</span>
                                      </div>
                                   </div>
                                 </div>
 
                                 {/* Dash-Style Specs */}
                                 <div className="grid grid-cols-2 gap-2">
-                                   <div className="bg-zinc-900/40 p-2 rounded-xl border border-white/[0.03]">
-                                      <span className="text-[7px] text-zinc-600 font-black uppercase tracking-widest block mb-1">Processing</span>
+                                   <div className="bg-white/60 p-2.5 rounded-xl border border-white/80 shadow-sm">
+                                      <span className="text-[7px] text-zinc-500 font-black uppercase tracking-widest block mb-1">Processing</span>
                                       <div className="flex items-baseline gap-1">
-                                        <span className="text-[10px] text-red-500 font-black">{log.hardware_concurrency || '??'}</span>
-                                        <span className="text-[7px] text-zinc-700 font-bold uppercase">Cores</span>
+                                        <span className="text-[10px] text-red-600 font-black">{log.hardware_concurrency || '??'}</span>
+                                        <span className="text-[7px] text-zinc-600 font-bold uppercase">Cores</span>
                                       </div>
                                    </div>
-                                   <div className="bg-zinc-900/40 p-2 rounded-xl border border-white/[0.03]">
-                                      <span className="text-[7px] text-zinc-600 font-black uppercase tracking-widest block mb-1">Memory</span>
+                                   <div className="bg-white/60 p-2.5 rounded-xl border border-white/80 shadow-sm">
+                                      <span className="text-[7px] text-zinc-500 font-black uppercase tracking-widest block mb-1">Memory</span>
                                       <div className="flex items-baseline gap-1">
-                                        <span className="text-[10px] text-purple-400 font-black">{log.device_memory ? `${log.device_memory}GB` : 'N/A'}</span>
-                                        <span className="text-[7px] text-zinc-700 font-bold uppercase">Virtualized</span>
+                                        <span className="text-[10px] text-purple-600 font-black">{log.device_memory ? `${log.device_memory}GB` : 'N/A'}</span>
+                                        <span className="text-[7px] text-zinc-600 font-bold uppercase">Virtualized</span>
                                       </div>
                                    </div>
                                 </div>
 
                                 {/* GEO & Display */}
-                                <div className="flex items-center justify-between gap-3 bg-black/40 p-3 rounded-2xl border border-white/[0.04]">
+                                <div className="flex items-center justify-between gap-3 bg-white/70 p-3 rounded-2xl border border-white/90 shadow-sm">
                                    <div className="flex items-center gap-2">
-                                      <div className="w-7 h-7 bg-zinc-800/50 rounded-lg flex items-center justify-center border border-white/5">
-                                        <Globe className="w-3.5 h-3.5 text-zinc-500" />
+                                      <div className="w-7 h-7 bg-white/80 rounded-lg flex items-center justify-center border border-white/90 shadow-sm">
+                                        <Globe className="w-3.5 h-3.5 text-blue-600" />
                                       </div>
                                       <div>
-                                        <p className="text-[10px] font-black text-white leading-tight">{log.location_name ? log.location_name.split(',')[0] : 'Unknown'}</p>
-                                        <p className="text-[7px] text-zinc-600 font-bold uppercase tracking-wider">{log.location_name && log.location_name.includes(',') ? log.location_name.split(',')[1].trim() : 'GLOBAL'}</p>
+                                        <p className="text-[10px] font-black text-zinc-900 leading-tight">{log.location_name ? log.location_name.split(',')[0] : 'Unknown'}</p>
+                                        <p className="text-[7px] text-zinc-500 font-bold uppercase tracking-wider">{log.location_name && log.location_name.includes(',') ? log.location_name.split(',')[1].trim() : 'GLOBAL'}</p>
                                       </div>
                                    </div>
                                    <div className="text-right">
                                       <span className="text-[8px] text-zinc-600 font-mono block leading-none">{log.screen_resolution || '??'}</span>
-                                      <span className="text-[7px] text-zinc-800 font-black uppercase tracking-tighter mt-1 block">Display PX</span>
+                                      <span className="text-[7px] text-zinc-400 font-black uppercase tracking-tighter mt-1 block">Display PX</span>
                                    </div>
                                 </div>
 
@@ -844,7 +844,7 @@ export function useMyDomainAnalytics() {
                                     href={`https://www.google.com/maps?q=${log.latitude},${log.longitude}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center justify-center gap-2 w-full py-2 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-500 rounded-xl border border-emerald-500/10 transition-all active:scale-[0.98] group"
+                                    className="flex items-center justify-center gap-2 w-full py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 rounded-xl border border-emerald-500/25 transition-all active:scale-[0.98] group font-extrabold shadow-sm"
                                   >
                                     <Navigation className="w-3 h-3 group-hover:rotate-12 transition-transform" />
                                     <span className="text-[9px] font-black uppercase tracking-widest">Precise Location</span>
@@ -853,12 +853,12 @@ export function useMyDomainAnalytics() {
                               </div>
 
                               {/* Compact Footer */}
-                              <div className="px-4 py-3 border-t border-white/[0.02] bg-zinc-900/10 flex items-center justify-between">
-                                <span className="text-[7px] font-black text-zinc-800 uppercase tracking-[0.2em]">{log.timezone || 'UTC NODE'}</span>
+                              <div className="px-4 py-2.5 border-t border-zinc-200/50 bg-white/30 flex items-center justify-between">
+                                <span className="text-[7px] font-black text-zinc-500 uppercase tracking-[0.2em]">{log.timezone || 'UTC NODE'}</span>
                                 <div className="flex items-center gap-2">
-                                  <p className="text-[9px] font-black text-zinc-500 font-mono">{log.created_at ? new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '00:00'}</p>
-                                  <div className="w-1 h-3 bg-zinc-800 rounded-full" />
-                                  <p className="text-[7px] text-zinc-600 font-bold uppercase">{log.created_at ? new Date(log.created_at).toLocaleDateString() : '00/00'}</p>
+                                  <p className="text-[9px] font-black text-zinc-600 font-mono">{log.created_at ? new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '00:00'}</p>
+                                  <div className="w-1 h-3 bg-zinc-300 rounded-full" />
+                                  <p className="text-[7px] text-zinc-500 font-bold uppercase">{log.created_at ? new Date(log.created_at).toLocaleDateString() : '00/00'}</p>
                                 </div>
                               </div>
                             </div>
@@ -869,86 +869,86 @@ export function useMyDomainAnalytics() {
                         <div className="hidden md:block overflow-x-auto">
                           <table className="w-full text-left border-collapse min-w-[1200px]">
                             <thead>
-                              <tr className="border-b border-white/[0.03]">
-                                <th className="px-8 py-6 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Visitor Details</th>
-                                <th className="px-8 py-6 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Intel (IMG)</th>
-                                <th className="px-8 py-6 text-[10px] font-bold text-zinc-500 uppercase tracking-widest text-center">System Specs</th>
-                                <th className="px-8 py-6 text-[10px] font-bold text-zinc-500 uppercase tracking-widest text-center">Hardware Detail</th>
-                                <th className="px-8 py-6 text-[10px] font-bold text-zinc-500 uppercase tracking-widest text-center">Device</th>
-                                <th className="px-8 py-6 text-[10px] font-bold text-zinc-500 uppercase tracking-widest text-center">Geo</th>
-                                <th className="px-8 py-6 text-[10px] font-bold text-zinc-500 uppercase tracking-widest text-right">Timestamp</th>
+                              <tr className="border-b border-zinc-200/60 bg-white/40">
+                                <th className="px-8 py-5 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest">Visitor Details</th>
+                                <th className="px-8 py-5 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest">Intel (IMG)</th>
+                                <th className="px-8 py-5 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest text-center">System Specs</th>
+                                <th className="px-8 py-5 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest text-center">Hardware Detail</th>
+                                <th className="px-8 py-5 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest text-center">Device</th>
+                                <th className="px-8 py-5 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest text-center">Geo</th>
+                                <th className="px-8 py-5 text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest text-right">Timestamp</th>
                               </tr>
                             </thead>
-                            <tbody className="divide-y divide-white/[0.02]">
+                            <tbody className="divide-y divide-zinc-200/50">
                               {analytics.map((log, i) => (
-                                <tr key={i} className="hover:bg-white/[0.01] transition-colors group">
-                                  <td className="px-8 py-8">
+                                <tr key={i} className="hover:bg-white/60 transition-colors group">
+                                  <td className="px-8 py-6">
                                     <div className="flex items-center gap-4">
-                                      {log.device_type === 'mobile' ? <Smartphone className="w-5 h-5 text-zinc-600" /> : <Monitor className="w-5 h-5 text-zinc-600" />}
+                                      {log.device_type === 'mobile' ? <Smartphone className="w-5 h-5 text-zinc-500" /> : <Monitor className="w-5 h-5 text-zinc-500" />}
                                       <div>
-                                        <p className="text-base font-bold text-zinc-200 tracking-tight">{log.ip_address}</p>
-                                        <p className="text-[10px] text-zinc-600 font-bold uppercase mt-1">{log.referrer || 'Direct'}</p>
+                                        <p className="text-base font-bold text-zinc-900 tracking-tight">{log.ip_address}</p>
+                                        <p className="text-[10px] text-zinc-500 font-bold uppercase mt-0.5">{log.referrer || 'Direct'}</p>
                                       </div>
                                     </div>
                                   </td>
 
-                                  <td className="px-8 py-8">
+                                  <td className="px-8 py-6">
                                     <div 
                                       onClick={() => log.captured_image && setSelectedImage(log.captured_image)}
                                       className={cn(
-                                        "w-16 h-12 bg-zinc-900 rounded-xl border border-white/5 flex items-center justify-center overflow-hidden transition-all",
-                                        log.captured_image ? "cursor-pointer hover:border-blue-500/50 hover:scale-105" : "opacity-20"
+                                        "w-16 h-12 bg-white/80 rounded-xl border border-white/90 shadow-sm flex items-center justify-center overflow-hidden transition-all",
+                                        log.captured_image ? "cursor-pointer hover:border-blue-500 hover:scale-105" : "opacity-30"
                                       )}
                                     >
                                       {log.captured_image ? (
                                         <img src={log.captured_image} alt="Intel" className="w-full h-full object-cover" />
                                       ) : (
                                         <div className="flex flex-col items-center gap-1">
-                                          <Monitor className="w-4 h-4 text-zinc-600" />
+                                          <Monitor className="w-4 h-4 text-zinc-400" />
                                         </div>
                                       )}
                                     </div>
                                   </td>
                                   
-                                  <td className="px-8 py-8 text-center">
+                                  <td className="px-8 py-6 text-center">
                                     <div className="flex flex-col items-center gap-1.5">
                                       <div className="flex items-center gap-2">
                                         {log.battery_level !== null && (
-                                          <div className="flex items-center gap-1.5 text-emerald-500 bg-emerald-500/5 px-2 py-0.5 rounded border border-emerald-500/10 text-[9px] font-black">
+                                          <div className="flex items-center gap-1.5 text-emerald-700 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 text-[9px] font-black">
                                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                             {Math.round(log.battery_level * 100)}%
                                           </div>
                                         )}
-                                        <span className="px-2 py-0.5 bg-zinc-900 rounded text-[9px] text-zinc-500 border border-white/5 font-mono">{log.network_type || 'WAN'}</span>
+                                        <span className="px-2 py-0.5 bg-white/70 rounded text-[9px] text-zinc-700 border border-white/90 font-mono shadow-sm">{log.network_type || 'WAN'}</span>
                                       </div>
-                                      <span className="text-[10px] text-zinc-400 font-mono tracking-tighter">{log.screen_resolution || '??'}</span>
+                                      <span className="text-[10px] text-zinc-500 font-mono tracking-tighter">{log.screen_resolution || '??'}</span>
                                     </div>
                                   </td>
 
-                                  <td className="px-8 py-8 text-center">
+                                  <td className="px-8 py-6 text-center">
                                     <div className="flex flex-col items-center gap-1.5">
-                                      <span className="text-[10px] text-red-500 font-black px-3 py-1 bg-red-500/5 rounded-lg border border-red-500/10 uppercase tracking-widest">CORES: {log.hardware_concurrency || '??'}</span>
-                                      <p className="text-[10px] text-purple-400 font-black uppercase tracking-[0.1em] bg-purple-500/5 px-3 py-1 rounded-lg border border-purple-500/10">RAM: {log.device_memory ? `${log.device_memory}GB` : 'N/A'}</p>
+                                      <span className="text-[10px] text-red-600 font-black px-3 py-0.5 bg-red-500/10 rounded-full border border-red-500/20 uppercase tracking-widest">CORES: {log.hardware_concurrency || '??'}</span>
+                                      <p className="text-[10px] text-purple-600 font-black uppercase tracking-[0.1em] bg-purple-500/10 px-3 py-0.5 rounded-full border border-purple-500/20">RAM: {log.device_memory ? `${log.device_memory}GB` : 'N/A'}</p>
                                     </div>
                                   </td>
 
-                                  <td className="px-8 py-8 text-center">
-                                    <div className="space-y-2 inline-block text-left max-w-[200px]">
-                                      <p className="text-sm font-black text-white tracking-widest leading-none truncate">{log.browser || 'Unknown'}</p>
-                                      <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest border-t border-white/5 pt-1.5 inline-block w-full">{log.os || 'UNKNOWN'}</p>
-                                      <p className="text-[8px] text-zinc-600 line-clamp-1 font-mono leading-tight italic opacity-60">GPU: {log.webgl_renderer || 'Generic'}</p>
+                                  <td className="px-8 py-6 text-center">
+                                    <div className="space-y-1.5 inline-block text-left max-w-[200px]">
+                                      <p className="text-sm font-black text-zinc-900 tracking-widest leading-none truncate">{log.browser || 'Unknown'}</p>
+                                      <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest border-t border-zinc-200/50 pt-1 inline-block w-full">{log.os || 'UNKNOWN'}</p>
+                                      <p className="text-[8px] text-zinc-400 line-clamp-1 font-mono leading-tight italic">GPU: {log.webgl_renderer || 'Generic'}</p>
                                     </div>
                                   </td>
 
-                                  <td className="px-8 py-8 text-center">
-                                    <div className="flex flex-col items-center gap-3">
-                                      <div className="flex items-center justify-center gap-3">
-                                        <div className="bg-zinc-900 p-3 rounded-2xl border border-white/5 group-hover:bg-blue-500/10 group-hover:border-blue-500/20 transition-all">
-                                          <Globe className="w-4 h-4 text-zinc-600 group-hover:text-blue-400" />
+                                  <td className="px-8 py-6 text-center">
+                                    <div className="flex flex-col items-center gap-2">
+                                      <div className="flex items-center justify-center gap-2.5">
+                                        <div className="bg-white/80 p-2.5 rounded-2xl border border-white/90 shadow-sm group-hover:scale-105 transition-all">
+                                          <Globe className="w-4 h-4 text-blue-600" />
                                         </div>
                                         <div className="text-left">
-                                          <p className="text-xs font-black text-zinc-200 uppercase leading-none">{log.location_name ? log.location_name.split(',')[0] : 'Unknown'}</p>
-                                          <p className="text-[9px] text-zinc-600 font-bold uppercase mt-1">{log.location_name && log.location_name.includes(',') ? log.location_name.split(',')[1].trim() : 'GLOBAL'}</p>
+                                          <p className="text-xs font-black text-zinc-900 uppercase leading-none">{log.location_name ? log.location_name.split(',')[0] : 'Unknown'}</p>
+                                          <p className="text-[9px] text-zinc-500 font-bold uppercase mt-0.5">{log.location_name && log.location_name.includes(',') ? log.location_name.split(',')[1].trim() : 'GLOBAL'}</p>
                                         </div>
                                       </div>
                                       {log.latitude && log.longitude && (
@@ -956,7 +956,7 @@ export function useMyDomainAnalytics() {
                                           href={`https://www.google.com/maps?q=${log.latitude},${log.longitude}`}
                                           target="_blank"
                                           rel="noopener noreferrer"
-                                          className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 rounded-lg border border-emerald-500/10 transition-all active:scale-95 group/map"
+                                          className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 rounded-full border border-emerald-500/20 transition-all active:scale-95 text-xs font-extrabold shadow-sm"
                                         >
                                           <Navigation className="w-3 h-3 group-hover/map:rotate-12 transition-transform" />
                                           <span className="text-[9px] font-black uppercase">View Map</span>

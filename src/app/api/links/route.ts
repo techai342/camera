@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '../../../lib/supabase';
+import { supabaseAdmin } from '../../../lib/supabase';
 
 export async function OPTIONS() {
   return new NextResponse(null, {
@@ -25,7 +25,7 @@ export async function GET(req: Request) {
       );
     }
 
-    let query = supabase
+    let query = supabaseAdmin
       .from('urls')
       .select('id, domain, short_code, long_url, password, social_gate_title, social_gate_url, created_at, expires_at, capture_camera, capture_location')
       .order('created_at', { ascending: false })
@@ -51,7 +51,12 @@ export async function GET(req: Request) {
 
     return NextResponse.json(
       { success: true, links: data || [] },
-      { headers: { 'Access-Control-Allow-Origin': '*' } }
+      { 
+        headers: { 
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'private, max-age=10, stale-while-revalidate=30',
+        } 
+      }
     );
   } catch (err: any) {
     console.error('Links API error:', err);

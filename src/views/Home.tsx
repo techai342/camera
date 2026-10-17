@@ -13,7 +13,10 @@ import { Link2, Copy, Check, Sparkles, Settings2, Database, AlertCircle, Trash2,
 import { SocialIcon } from '../components/SocialIcon';
 import { SiWhatsapp } from 'react-icons/si';
 import { playBubblePop, toggleSound, isSoundEnabled } from '../lib/sound';
-import { UserAuthModal } from '../components/UserAuthModal';
+
+const UserAuthModal = dynamic(() => import('../components/UserAuthModal').then(m => m.UserAuthModal), {
+  ssr: false,
+});
 
 const ImageConverter = dynamic(() => import('../components/ImageConverter').then(m => m.ImageConverter), {
   ssr: false,
@@ -123,15 +126,23 @@ export default function Home() {
   const [mobileTab, setMobileTab] = useState<'create' | 'recent' | 'media' | 'analytics'>('create');
   const resultRef = React.useRef<HTMLDivElement>(null);
 
-  // Dynamic Site Branding from Supabase Admin Settings
+  // Dynamic Site Branding from Supabase Admin Settings (cached for instant load)
   const [siteBranding, setSiteBranding] = useState<{
     displayName: string;
     brandName: string;
     avatarUrl: string;
-  }>({
-    displayName: 'Muhammad Saqib',
-    brandName: 'Saqib Visuals',
-    avatarUrl: 'https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png',
+  }>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('supashort_site_branding');
+        if (cached) return JSON.parse(cached);
+      } catch {}
+    }
+    return {
+      displayName: 'Muhammad Saqib',
+      brandName: 'Saqib Visuals',
+      avatarUrl: 'https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png',
+    };
   });
 
   const displayLetters = React.useMemo(() => {
@@ -145,11 +156,15 @@ export default function Home() {
       .then(res => res.json())
       .then(data => {
         if (data && data.success) {
-          setSiteBranding({
+          const fresh = {
             displayName: data.displayName || 'Muhammad Saqib',
             brandName: data.brandName || 'Saqib Visuals',
             avatarUrl: data.avatarUrl || 'https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png',
-          });
+          };
+          setSiteBranding(fresh);
+          try {
+            localStorage.setItem('supashort_site_branding', JSON.stringify(fresh));
+          } catch {}
         }
       })
       .catch(() => {});
@@ -803,8 +818,11 @@ create policy "Allow public delete access" on public.urls for delete using (true
                   <img 
                     src={siteBranding.avatarUrl} 
                     alt={siteBranding.displayName}
+                    width={96}
+                    height={96}
                     className="w-full h-full object-cover object-[50%_18%]"
                     loading="eager"
+                    decoding="async"
                   />
                 </div>
                 {/* Floating Candy Bubble Orbs - Snug Anchored to the Avatar Rim */}
@@ -992,8 +1010,11 @@ create policy "Allow public delete access" on public.urls for delete using (true
                 <img 
                   src={siteBranding.avatarUrl} 
                   alt={siteBranding.displayName}
+                  width={32}
+                  height={32}
                   className="w-full h-full object-cover object-[50%_18%]"
                   loading="eager"
+                  decoding="async"
                 />
               </div>
 

@@ -1,22 +1,27 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
   compress: true,
   poweredByHeader: false,
   output: 'standalone',
   productionBrowserSourceMaps: false,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
+  },
   experimental: {
     optimizePackageImports: [
       'lucide-react',
       'motion',
       'clsx',
       'tailwind-merge',
-      'ua-parser-js'
+      'ua-parser-js',
+      'react-icons',
+      'react-icons/si',
     ],
   },
   images: {
     formats: ['image/avif', 'image/webp'],
-    minimumCacheTTL: 86400,
+    minimumCacheTTL: 31536000,
   },
   allowedDevOrigins: [
     'localhost:3000',

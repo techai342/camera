@@ -753,7 +753,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
 
   return (
-    <div className="min-h-screen min-h-[100dvh] clay-noise py-1 sm:py-6 px-1.5 sm:px-4 md:px-6 flex flex-col items-center justify-start lg:justify-center font-sans safe-bottom-padding pb-32 sm:pb-36 lg:pb-6 w-full max-w-full overflow-x-hidden">
+    <div className="min-h-screen min-h-[100dvh] clay-noise py-1 sm:py-6 px-1.5 sm:px-4 md:px-6 flex flex-col items-center justify-start lg:justify-center font-sans safe-bottom-padding pb-32 sm:pb-36 lg:pb-6 w-full max-w-full overflow-x-clip">
       {/* MAIN 3D CLAY BOARD CONTAINER */}
       <div className="clay-board w-full max-w-[1400px] min-w-0 mx-auto p-2.5 sm:p-5 lg:p-6 flex flex-col lg:flex-row gap-3 sm:gap-5 relative">
 
@@ -1116,7 +1116,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
                 <div className="space-y-2.5">
                   {history.map((link: any) => (
-                    <div key={link.code} className="clay-recessed p-3 sm:p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 transition-transform hover:-translate-y-0.5 gpu-virtual-card">
+                    <div key={link.code} className="clay-recessed p-3 sm:p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 transition-transform hover:-translate-y-0.5">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <span className="text-xs sm:text-sm font-extrabold text-[#0e3b44] font-mono">/{link.code}</span>
@@ -1287,7 +1287,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                         <h4 className="text-[#152432] font-extrabold text-[15px] mb-3">Live Visitor Telemetry</h4>
                         <div className="space-y-2.5 max-h-[500px] overflow-y-auto clay-scroll pr-1">
                           {analyticsData.map((log: any, i: number) => (
-                            <div key={i} className="clay-recessed p-3 sm:p-3.5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs gpu-virtual-card">
+                            <div key={i} className="clay-recessed p-3 sm:p-3.5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
                               <div className="flex items-center justify-between sm:justify-start gap-2.5 min-w-0">
                                 <div className="flex items-center gap-2 min-w-0">
                                   {log.device_type?.toLowerCase() === 'mobile' ? (
@@ -2178,7 +2178,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                          </div>
                          <div className="space-y-3">
                             {analyticsData.map((log, i) => (
-                               <div key={i} className="clay-recessed p-4 rounded-2xl flex flex-col md:grid grid-cols-7 md:items-center gap-4 md:gap-0 transition-transform hover:-translate-y-0.5 gpu-virtual-card">
+                               <div key={i} className="clay-recessed p-4 rounded-2xl flex flex-col md:grid grid-cols-7 md:items-center gap-4 md:gap-0 transition-transform hover:-translate-y-0.5">
                                   {/* Column 1: Details */}
                                   <div className="md:col-span-2">
                                      <div className="flex items-center gap-2 mb-1">

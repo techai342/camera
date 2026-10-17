@@ -58,7 +58,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${plusJakartaSans.variable} ${jetbrainsMono.variable} ${fredoka.variable}`} suppressHydrationWarning>
-      <body className="antialiased overflow-x-hidden selection:bg-amber-300 selection:text-zinc-900 relative" suppressHydrationWarning>
+      <body className="antialiased selection:bg-amber-300 selection:text-zinc-900 relative" suppressHydrationWarning>
         <AntiInspectionShield />
 
         {/* Ambient Refraction Blobs Behind Glass Surfaces */}

@@ -932,8 +932,8 @@ create policy "Allow public delete access" on public.urls for delete using (true
         <main className="flex-1 flex flex-col gap-3.5 sm:gap-5 min-w-0">
 
           {/* 1. TOP 3D LIQUID GLASS HEADER BAR */}
-          <header className="liquid-glass-box rounded-2xl sm:rounded-full px-3 sm:px-5 py-2 sm:py-2.5 flex items-center justify-between gap-2 sm:gap-3 shadow-md">
-            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <header className="liquid-glass-box rounded-2xl sm:rounded-full px-2.5 sm:px-5 py-2 sm:py-2.5 flex items-center justify-between gap-1.5 sm:gap-3 shadow-md">
+            <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 shrink-0">
               {/* Mini Avatar Lens for Mobile View (Desktop has full sidebar) */}
               <div 
                 onClick={() => playBubblePop(560)}
@@ -949,11 +949,11 @@ create policy "Allow public delete access" on public.urls for delete using (true
               </div>
 
               <div className="flex items-center gap-0.5 select-none shrink-0">
-                <span className="cartoon-letter text-[#2e45b8] text-[18px] sm:text-[26px] -rotate-6">S</span>
-                <span className="cartoon-letter text-[#e03c28] text-[18px] sm:text-[26px] rotate-3 -ml-0.5">A</span>
-                <span className="cartoon-letter text-[#f5ecd7] text-[18px] sm:text-[26px] -rotate-3 -ml-0.5">Q</span>
-                <span className="cartoon-letter text-[#f2b726] text-[18px] sm:text-[26px] rotate-6 -ml-0.5">I</span>
-                <span className="cartoon-letter text-[#278c68] text-[18px] sm:text-[26px] -rotate-6 -ml-0.5">B</span>
+                <span className="cartoon-letter text-[#2e45b8] text-[17px] sm:text-[26px] -rotate-6">S</span>
+                <span className="cartoon-letter text-[#e03c28] text-[17px] sm:text-[26px] rotate-3 -ml-0.5">A</span>
+                <span className="cartoon-letter text-[#f5ecd7] text-[17px] sm:text-[26px] -rotate-3 -ml-0.5">Q</span>
+                <span className="cartoon-letter text-[#f2b726] text-[17px] sm:text-[26px] rotate-6 -ml-0.5">I</span>
+                <span className="cartoon-letter text-[#278c68] text-[17px] sm:text-[26px] -rotate-6 -ml-0.5">B</span>
               </div>
               <div className="min-w-0 hidden md:block">
                 <div className="flex items-center gap-1.5">
@@ -973,7 +973,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                   const state = toggleSound();
                   setSoundOn(state);
                 }} 
-                className={cn("glass-orb w-7 h-7 sm:w-9 sm:h-9 text-xs transition-transform active:scale-90", soundOn ? "orb-clear" : "orb-champagne opacity-70")}
+                className={cn("glass-orb w-7 h-7 sm:w-9 sm:h-9 text-xs transition-transform active:scale-90 shrink-0", soundOn ? "orb-clear" : "orb-champagne opacity-70")}
                 title={soundOn ? "Mute Tactile Bubble Audio" : "Enable Tactile Bubble Audio"}
               >
                 {soundOn ? <Volume2 className="w-3.5 h-3.5 text-zinc-900" /> : <VolumeX className="w-3.5 h-3.5 text-zinc-500" />}
@@ -985,7 +985,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                   playBubblePop(660);
                   setShowSyncModal(true);
                 }} 
-                className="glass-orb orb-champagne w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center text-zinc-900 active:scale-95 transition-transform"
+                className="glass-orb orb-champagne w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center text-zinc-900 active:scale-95 transition-transform shrink-0"
                 title={phoneNumber ? `Synced: ${phoneNumber}` : "Sync Device Identity"}
               >
                 <Smartphone className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -993,11 +993,11 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
               {/* User Profile / Free Quota Badge */}
               {currentUser ? (
-                <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 rounded-full liquid-glass-input shadow-xs">
+                <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 rounded-full liquid-glass-input shadow-xs shrink-0 max-w-[110px] xs:max-w-[140px] sm:max-w-none">
                   <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center text-[10px] font-black shrink-0">
                     {currentUser.username.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-[11px] sm:text-xs font-black text-zinc-900 truncate max-w-[70px] sm:max-w-[110px]">
+                  <span className="text-[10.5px] sm:text-xs font-black text-zinc-900 truncate max-w-[55px] xs:max-w-[85px] sm:max-w-[120px]">
                     @{currentUser.username}
                   </span>
                   <span className="hidden xs:inline-block px-1.5 py-0.2 rounded-full bg-amber-400 text-amber-950 text-[9px] font-black shadow-xs">
@@ -1005,14 +1005,14 @@ create policy "Allow public delete access" on public.urls for delete using (true
                   </span>
                   <button
                     onClick={handleLogout}
-                    className="text-zinc-500 hover:text-red-600 p-0.5 transition-colors cursor-pointer"
+                    className="text-zinc-500 hover:text-red-600 p-0.5 transition-colors cursor-pointer shrink-0"
                     title="Log Out"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                   </button>
                 </div>
               ) : (
-                <div className="flex items-center gap-1 sm:gap-1.5">
+                <div className="flex items-center gap-1 shrink-0">
                   {/* Guest Quota Badge */}
                   <button
                     onClick={() => {
@@ -1022,7 +1022,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                       setShowAuthModal(true);
                     }}
                     className={cn(
-                      "px-2 sm:px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-black transition-all flex items-center gap-1 border shadow-xs cursor-pointer active:scale-95",
+                      "px-2 sm:px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-black transition-all flex items-center gap-0.5 sm:gap-1 border shadow-xs cursor-pointer active:scale-95 shrink-0",
                       guestTriesUsed >= 5 
                         ? "bg-rose-100 text-rose-800 border-rose-300 animate-pulse" 
                         : "bg-indigo-50 text-indigo-800 border-indigo-200 hover:bg-indigo-100"
@@ -1030,7 +1030,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                     title="Guest limit: 5 free links. Click to unlock unlimited links!"
                   >
                     <Sparkles className="w-3 h-3 text-indigo-600 shrink-0" />
-                    <span>{Math.max(0, 5 - guestTriesUsed)}/5 Free</span>
+                    <span>{Math.max(0, 5 - guestTriesUsed)}/5<span className="hidden xs:inline"> Free</span></span>
                   </button>
 
                   {/* Sign In Button */}
@@ -1041,7 +1041,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                       setAuthModalReason('manual');
                       setShowAuthModal(true);
                     }}
-                    className="glass-orb orb-champagne px-2 py-1 sm:px-3 sm:py-1.5 text-[10.5px] sm:text-xs font-black text-zinc-800 flex items-center gap-1 active:scale-95 transition-transform"
+                    className="glass-orb orb-champagne px-2 py-1 sm:px-3 sm:py-1.5 text-[10.5px] sm:text-xs font-black text-zinc-800 flex items-center gap-1 active:scale-95 transition-transform shrink-0"
                     title="Sign In or Register"
                   >
                     <User className="w-3.5 h-3.5 shrink-0" />
@@ -1056,7 +1056,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                   playBubblePop(690);
                   setShowApiModal(true);
                 }} 
-                className="glass-orb orb-amber w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center text-zinc-950 active:scale-95 transition-transform relative"
+                className="glass-orb orb-amber w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center text-zinc-950 active:scale-95 transition-transform relative shrink-0"
                 title={currentUser ? "API Hub & Documentation" : "API Hub (Unlock with Free Account)"}
               >
                 <Code className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -1073,11 +1073,11 @@ create policy "Allow public delete access" on public.urls for delete using (true
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => playBubblePop(720)}
-                className="glass-orb orb-green px-2.5 py-1 sm:px-4 sm:py-2 text-[10.5px] sm:text-xs font-black flex items-center gap-1 text-white active:scale-95 transition-transform shrink-0 shadow-md"
+                className="glass-orb orb-green w-7 h-7 sm:w-auto px-1.5 sm:px-3 sm:py-1.5 text-[10.5px] sm:text-xs font-black flex items-center justify-center gap-1 text-white active:scale-95 transition-transform shrink-0 shadow-md"
                 title="Join WhatsApp Channel"
               >
                 <MessageCircle className="w-3.5 h-3.5 shrink-0" />
-                <span className="hidden xs:inline">Channel</span>
+                <span className="hidden sm:inline">Channel</span>
               </a>
             </div>
           </header>
@@ -1124,31 +1124,31 @@ create policy "Allow public delete access" on public.urls for delete using (true
                         </div>
                         <p className="text-[11px] text-[#344f63] font-medium truncate">{link.longUrl}</p>
                       </div>
-                      <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+                      <div className="flex items-center gap-1.5 w-full sm:w-auto justify-between sm:justify-end pt-2 sm:pt-0 border-t border-white/20 sm:border-0 shrink-0">
                         <button 
                           onClick={() => fetchAnalytics(link)} 
-                          className="clay-teal-btn px-3 py-1.5 text-xs font-bold flex items-center gap-1.5 text-white active:scale-95"
+                          className="glass-orb orb-blue px-3 py-2 text-xs font-black flex items-center justify-center gap-1.5 text-white active:scale-95 flex-1 sm:flex-none shadow-sm cursor-pointer"
                         >
                           <BarChart3 className="w-3.5 h-3.5" />
                           <span>Intel</span>
                         </button>
                         <button 
                           onClick={() => copyToClipboard(link.shortUrl)} 
-                          className="clay-small-pill p-2 text-[#1c3546] active:scale-95" 
+                          className="glass-orb orb-clear p-2 min-w-[36px] flex items-center justify-center text-zinc-800 active:scale-95 shadow-xs cursor-pointer" 
                           title="Copy Link"
                         >
                           <Copy className="w-3.5 h-3.5" />
                         </button>
                         <button 
                           onClick={() => handleEditClick(link.code)} 
-                          className="clay-small-pill p-2 text-[#1c3546] active:scale-95" 
+                          className="glass-orb orb-champagne p-2 min-w-[36px] flex items-center justify-center text-zinc-800 active:scale-95 shadow-xs cursor-pointer" 
                           title="Manage Link"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
                         <button 
                           onClick={() => handleDeleteLink(link.code)} 
-                          className="clay-small-pill p-2 text-red-600 hover:text-red-700 active:scale-95" 
+                          className="glass-orb orb-clear p-2 min-w-[36px] flex items-center justify-center text-rose-600 hover:text-rose-700 active:scale-95 shadow-xs cursor-pointer" 
                           title="Delete Link"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -1284,43 +1284,50 @@ create policy "Allow public delete access" on public.urls for delete using (true
                         <h4 className="text-[#152432] font-extrabold text-[15px] mb-3">Live Visitor Telemetry</h4>
                         <div className="space-y-2.5 max-h-[500px] overflow-y-auto clay-scroll pr-1">
                           {analyticsData.map((log: any, i: number) => (
-                            <div key={i} className="clay-recessed p-3.5 flex flex-wrap items-center justify-between gap-3 text-xs">
-                              <div className="flex items-center gap-3">
-                                {log.device_type?.toLowerCase() === 'mobile' ? (
-                                  <Smartphone className="w-4 h-4 text-[#265e6b]" />
-                                ) : (
-                                  <Monitor className="w-4 h-4 text-[#265e6b]" />
-                                )}
-                                <div>
-                                  <span className="font-mono font-bold text-[#102030]">{log.ip_address}</span>
-                                  <span className="ml-2 px-2 py-0.5 rounded-full bg-white/40 text-[10px] font-bold text-[#142331]">
+                            <div key={i} className="clay-recessed p-3 sm:p-3.5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
+                              <div className="flex items-center justify-between sm:justify-start gap-2.5 min-w-0">
+                                <div className="flex items-center gap-2 min-w-0">
+                                  {log.device_type?.toLowerCase() === 'mobile' ? (
+                                    <Smartphone className="w-4 h-4 text-indigo-600 shrink-0" />
+                                  ) : (
+                                    <Monitor className="w-4 h-4 text-indigo-600 shrink-0" />
+                                  )}
+                                  <span className="font-mono font-bold text-zinc-900 text-xs sm:text-sm">{log.ip_address}</span>
+                                  <span className="px-2 py-0.5 rounded-full bg-white/70 border border-white text-[9.5px] font-bold text-zinc-800 truncate">
                                     {log.location_name || 'Direct'}
                                   </span>
                                 </div>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <span className="font-semibold text-[#31495e]">{log.browser} • {log.os}</span>
-                                {log.captured_image && (
-                                  <button
-                                    onClick={() => setSelectedImage(log.captured_image)}
-                                    className="clay-small-pill px-2.5 py-1 text-[10px] font-bold text-[#142331]"
-                                  >
-                                    View Image
-                                  </button>
-                                )}
-                                {log.latitude && (
-                                  <a
-                                    href={`https://www.google.com/maps?q=${log.latitude},${log.longitude}`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="clay-small-pill px-2.5 py-1 text-[10px] font-bold text-emerald-800"
-                                  >
-                                    View Map
-                                  </a>
-                                )}
-                                <span className="text-[10px] font-mono font-bold text-[#31495e]">
+                                <span className="text-[10px] font-mono font-bold text-zinc-500 sm:hidden">
                                   {new Date(log.created_at).toLocaleTimeString()}
                                 </span>
+                              </div>
+                              <div className="flex items-center justify-between sm:justify-end gap-2 pt-1.5 sm:pt-0 border-t border-white/20 sm:border-0 shrink-0">
+                                <span className="text-[10.5px] font-semibold text-zinc-600 truncate max-w-[170px] sm:max-w-none">
+                                  {log.browser} • {log.os}
+                                </span>
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                  {log.captured_image && (
+                                    <button
+                                      onClick={() => setSelectedImage(log.captured_image)}
+                                      className="glass-orb orb-rainbow px-2.5 py-1 text-[10px] font-extrabold text-white active:scale-95 shadow-xs"
+                                    >
+                                      📸 Photo
+                                    </button>
+                                  )}
+                                  {log.latitude && (
+                                    <a
+                                      href={`https://www.google.com/maps?q=${log.latitude},${log.longitude}`}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="glass-orb orb-green px-2.5 py-1 text-[10px] font-extrabold text-white active:scale-95 shadow-xs"
+                                    >
+                                      📍 Map
+                                    </a>
+                                  )}
+                                  <span className="text-[10px] font-mono font-bold text-zinc-500 hidden sm:inline">
+                                    {new Date(log.created_at).toLocaleTimeString()}
+                                  </span>
+                                </div>
                               </div>
                             </div>
                           ))}
@@ -1638,14 +1645,17 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
                 {/* Result Card */}
                 {shortUrl && (
-                  <div ref={resultRef} className="clay-stat-teal mt-3.5 sm:mt-5 p-3 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 animate-in slide-in-from-bottom-3 duration-300">
+                  <div ref={resultRef} className="liquid-glass-box rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 mt-4 border-2 border-emerald-400/80 bg-white/85 shadow-2xl backdrop-blur-xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3.5 sm:gap-4 animate-in slide-in-from-bottom-3 duration-300">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="clay-badge-teal w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center shrink-0">
-                        <Check className="w-5 h-5 sm:w-6 sm:h-6 text-white stroke-[3]" />
+                      <div className="glass-orb orb-green w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center shrink-0 shadow-md text-white">
+                        <Check className="w-5 h-5 sm:w-6 sm:h-6 stroke-[3]" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-[#0e2129]">Success! Link Ready</p>
-                        <p className="text-sm sm:text-lg font-black text-[#0a181e] font-mono truncate">{shortUrl.replace(/^https?:\/\//, '')}</p>
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                          <p className="text-[10px] font-black uppercase tracking-widest text-emerald-800">Ready to Share</p>
+                        </div>
+                        <p className="text-sm sm:text-lg font-black text-zinc-900 font-mono truncate select-all">{shortUrl.replace(/^https?:\/\//, '')}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
@@ -1656,6 +1666,25 @@ create policy "Allow public delete access" on public.urls for delete using (true
                         {copied ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : <Copy className="w-3.5 h-3.5" />}
                         <span>{copied ? "Copied!" : "Copy Link"}</span>
                       </button>
+
+                      {/* Native Mobile Share Button */}
+                      {typeof navigator !== 'undefined' && typeof (navigator as any).share === 'function' && (
+                        <button
+                          onClick={() => {
+                            playBubblePop(720);
+                            navigator.share({
+                              title: 'Saqib Visuals Smart Link',
+                              url: shortUrl,
+                            }).catch(() => {});
+                          }}
+                          className="flex-1 sm:flex-none glass-orb orb-rainbow px-3.5 py-2.5 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 text-white active:scale-95 shadow-md cursor-pointer"
+                          title="Share to WhatsApp, Telegram, or Apps"
+                        >
+                          <ArrowUpRight className="w-3.5 h-3.5" />
+                          <span>Share</span>
+                        </button>
+                      )}
+
                       <a
                         href={shortUrl}
                         target="_blank"

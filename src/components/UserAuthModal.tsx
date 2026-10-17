@@ -149,7 +149,7 @@ export function UserAuthModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/45 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 min-h-[100dvh] overflow-y-auto clay-scroll">
-      <div className="liquid-glass-box liquid-glass-modal p-4 sm:p-7 w-full max-w-md relative text-zinc-900 shadow-2xl rounded-[26px] sm:rounded-[34px] border-2 border-white/95 animate-in fade-in zoom-in-95 duration-200 my-auto">
+      <div className="liquid-glass-box liquid-glass-modal p-4 sm:p-7 w-full max-w-md relative text-zinc-900 shadow-2xl rounded-[26px] sm:rounded-[34px] border-2 border-white/95 animate-in fade-in zoom-in-95 duration-200 my-auto max-h-[92dvh] overflow-y-auto clay-scroll">
         
         {/* Header with Title and Close Button */}
         <div className="flex items-center justify-between pb-3 sm:pb-4 mb-3 border-b border-zinc-200/60">

@@ -3717,82 +3717,88 @@ except Exception as error:
           }}
         >
           <div 
-            className="liquid-glass-box w-full max-w-lg p-5 sm:p-7 rounded-3xl shadow-2xl border border-white/40 flex flex-col gap-4 sm:gap-5 relative max-h-[92vh] overflow-y-auto clay-scroll"
+            className="liquid-glass-box w-full max-w-lg p-5 sm:p-7 rounded-[28px] shadow-2xl border-2 border-white/90 flex flex-col gap-4 sm:gap-5 relative max-h-[92vh] overflow-y-auto clay-scroll"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close Button */}
-            <button
-              onClick={() => {
-                playBubblePop(450);
-                setShowUserPlanModal(false);
-                setCouponMessage(null);
-              }}
-              className="absolute top-4 right-4 sm:top-5 sm:right-5 w-8 h-8 rounded-full glass-orb orb-champagne flex items-center justify-center text-zinc-700 hover:text-zinc-950 transition-all cursor-pointer shadow-sm"
-              title="Close Modal"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
-            {/* Profile Overview Header */}
-            <div className="flex items-center gap-3 pr-8">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white flex items-center justify-center text-xl font-black shadow-lg shrink-0">
-                {currentUser.username.charAt(0).toUpperCase()}
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h2 className="text-lg sm:text-xl font-black text-zinc-900 tracking-tight truncate">@{currentUser.username}</h2>
-                  {currentUser.plan === 'premium' ? (
-                    <span className="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1 shrink-0">
-                      <span>👑</span> VIP Tier
-                    </span>
-                  ) : currentUser.plan === 'pro' ? (
-                    <span className="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 text-white text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1 shrink-0">
-                      <span>💎</span> PRO Tier
-                    </span>
-                  ) : (
-                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-900 text-[10px] font-black uppercase tracking-wider shadow-xs shrink-0">
-                      Free Tier
-                    </span>
-                  )}
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-zinc-200/60">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white flex items-center justify-center text-lg font-black shadow-md shrink-0">
+                  {currentUser.username.charAt(0).toUpperCase()}
                 </div>
-                <p className="text-xs text-zinc-500 font-medium truncate max-w-[240px] sm:max-w-xs mt-0.5">
-                  {currentUser.email || 'No email attached'}
-                </p>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h2 className="text-base sm:text-lg font-black text-zinc-900 tracking-tight truncate">
+                      @{currentUser.username}
+                    </h2>
+                    {currentUser.plan === 'premium' ? (
+                      <span className="px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1 shrink-0">
+                        <span>👑</span> VIP
+                      </span>
+                    ) : currentUser.plan === 'pro' ? (
+                      <span className="px-2 py-0.5 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 text-white text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1 shrink-0">
+                        <span>💎</span> PRO
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-900 text-[10px] font-black uppercase tracking-wider shrink-0">
+                        Free Tier
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-zinc-500 font-medium truncate mt-0.5">
+                    {currentUser.email || 'No email attached'}
+                  </p>
+                </div>
               </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  playBubblePop(450);
+                  setShowUserPlanModal(false);
+                  setCouponMessage(null);
+                }}
+                className="w-8 h-8 rounded-xl bg-white/70 hover:bg-white text-zinc-700 hover:text-zinc-950 border border-zinc-200/80 flex items-center justify-center transition-all active:scale-90 shadow-xs cursor-pointer shrink-0"
+                title="Close Modal"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
-            {/* Plan & Usage Details Card */}
-            <div className="liquid-glass-input p-4 rounded-2xl space-y-3">
+            {/* Plan & Usage Details Card - Clean Modern Rounded-2xl (No bulging oval circles) */}
+            <div className="bg-white/75 backdrop-blur-md rounded-2xl border border-white/95 shadow-sm p-4 sm:p-5 space-y-3.5">
               <div className="flex items-center justify-between text-xs font-bold text-zinc-700">
                 <span className="uppercase tracking-wider text-[10px] text-zinc-500 font-black">Plan Status</span>
                 <span>
                   {currentUser.plan === 'free' ? (
-                    <span className="text-zinc-600">Standard Free Account</span>
+                    <span className="px-2.5 py-1 rounded-lg bg-zinc-100 text-zinc-700 font-bold text-[11px]">
+                      Standard Free Account
+                    </span>
                   ) : currentUser.planExpiresAt ? (
                     (() => {
                       const exp = new Date(currentUser.planExpiresAt);
                       const now = new Date();
                       const days = Math.max(0, Math.ceil((exp.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
                       if (days > 3650) {
-                        return <span className="text-emerald-700 font-black">🌟 Lifetime Access</span>;
+                        return <span className="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 font-black text-[11px]">🌟 Lifetime Access</span>;
                       }
                       return (
-                        <span className="text-indigo-750 font-black">
+                        <span className="px-2.5 py-1 rounded-lg bg-indigo-100 text-indigo-800 font-black text-[11px]">
                           Active ({days} {days === 1 ? 'day' : 'days'} left)
                         </span>
                       );
                     })()
                   ) : (
-                    <span className="text-emerald-700 font-black">🌟 Active</span>
+                    <span className="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 font-black text-[11px]">🌟 Active</span>
                   )}
                 </span>
               </div>
 
               {/* Expiry date preview if not free */}
               {currentUser.plan !== 'free' && currentUser.planExpiresAt && (
-                <div className="text-[11px] text-zinc-500 flex items-center justify-between">
-                  <span>Valid Until:</span>
-                  <span className="font-mono font-bold text-zinc-800">
+                <div className="text-[11px] text-zinc-600 flex items-center justify-between bg-zinc-50/80 px-3 py-1.5 rounded-xl border border-zinc-200/60">
+                  <span className="font-medium">Valid Until:</span>
+                  <span className="font-mono font-bold text-zinc-900">
                     {new Date(currentUser.planExpiresAt).toLocaleDateString(undefined, {
                       year: 'numeric',
                       month: 'short',
@@ -3803,7 +3809,7 @@ except Exception as error:
               )}
 
               {/* Daily Quota Bar */}
-              <div className="space-y-1.5 pt-1">
+              <div className="space-y-1.5 pt-0.5">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-bold text-zinc-700 flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5 text-zinc-500" />
@@ -3811,16 +3817,16 @@ except Exception as error:
                   </span>
                   <span className="font-mono font-black text-zinc-900">
                     {currentUser.plan === 'premium' ? (
-                      <span className="text-amber-700">Unlimited ({currentUser.dailyUsed || 0} used)</span>
+                      <span className="text-amber-700 font-bold">Unlimited ({currentUser.dailyUsed || 0} used)</span>
                     ) : (
                       `${currentUser.dailyUsed || 0} / ${currentUser.dailyLimit || (currentUser.plan === 'pro' ? 50 : 5)}`
                     )}
                   </span>
                 </div>
                 
-                {/* Progress Bar (capped at 100%) */}
+                {/* Progress Bar */}
                 {currentUser.plan !== 'premium' && (
-                  <div className="w-full h-2.5 bg-zinc-200/80 rounded-full overflow-hidden p-0.5 border border-zinc-300/60">
+                  <div className="w-full h-2 bg-zinc-200/80 rounded-full overflow-hidden p-0.5 border border-zinc-300/60">
                     <div 
                       className={cn(
                         "h-full rounded-full transition-all duration-500",
@@ -3840,12 +3846,12 @@ except Exception as error:
               </div>
 
               {/* Stats grid */}
-              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-200/70">
-                <div className="bg-white/60 rounded-xl p-2.5 text-center">
+              <div className="grid grid-cols-2 gap-2.5 pt-1">
+                <div className="bg-white/90 rounded-xl p-2.5 text-center border border-zinc-200/60 shadow-xs">
                   <span className="text-[10px] font-bold text-zinc-500 uppercase block">Total Links Created</span>
                   <span className="text-base font-black text-zinc-900 font-mono">{currentUser.totalUsed || 0}</span>
                 </div>
-                <div className="bg-white/60 rounded-xl p-2.5 text-center">
+                <div className="bg-white/90 rounded-xl p-2.5 text-center border border-zinc-200/60 shadow-xs">
                   <span className="text-[10px] font-bold text-zinc-500 uppercase block">Last Coupon Used</span>
                   <span className="text-xs font-black text-indigo-700 font-mono truncate block" title={currentUser.lastCouponUsed || 'None'}>
                     {currentUser.lastCouponUsed || 'None'}
@@ -3854,15 +3860,15 @@ except Exception as error:
               </div>
             </div>
 
-            {/* Redeem Promo / Coupon Code Card */}
-            <div className="liquid-glass-input p-4 rounded-2xl space-y-3 border border-amber-300/40 bg-amber-50/30">
+            {/* Redeem Promo / Coupon Code Card - Clean Modern Rounded-2xl */}
+            <div className="bg-gradient-to-br from-amber-50/85 to-orange-50/60 backdrop-blur-md rounded-2xl p-4 sm:p-5 space-y-3 border border-amber-200/80 shadow-sm">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-lg bg-amber-400/30 text-amber-800 flex items-center justify-center shrink-0">
                   <Ticket className="w-4 h-4" />
                 </div>
                 <div>
                   <h3 className="text-xs font-black uppercase tracking-wider text-amber-950">Redeem Promo / Coupon Code</h3>
-                  <p className="text-[10.5px] text-zinc-500">Got a code from Admin? Activate or extend your Pro or VIP plan instantly.</p>
+                  <p className="text-[10.5px] text-zinc-600 font-medium">Got a code from Admin? Activate or extend your Pro or VIP plan instantly.</p>
                 </div>
               </div>
 
@@ -3873,17 +3879,17 @@ except Exception as error:
                     value={couponCodeInput}
                     onChange={(e) => setCouponCodeInput(e.target.value.toUpperCase())}
                     placeholder="e.g. VIP-2026 or PRO-30D"
-                    className="flex-1 px-3.5 py-2.5 rounded-xl bg-white/80 border border-zinc-300 text-xs font-mono font-black text-zinc-900 placeholder:text-zinc-400 outline-none focus:border-amber-500 transition-colors uppercase tracking-wider"
+                    className="flex-1 px-3.5 py-2.5 rounded-xl bg-white border border-amber-300 text-xs font-mono font-bold text-zinc-900 placeholder:text-zinc-400 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all uppercase tracking-wider shadow-inner"
                   />
                   <button
                     type="submit"
                     disabled={isRedeemingCoupon || !couponCodeInput.trim()}
-                    className="px-4 py-2.5 rounded-xl glass-orb orb-champagne text-amber-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 active:scale-95 transition-all disabled:opacity-50 cursor-pointer shadow-md shrink-0"
+                    className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 active:scale-95 transition-all disabled:opacity-50 cursor-pointer shadow-md shrink-0"
                   >
                     {isRedeemingCoupon ? (
                       <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                     ) : (
-                      <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                      <Sparkles className="w-3.5 h-3.5 text-white" />
                     )}
                     <span>{isRedeemingCoupon ? 'Applying...' : 'Redeem'}</span>
                   </button>
@@ -3910,22 +3916,24 @@ except Exception as error:
             {/* Modal Actions Footer */}
             <div className="flex items-center justify-between pt-1">
               <button
+                type="button"
                 onClick={() => {
                   handleLogout();
                   setShowUserPlanModal(false);
                 }}
-                className="text-xs font-bold text-red-600 hover:text-red-700 flex items-center gap-1.5 px-3 py-2 rounded-xl hover:bg-red-50/60 transition-colors cursor-pointer"
+                className="text-xs font-bold text-red-600 hover:text-red-700 flex items-center gap-1.5 px-3 py-2 rounded-xl hover:bg-red-50/70 transition-colors cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span>Sign Out</span>
               </button>
               <button
+                type="button"
                 onClick={() => {
                   playBubblePop(450);
                   setShowUserPlanModal(false);
                   setCouponMessage(null);
                 }}
-                className="px-5 py-2 rounded-full glass-orb orb-clear text-xs font-black uppercase tracking-wider text-zinc-800 active:scale-95 transition-all cursor-pointer shadow-xs"
+                className="px-5 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold uppercase tracking-wider active:scale-95 transition-all cursor-pointer shadow-md"
               >
                 Close
               </button>

@@ -432,6 +432,67 @@ body::before {
   transform: scale(0.96);
 }
 
+/* 3D Liquid Glass Mobile Navigation Dock */
+.liquid-glass-dock {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 2px solid rgba(255, 255, 255, 0.98);
+  box-shadow:
+    0 16px 38px -6px rgba(35, 30, 25, 0.22),
+    0 4px 14px rgba(0, 0, 0, 0.08),
+    inset 0 2px 4px rgba(255, 255, 255, 0.95),
+    inset 0 -2px 4px rgba(60, 50, 40, 0.12);
+}
+
+.dock-nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border-radius: 18px;
+  padding: 7px 4px 6px;
+  transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  color: #3f3f46;
+  font-weight: 800;
+  cursor: pointer;
+  user-select: none;
+  min-height: 50px;
+}
+
+.dock-nav-btn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: #18181b;
+}
+
+.dock-nav-btn:active {
+  transform: scale(0.92);
+}
+
+.dock-nav-btn-active {
+  position: relative;
+  background: radial-gradient(circle at 35% 30%, #4f75ff 0%, #2540b0 65%, #182875 100%) !important;
+  color: #ffffff !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow:
+    0 8px 18px -2px rgba(37, 60, 175, 0.52),
+    inset 0 2px 4px rgba(255, 255, 255, 0.8),
+    inset 0 -3px 6px rgba(10, 18, 68, 0.5) !important;
+}
+
+.dock-nav-btn-active::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 20%;
+  right: 20%;
+  height: 6px;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+}
+
 /* Sidebar Promo Card in Warm Champagne Glass */
 .clay-promo-card {
   position: relative;
@@ -636,10 +697,22 @@ body {
   }
 }
 
-/* iPhone safe area insets */
+/* Mobile navigation bar safe placement & iPhone safe area insets */
+.safe-bottom-bar {
+  position: fixed !important;
+  bottom: 0.65rem !important;
+  left: 0 !important;
+  right: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  transform: none !important;
+  will-change: auto !important;
+  z-index: 50 !important;
+}
+
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   .safe-bottom-padding {
-    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 5.5rem) !important;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 7rem) !important;
   }
   .safe-bottom-bar {
     bottom: calc(env(safe-area-inset-bottom, 0px) + 0.65rem) !important;

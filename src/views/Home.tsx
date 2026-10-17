@@ -751,7 +751,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
 
   return (
-    <div className="min-h-screen min-h-[100dvh] clay-noise py-1 sm:py-6 px-1.5 sm:px-4 md:px-6 flex flex-col items-center justify-start lg:justify-center font-sans safe-bottom-padding pb-28 sm:pb-32 lg:pb-6 w-full max-w-full overflow-x-hidden">
+    <div className="min-h-screen min-h-[100dvh] clay-noise py-1 sm:py-6 px-1.5 sm:px-4 md:px-6 flex flex-col items-center justify-start lg:justify-center font-sans safe-bottom-padding pb-32 sm:pb-36 lg:pb-6 w-full max-w-full overflow-x-hidden">
       {/* MAIN 3D CLAY BOARD CONTAINER */}
       <div className="clay-board w-full max-w-[1400px] min-w-0 mx-auto p-2.5 sm:p-5 lg:p-6 flex flex-col lg:flex-row gap-3 sm:gap-5 relative">
 
@@ -1738,62 +1738,78 @@ create policy "Allow public delete access" on public.urls for delete using (true
         </main>
       </div>
 
-      {/* Mobile Bottom Navigation Bar (High-Gloss Liquid Glass) */}
-      <div className="lg:hidden fixed bottom-3 left-3 right-3 sm:left-6 sm:right-6 max-w-md mx-auto liquid-glass-box p-1 sm:p-1.5 flex items-center justify-around z-50 shadow-2xl safe-bottom-bar rounded-full border-2 border-white/90 backdrop-blur-xl">
-        <button 
-          onClick={() => {
-            playBubblePop(520);
-            setMobileTab('create');
-          }}
-          className={cn(
-            "flex-1 py-2 sm:py-2.5 px-1 rounded-full flex flex-col xs:flex-row items-center justify-center gap-1 text-[10.5px] sm:text-[11px] font-black transition-all active:scale-90 cursor-pointer select-none",
-            mobileTab === 'create' ? "nav-pill-active shadow-md" : "text-zinc-700 hover:text-zinc-950 font-bold"
-          )}
-        >
-          <Plus className="w-4 h-4 shrink-0" />
-          <span>Shorten</span>
-        </button>
-        <button 
-          onClick={() => {
-            playBubblePop(560);
-            setMobileTab('media');
-          }}
-          className={cn(
-            "flex-1 py-2 sm:py-2.5 px-1 rounded-full flex flex-col xs:flex-row items-center justify-center gap-1 text-[10.5px] sm:text-[11px] font-black transition-all active:scale-90 cursor-pointer select-none",
-            mobileTab === 'media' ? "nav-pill-active shadow-md" : "text-zinc-700 hover:text-zinc-950 font-bold"
-          )}
-        >
-          <Camera className="w-4 h-4 shrink-0" />
-          <span>Media</span>
-        </button>
-        <button 
-          onClick={() => {
-            playBubblePop(600);
-            setMobileTab('analytics');
-            if (!analyticsLink && history.length > 0) fetchAnalytics(history[0]);
-          }}
-          className={cn(
-            "flex-1 py-2 sm:py-2.5 px-1 rounded-full flex flex-col xs:flex-row items-center justify-center gap-1 text-[10.5px] sm:text-[11px] font-black transition-all active:scale-90 cursor-pointer select-none",
-            mobileTab === 'analytics' ? "nav-pill-active shadow-md" : "text-zinc-700 hover:text-zinc-950 font-bold"
-          )}
-        >
-          <BarChart3 className="w-4 h-4 shrink-0" />
-          <span>Stats</span>
-        </button>
-        <button 
-          onClick={() => {
-            playBubblePop(640);
-            setMobileTab('recent');
-          }}
-          className={cn(
-            "flex-1 py-2 sm:py-2.5 px-1 rounded-full flex flex-col xs:flex-row items-center justify-center gap-1 text-[10.5px] sm:text-[11px] font-black transition-all active:scale-90 cursor-pointer select-none",
-            mobileTab === 'recent' ? "nav-pill-active shadow-md" : "text-zinc-700 hover:text-zinc-950 font-bold"
-          )}
-        >
-          <History className="w-4 h-4 shrink-0" />
-          <span>Recent</span>
-        </button>
-      </div>
+      {/* Mobile Bottom Navigation Bar (High-Gloss 3D Liquid Glass Dock) */}
+      <nav 
+        aria-label="Mobile Navigation"
+        className="lg:hidden fixed bottom-2.5 sm:bottom-4 left-0 right-0 mx-auto w-[calc(100%-1.25rem)] xs:w-[calc(100%-2rem)] max-w-[440px] z-50 safe-bottom-bar pointer-events-auto"
+      >
+        <div className="liquid-glass-dock p-1.5 flex items-center justify-between gap-1 shadow-2xl rounded-[24px]">
+          <button 
+            type="button"
+            onClick={() => {
+              playBubblePop(520);
+              setMobileTab('create');
+            }}
+            className={cn(
+              "flex-1 dock-nav-btn",
+              mobileTab === 'create' && "dock-nav-btn-active"
+            )}
+            title="Shorten & Generate Smart Links"
+          >
+            <Plus className="w-5 h-5 shrink-0 stroke-[2.6]" />
+            <span className="text-[10px] sm:text-[10.5px] font-black uppercase tracking-wider leading-none">Shorten</span>
+          </button>
+
+          <button 
+            type="button"
+            onClick={() => {
+              playBubblePop(560);
+              setMobileTab('media');
+            }}
+            className={cn(
+              "flex-1 dock-nav-btn",
+              mobileTab === 'media' && "dock-nav-btn-active"
+            )}
+            title="Webcam & Media Capture Feed"
+          >
+            <Camera className="w-5 h-5 shrink-0 stroke-[2.2]" />
+            <span className="text-[10px] sm:text-[10.5px] font-black uppercase tracking-wider leading-none">Media</span>
+          </button>
+
+          <button 
+            type="button"
+            onClick={() => {
+              playBubblePop(600);
+              setMobileTab('analytics');
+              if (!analyticsLink && history.length > 0) fetchAnalytics(history[0]);
+            }}
+            className={cn(
+              "flex-1 dock-nav-btn",
+              mobileTab === 'analytics' && "dock-nav-btn-active"
+            )}
+            title="Live Visitor GPS & Device Analytics"
+          >
+            <BarChart3 className="w-5 h-5 shrink-0 stroke-[2.2]" />
+            <span className="text-[10px] sm:text-[10.5px] font-black uppercase tracking-wider leading-none">Stats</span>
+          </button>
+
+          <button 
+            type="button"
+            onClick={() => {
+              playBubblePop(640);
+              setMobileTab('recent');
+            }}
+            className={cn(
+              "flex-1 dock-nav-btn",
+              mobileTab === 'recent' && "dock-nav-btn-active"
+            )}
+            title="Recent Links History"
+          >
+            <History className="w-5 h-5 shrink-0 stroke-[2.2]" />
+            <span className="text-[10px] sm:text-[10.5px] font-black uppercase tracking-wider leading-none">Recent</span>
+          </button>
+        </div>
+      </nav>
 
       {/* Edit Password Modal */}
       {editingLink && (

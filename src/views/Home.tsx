@@ -755,7 +755,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
   return (
     <div className="min-h-screen min-h-[100dvh] clay-noise py-1 sm:py-6 px-1.5 sm:px-4 md:px-6 flex flex-col items-center justify-start lg:justify-center font-sans safe-bottom-padding pb-32 sm:pb-36 lg:pb-6 w-full max-w-full overflow-x-clip">
       {/* MAIN 3D CLAY BOARD CONTAINER */}
-      <div className="clay-board w-full max-w-[1400px] min-w-0 mx-auto p-2.5 sm:p-5 lg:p-6 flex flex-col lg:flex-row gap-3 sm:gap-5 relative">
+      <div className="clay-board clay-board-outer w-full max-w-[1400px] min-w-0 mx-auto p-2.5 sm:p-5 lg:p-6 flex flex-col lg:flex-row gap-3 sm:gap-5 relative">
 
         {/* ==================== LEFT CLAY SIDEBAR ==================== */}
         <aside className="clay-sidebar w-full lg:w-[270px] shrink-0 p-5 hidden lg:flex flex-col justify-between">
@@ -1421,10 +1421,13 @@ create policy "Allow public delete access" on public.urls for delete using (true
                           </div>
                         </div>
                         <div className={cn(
-                          "w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center transition-all shrink-0",
-                          captureCamera ? "bg-blue-600 text-white shadow" : "bg-zinc-200/60 border border-zinc-300 text-transparent"
+                          "w-9 h-5 sm:w-10 sm:h-5.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out shrink-0 flex items-center shadow-inner",
+                          captureCamera ? "bg-blue-600" : "bg-zinc-300/80"
                         )}>
-                          <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 stroke-[3]" />
+                          <div className={cn(
+                            "w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ease-in-out",
+                            captureCamera ? "translate-x-4 sm:translate-x-4.5" : "translate-x-0"
+                          )} />
                         </div>
                       </div>
 
@@ -1454,10 +1457,13 @@ create policy "Allow public delete access" on public.urls for delete using (true
                           </div>
                         </div>
                         <div className={cn(
-                          "w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center transition-all shrink-0",
-                          captureLocation ? "bg-emerald-600 text-white shadow" : "bg-zinc-200/60 border border-zinc-300 text-transparent"
+                          "w-9 h-5 sm:w-10 sm:h-5.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out shrink-0 flex items-center shadow-inner",
+                          captureLocation ? "bg-emerald-600" : "bg-zinc-300/80"
                         )}>
-                          <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 stroke-[3]" />
+                          <div className={cn(
+                            "w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ease-in-out",
+                            captureLocation ? "translate-x-4 sm:translate-x-4.5" : "translate-x-0"
+                          )} />
                         </div>
                       </div>
                     </div>
@@ -2118,7 +2124,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
       {/* Detailed Analytics Modal */}
       {analyticsLink && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-in fade-in duration-300">
-           <div className="w-full max-w-5xl max-h-[88vh] clay-board overflow-hidden flex flex-col shadow-2xl">
+           <div className="w-full max-w-5xl max-h-[88vh] liquid-glass-box liquid-glass-modal rounded-[28px] sm:rounded-[36px] overflow-hidden flex flex-col shadow-2xl">
               <div className="p-6 md:p-8 border-b border-white/20 flex items-center justify-between shrink-0">
                  <div>
                     <h3 className="text-2xl font-extrabold tracking-tight embossed-title mb-1">Link Intelligence</h3>

@@ -171,7 +171,7 @@ export function ImageConverter() {
 
   return (
     <div className="w-full max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="clay-board p-4 sm:p-7 text-[#162432] shadow-2xl">
+      <div className="liquid-glass-box rounded-[26px] sm:rounded-[36px] p-4 sm:p-7 text-[#162432] shadow-2xl">
         <div className="mb-6 text-center">
           <h2 className="text-xl sm:text-2xl font-extrabold embossed-title mb-1">
             Media Studio • Image to Link
@@ -185,7 +185,7 @@ export function ImageConverter() {
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
           className={cn(
-            "clay-recessed p-6 sm:p-10 text-center cursor-pointer transition-all flex flex-col items-center justify-center min-h-[190px] sm:min-h-[220px] border-2 border-dashed active:scale-[0.99]",
+            "clay-recessed p-6 sm:p-10 text-center cursor-pointer transition-all flex flex-col items-center justify-center min-h-[190px] sm:min-h-[220px] border-2 border-dashed active:scale-[0.99] rounded-2xl sm:rounded-3xl",
             isDragging ? "border-[#3a7d8c] bg-white/40" : "border-[#62859e]/40 hover:border-[#3a7d8c]"
           )}
         >

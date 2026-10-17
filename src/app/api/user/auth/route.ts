@@ -31,21 +31,13 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { action, username, password } = body;
+    const { action, username, email, password } = body;
 
-    if (!username || typeof username !== 'string' || !password || typeof password !== 'string') {
+    const identifier = (username || body.identifier || '').trim().toLowerCase();
+
+    if (!identifier || !password || typeof password !== 'string') {
       return NextResponse.json(
-        { error: 'Both username and password are required.' },
-        { status: 400 }
-      );
-    }
-
-    const cleanUsername = username.trim().toLowerCase();
-
-    // Username validation: 3-30 chars, alphanumeric + _ -
-    if (!/^[a-z0-9_-]{3,30}$/.test(cleanUsername)) {
-      return NextResponse.json(
-        { error: 'Username must be between 3 and 30 characters (letters, numbers, underscores, and hyphens only).' },
+        { error: 'Credentials are required.' },
         { status: 400 }
       );
     }
@@ -61,7 +53,26 @@ export async function POST(req: Request) {
     // ACTION: REGISTER
     // ========================================================
     if (action === 'register') {
-      // 1. Check if user already exists
+      const cleanUsername = identifier;
+      const cleanEmail = (email || '').trim().toLowerCase();
+
+      // Username validation: 3-30 chars, alphanumeric + _ -
+      if (!/^[a-z0-9_-]{3,30}$/.test(cleanUsername)) {
+        return NextResponse.json(
+          { error: 'Username must be between 3 and 30 characters (letters, numbers, underscores, and hyphens only).' },
+          { status: 400 }
+        );
+      }
+
+      // Email validation (Gmail / standard email)
+      if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+        return NextResponse.json(
+          { error: 'Please enter a valid Gmail / Email address.' },
+          { status: 400 }
+        );
+      }
+
+      // 1. Check if username already exists
       const { data: existingUser } = await supabase
         .from('app_users')
         .select('id')
@@ -75,39 +86,87 @@ export async function POST(req: Request) {
         );
       }
 
-      // 2. Hash password with PBKDF2-SHA256 (100,000 iterations)
+      // 2. Check if email already exists
+      try {
+        const { data: existingEmail } = await supabase
+          .from('app_users')
+          .select('id')
+          .eq('email', cleanEmail)
+          .maybeSingle();
+
+        if (existingEmail) {
+          return NextResponse.json(
+            { error: `An account with "${cleanEmail}" already exists. Please sign in instead.` },
+            { status: 409 }
+          );
+        }
+      } catch {
+        // If email column doesn't exist yet in Supabase, proceed safely
+      }
+
+      // 3. Hash password with PBKDF2-SHA256 (100,000 iterations)
       const passwordHash = await hashUserPassword(password, cleanUsername);
 
-      // 3. Create user in Supabase
-      const { data: newUser, error: insertError } = await supabase
-        .from('app_users')
-        .insert([
-          {
-            username: cleanUsername,
-            password_hash: passwordHash,
-          },
-        ])
-        .select('id, username')
-        .single();
+      // 4. Create user in Supabase
+      let newUser: any = null;
+      let insertError: any = null;
+
+      try {
+        const res = await supabase
+          .from('app_users')
+          .insert([
+            {
+              username: cleanUsername,
+              email: cleanEmail,
+              password_hash: passwordHash,
+            },
+          ])
+          .select('id, username, email')
+          .single();
+        newUser = res.data;
+        insertError = res.error;
+      } catch (err: any) {
+        insertError = err;
+      }
+
+      // Fallback if email column not created yet in DB
+      if (insertError && (insertError.message?.includes('column "email"') || insertError.code === '42703')) {
+        const fallbackRes = await supabase
+          .from('app_users')
+          .insert([
+            {
+              username: cleanUsername,
+              password_hash: passwordHash,
+            },
+          ])
+          .select('id, username')
+          .single();
+        newUser = fallbackRes.data;
+        insertError = fallbackRes.error;
+      }
 
       if (insertError || !newUser) {
         console.error('Registration DB error:', insertError);
         return NextResponse.json(
-          { error: 'Failed to create user account. Please make sure the app_users table exists in Supabase.' },
+          { error: 'Failed to create user account. Please run the SQL query in Supabase to create or update app_users table.' },
           { status: 500 }
         );
       }
 
-      // 4. Issue session token
-      const { token } = await createUserSessionToken({ id: newUser.id, username: newUser.username });
+      // 5. Issue session token (Auto-login immediately upon creation!)
+      const { token } = await createUserSessionToken({
+        id: newUser.id,
+        username: newUser.username,
+        email: newUser.email || cleanEmail,
+      });
 
       const response = NextResponse.json({
         success: true,
-        message: 'Account created successfully!',
-        user: { id: newUser.id, username: newUser.username },
+        message: 'Account created and logged in successfully!',
+        user: { id: newUser.id, username: newUser.username, email: newUser.email || cleanEmail },
       });
 
-      // Set HTTP-Only Cookie
+      // Set HTTP-Only Session Cookie
       response.cookies.set({
         name: USER_COOKIE_NAME,
         value: token,
@@ -122,37 +181,61 @@ export async function POST(req: Request) {
     }
 
     // ========================================================
-    // ACTION: LOGIN
+    // ACTION: LOGIN (Supports Username OR Gmail/Email)
     // ========================================================
     if (action === 'login') {
-      const { data: user, error: queryError } = await supabase
+      let user: any = null;
+
+      // 1. Check by username
+      const { data: userByUsername } = await supabase
         .from('app_users')
-        .select('id, username, password_hash')
-        .eq('username', cleanUsername)
+        .select('id, username, email, password_hash')
+        .eq('username', identifier)
         .maybeSingle();
 
-      if (queryError || !user) {
+      if (userByUsername) {
+        user = userByUsername;
+      } else {
+        // 2. Check by email if username didn't match
+        try {
+          const { data: userByEmail } = await supabase
+            .from('app_users')
+            .select('id, username, email, password_hash')
+            .eq('email', identifier)
+            .maybeSingle();
+          if (userByEmail) user = userByEmail;
+        } catch {
+          // email column might not exist yet
+        }
+      }
+
+      if (!user) {
         return NextResponse.json(
-          { error: 'Invalid username or password.' },
+          { error: 'Invalid username/email or password.' },
           { status: 401 }
         );
       }
 
-      const isValid = await verifyUserPassword(password, cleanUsername, user.password_hash);
+      // Salt uses user.username
+      const isValid = await verifyUserPassword(password, user.username, user.password_hash);
       if (!isValid) {
         return NextResponse.json(
-          { error: 'Invalid username or password.' },
+          { error: 'Invalid username/email or password.' },
           { status: 401 }
         );
       }
 
       // Issue session token
-      const { token } = await createUserSessionToken({ id: user.id, username: user.username });
+      const { token } = await createUserSessionToken({
+        id: user.id,
+        username: user.username,
+        email: user.email,
+      });
 
       const response = NextResponse.json({
         success: true,
         message: 'Logged in successfully!',
-        user: { id: user.id, username: user.username },
+        user: { id: user.id, username: user.username, email: user.email },
       });
 
       response.cookies.set({

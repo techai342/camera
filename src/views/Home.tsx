@@ -86,7 +86,7 @@ export default function Home() {
   const [apiHtmlCopied, setApiHtmlCopied] = useState(false);
 
   // User Authentication & 5-Try Free Tier Quota States
-  const [currentUser, setCurrentUser] = useState<{ id: string; username: string } | null>(null);
+  const [currentUser, setCurrentUser] = useState<{ id: string; username: string; email?: string } | null>(null);
   const [guestTriesUsed, setGuestTriesUsed] = useState<number>(0);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('register');
@@ -711,13 +711,17 @@ create table public.link_analytics (
 -- Add user_id column for authenticated user links
 ALTER TABLE public.urls ADD COLUMN IF NOT EXISTS user_id uuid;
 
--- App Users Table for Registration & Login
+-- App Users Table for Registration & Login (Username + Gmail/Email + PBKDF2 Password)
 CREATE TABLE IF NOT EXISTS public.app_users (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   username text UNIQUE NOT NULL,
+  email text UNIQUE,
   password_hash text NOT NULL,
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- Ensure email column exists if table was created previously
+ALTER TABLE public.app_users ADD COLUMN IF NOT EXISTS email text UNIQUE;
 
 -- Turn on row security for app_users
 ALTER TABLE public.app_users ENABLE ROW LEVEL SECURITY;

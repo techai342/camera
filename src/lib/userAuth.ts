@@ -86,11 +86,12 @@ async function signHMAC(data: string, secret: string = USER_SESSION_SECRET): Pro
 /**
  * Create a cryptographically signed user session token
  */
-export async function createUserSessionToken(user: { id: string; username: string }): Promise<{ token: string; expiresAt: number }> {
+export async function createUserSessionToken(user: { id: string; username: string; email?: string }): Promise<{ token: string; expiresAt: number }> {
   const expiresAt = Date.now() + SESSION_EXPIRATION_SECONDS * 1000;
   const payload = JSON.stringify({
     id: user.id,
     username: user.username,
+    email: user.email || undefined,
     exp: expiresAt,
     iat: Date.now(),
   });
@@ -105,7 +106,7 @@ export async function createUserSessionToken(user: { id: string; username: strin
 /**
  * Verify signed user session token
  */
-export async function verifyUserSessionToken(token: string | undefined | null): Promise<{ valid: boolean; user?: { id: string; username: string } }> {
+export async function verifyUserSessionToken(token: string | undefined | null): Promise<{ valid: boolean; user?: { id: string; username: string; email?: string } }> {
   if (!token || typeof token !== 'string') {
     return { valid: false };
   }
@@ -139,6 +140,7 @@ export async function verifyUserSessionToken(token: string | undefined | null): 
       user: {
         id: payload.id,
         username: payload.username,
+        email: payload.email || undefined,
       },
     };
   } catch {
@@ -149,7 +151,7 @@ export async function verifyUserSessionToken(token: string | undefined | null): 
 /**
  * Extract and verify user session from Request cookies or Authorization header
  */
-export async function getUserFromRequest(req: Request): Promise<{ id: string; username: string } | null> {
+export async function getUserFromRequest(req: Request): Promise<{ id: string; username: string; email?: string } | null> {
   let token: string | null = null;
 
   // 1. Check Cookie header

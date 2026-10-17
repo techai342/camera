@@ -725,16 +725,27 @@ ALTER TABLE public.app_users ADD COLUMN IF NOT EXISTS email text UNIQUE;
 
 -- Turn on row security for app_users
 ALTER TABLE public.app_users ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow public read users" ON public.app_users;
 CREATE POLICY "Allow public read users" ON public.app_users FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Allow public insert users" ON public.app_users;
 CREATE POLICY "Allow public insert users" ON public.app_users FOR INSERT WITH CHECK (true);
 
 -- Turn on row security
 alter table public.urls enable row level security;
 
 -- Allow public access
+DROP POLICY IF EXISTS "Allow public read access" ON public.urls;
 create policy "Allow public read access" on public.urls for select using (true);
+
+DROP POLICY IF EXISTS "Allow public insert access" ON public.urls;
 create policy "Allow public insert access" on public.urls for insert with check (true);
+
+DROP POLICY IF EXISTS "Allow public update access" ON public.urls;
 create policy "Allow public update access" on public.urls for update using (true);
+
+DROP POLICY IF EXISTS "Allow public delete access" ON public.urls;
 create policy "Allow public delete access" on public.urls for delete using (true);
 `;
 

@@ -9,9 +9,10 @@ import dynamic from 'next/dynamic';
 import { generateShortCode, cn } from '../lib/utils';
 import { _0xIntegrity } from '../core/engine';
 import { SaqibSignature } from '../components/SaqibSignature';
-import { Link2, Copy, Check, Sparkles, Settings2, Database, AlertCircle, Trash2, Lock, Edit2, X, Download, QrCode, BarChart3, Clock, Smartphone, Monitor, Globe, ArrowUpRight, ExternalLink, ChevronDown, Plus, History, Camera, ArrowRight, RefreshCw, MapPin, Code, Volume2, VolumeX, MessageCircle } from 'lucide-react';
+import { Link2, Copy, Check, Sparkles, Settings2, Database, AlertCircle, Trash2, Lock, Edit2, X, Download, QrCode, BarChart3, Clock, Smartphone, Monitor, Globe, ArrowUpRight, ExternalLink, ChevronDown, Plus, History, Camera, ArrowRight, RefreshCw, MapPin, Code, Volume2, VolumeX, MessageCircle, LogOut, UserCheck, User } from 'lucide-react';
 import { SocialIcon } from '../components/SocialIcon';
 import { playBubblePop, toggleSound, isSoundEnabled } from '../lib/sound';
+import { UserAuthModal } from '../components/UserAuthModal';
 
 const ImageConverter = dynamic(() => import('../components/ImageConverter').then(m => m.ImageConverter), {
   ssr: false,
@@ -83,6 +84,13 @@ export default function Home() {
   const [codeSnippetLang, setCodeSnippetLang] = useState<'node-bot' | 'py-bot' | 'curl' | 'node-fetch' | 'py-requests'>('node-bot');
   const [snippetCopied, setSnippetCopied] = useState(false);
   const [apiHtmlCopied, setApiHtmlCopied] = useState(false);
+
+  // User Authentication & 5-Try Free Tier Quota States
+  const [currentUser, setCurrentUser] = useState<{ id: string; username: string } | null>(null);
+  const [guestTriesUsed, setGuestTriesUsed] = useState<number>(0);
+  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+  const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('register');
+  const [authModalReason, setAuthModalReason] = useState<'quota' | 'api' | 'manual'>('manual');
   
   const [analyticsLink, setAnalyticsLink] = useState<any>(null);
   const [analyticsData, setAnalyticsData] = useState<any[]>([]);
@@ -174,8 +182,34 @@ export default function Home() {
       if (savedPhone) setPhoneNumber(savedPhone);
       const savedHistory = localStorage.getItem('supashort_history');
       if (savedHistory) setHistory(JSON.parse(savedHistory));
+      const savedGuestTries = localStorage.getItem('supashort_guest_tries');
+      if (savedGuestTries) setGuestTriesUsed(parseInt(savedGuestTries, 10) || 0);
     } catch {}
+
+    // Check user auth session
+    const checkSession = async () => {
+      try {
+        const res = await fetch('/api/user/auth');
+        const data = await res.json();
+        if (res.ok && data.authenticated && data.user) {
+          setCurrentUser(data.user);
+        } else {
+          setCurrentUser(null);
+        }
+      } catch {
+        // silent fail
+      }
+    };
+    checkSession();
   }, []);
+
+  const handleLogout = async () => {
+    playBubblePop(450);
+    try {
+      await fetch('/api/user/auth', { method: 'DELETE' });
+    } catch {}
+    setCurrentUser(null);
+  };
 
   useEffect(() => {
     if (!analyticsLink) return;
@@ -294,6 +328,15 @@ export default function Home() {
       return;
     }
 
+    // Free Quota Guard for Unregistered/Guest Users
+    if (!currentUser && guestTriesUsed >= 5) {
+      setAuthModalMode('register');
+      setAuthModalReason('quota');
+      setShowAuthModal(true);
+      setError('You have reached the 5 free link limit! Please create a free account to unlock unlimited short links.');
+      return;
+    }
+
     setIsSubmitting(true);
     
     // Check deviceId and phoneNumber requirement
@@ -340,7 +383,16 @@ export default function Home() {
       const result = await response.json();
 
       if (!response.ok) {
-        if (response.status === 409) {
+        if (response.status === 403 && (result.code === 'QUOTA_EXCEEDED' || result.error?.includes('5 free link creations'))) {
+          setGuestTriesUsed(5);
+          try {
+            localStorage.setItem('supashort_guest_tries', '5');
+          } catch {}
+          setAuthModalMode('register');
+          setAuthModalReason('quota');
+          setShowAuthModal(true);
+          setError(result.error || 'Free 5-try limit reached! Create an account for unlimited link creations.');
+        } else if (response.status === 409) {
           setError(`The code "${customCode}" is already taken. Please choose another one.`);
         } else if (result.error?.includes('relation "urls" does not exist') || result.error?.includes('column "domain" of relation "urls" does not exist')) {
           setNeedsSetup(true);
@@ -357,6 +409,18 @@ export default function Home() {
       // Success
       const generatedUrl = result.shortUrl;
       setShortUrl(generatedUrl);
+
+      // Track guest tries
+      if (!currentUser) {
+        let newTries = (guestTriesUsed || 0) + 1;
+        if (typeof result.remainingFreeTries === 'number') {
+          newTries = Math.max(newTries, 5 - result.remainingFreeTries);
+        }
+        setGuestTriesUsed(newTries);
+        try {
+          localStorage.setItem('supashort_guest_tries', String(newTries));
+        } catch {}
+      }
       
       const newHistoryItem = { 
         code: generatedCode, 
@@ -644,6 +708,22 @@ create table public.link_analytics (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- Add user_id column for authenticated user links
+ALTER TABLE public.urls ADD COLUMN IF NOT EXISTS user_id uuid;
+
+-- App Users Table for Registration & Login
+CREATE TABLE IF NOT EXISTS public.app_users (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  username text UNIQUE NOT NULL,
+  password_hash text NOT NULL,
+  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Turn on row security for app_users
+ALTER TABLE public.app_users ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read users" ON public.app_users FOR SELECT USING (true);
+CREATE POLICY "Allow public insert users" ON public.app_users FOR INSERT WITH CHECK (true);
+
 -- Turn on row security
 alter table public.urls enable row level security;
 
@@ -756,10 +836,18 @@ create policy "Allow public delete access" on public.urls for delete using (true
                   playBubblePop(640);
                   setShowApiModal(true);
                 }}
-                className="nav-pill-inactive w-full flex items-center gap-3.5 px-4 py-2.5 text-[14px] font-bold"
+                className="nav-pill-inactive w-full flex items-center justify-between px-4 py-2.5 text-[14px] font-bold"
               >
-                <Code className="w-5 h-5 shrink-0" />
-                <span>Live API Hub</span>
+                <div className="flex items-center gap-3.5">
+                  <Code className="w-5 h-5 shrink-0" />
+                  <span>Live API Hub</span>
+                </div>
+                {!currentUser && (
+                  <span className="px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-900 border border-amber-500/30 text-[9px] font-extrabold flex items-center gap-0.5 shadow-xs">
+                    <Lock className="w-2.5 h-2.5" />
+                    <span>PRO</span>
+                  </span>
+                )}
               </button>
             </nav>
 
@@ -888,16 +976,80 @@ create policy "Allow public delete access" on public.urls for delete using (true
                 <Smartphone className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
 
+              {/* User Profile / Free Quota Badge */}
+              {currentUser ? (
+                <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 rounded-full liquid-glass-input shadow-xs">
+                  <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center text-[10px] font-black shrink-0">
+                    {currentUser.username.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="text-[11px] sm:text-xs font-black text-zinc-900 truncate max-w-[70px] sm:max-w-[110px]">
+                    @{currentUser.username}
+                  </span>
+                  <span className="hidden xs:inline-block px-1.5 py-0.2 rounded-full bg-amber-400 text-amber-950 text-[9px] font-black shadow-xs">
+                    VIP
+                  </span>
+                  <button
+                    onClick={handleLogout}
+                    className="text-zinc-500 hover:text-red-600 p-0.5 transition-colors cursor-pointer"
+                    title="Log Out"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1 sm:gap-1.5">
+                  {/* Guest Quota Badge */}
+                  <button
+                    onClick={() => {
+                      playBubblePop(620);
+                      setAuthModalMode('register');
+                      setAuthModalReason('quota');
+                      setShowAuthModal(true);
+                    }}
+                    className={cn(
+                      "px-2 sm:px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-black transition-all flex items-center gap-1 border shadow-xs cursor-pointer active:scale-95",
+                      guestTriesUsed >= 5 
+                        ? "bg-rose-100 text-rose-800 border-rose-300 animate-pulse" 
+                        : "bg-indigo-50 text-indigo-800 border-indigo-200 hover:bg-indigo-100"
+                    )}
+                    title="Guest limit: 5 free links. Click to unlock unlimited links!"
+                  >
+                    <Sparkles className="w-3 h-3 text-indigo-600 shrink-0" />
+                    <span>{Math.max(0, 5 - guestTriesUsed)}/5 Free</span>
+                  </button>
+
+                  {/* Sign In Button */}
+                  <button
+                    onClick={() => {
+                      playBubblePop(640);
+                      setAuthModalMode('login');
+                      setAuthModalReason('manual');
+                      setShowAuthModal(true);
+                    }}
+                    className="glass-orb orb-champagne px-2 py-1 sm:px-3 sm:py-1.5 text-[10.5px] sm:text-xs font-black text-zinc-800 flex items-center gap-1 active:scale-95 transition-transform"
+                    title="Sign In or Register"
+                  >
+                    <User className="w-3.5 h-3.5 shrink-0" />
+                    <span className="hidden sm:inline">Sign In</span>
+                  </button>
+                </div>
+              )}
+
               {/* API Modal Button */}
               <button 
                 onClick={() => {
                   playBubblePop(690);
                   setShowApiModal(true);
                 }} 
-                className="glass-orb orb-amber w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center text-zinc-950 active:scale-95 transition-transform"
-                title="API Hub & Documentation"
+                className="glass-orb orb-amber w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center text-zinc-950 active:scale-95 transition-transform relative"
+                title={currentUser ? "API Hub & Documentation" : "API Hub (Unlock with Free Account)"}
               >
                 <Code className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                {!currentUser && (
+                  <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-rose-500 text-white flex items-center justify-center text-[7px] font-black shadow-sm">
+                    <Lock className="w-2 h-2" />
+                  </span>
+                )}
               </button>
 
               {/* Join Channel Button */}
@@ -2201,8 +2353,70 @@ create policy "Allow public delete access" on public.urls for delete using (true
               </button>
             </div>
 
-            {/* Navigation Tabs */}
-            <div className="flex liquid-glass-input p-1 rounded-full mb-4 shrink-0 gap-1.5">
+            {!currentUser ? (
+              <div className="py-6 sm:py-8 px-2 sm:px-6 flex flex-col items-center text-center space-y-4">
+                <div className="relative">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-amber-500 via-rose-500 to-indigo-600 flex items-center justify-center text-white shadow-xl animate-pulse">
+                    <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                  </div>
+                  <span className="glass-orb orb-green w-7 h-7 text-white absolute -bottom-1 -right-1 shadow-md flex items-center justify-center text-[10px] font-black">
+                    VIP
+                  </span>
+                </div>
+
+                <div className="max-w-md space-y-1.5">
+                  <h4 className="text-xl sm:text-2xl font-black text-zinc-900 tracking-tight">
+                    Developer API &amp; Bot Hub is Gated
+                  </h4>
+                  <p className="text-xs sm:text-sm text-zinc-600 font-medium leading-relaxed">
+                    Access to our HTTP endpoints, bot SDKs, and code generators is reserved for registered members. Create a free account in 5 seconds to unlock everything!
+                  </p>
+                </div>
+
+                <div className="w-full max-w-md bg-white/70 backdrop-blur-sm border border-white/90 rounded-2xl p-4 text-left space-y-2 text-xs text-zinc-700 shadow-sm">
+                  <div className="flex items-center gap-2 font-bold text-zinc-900">
+                    <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                    <span>Unlocked with Free Account:</span>
+                  </div>
+                  <ul className="space-y-1.5 pl-6 list-disc text-[11px] text-zinc-600">
+                    <li><strong className="text-zinc-800">Unlimited Link Creations</strong> (Bypasses guest 5-try limit)</li>
+                    <li><strong className="text-zinc-800">Direct HTTP Endpoints</strong> (<code className="text-indigo-600">POST /api/shorten</code> &amp; GET Telemetry)</li>
+                    <li><strong className="text-zinc-800">Telegram Bot SDK</strong> ready-to-run templates for Node.js and Python</li>
+                    <li><strong className="text-zinc-800">Standalone Client Widget</strong> HTML downloader (<code className="text-indigo-600">index.html</code>)</li>
+                  </ul>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full max-w-md pt-2">
+                  <button
+                    onClick={() => {
+                      playBubblePop(660);
+                      setAuthModalMode('register');
+                      setAuthModalReason('api');
+                      setShowAuthModal(true);
+                    }}
+                    className="w-full sm:flex-1 py-3.5 px-4 rounded-xl font-black text-xs uppercase tracking-wider text-white glass-orb orb-blue shadow-xl active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    <span>Create Free Account</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      playBubblePop(550);
+                      setAuthModalMode('login');
+                      setAuthModalReason('api');
+                      setShowAuthModal(true);
+                    }}
+                    className="w-full sm:flex-1 py-3.5 px-4 rounded-xl font-black text-xs uppercase tracking-wider text-zinc-900 glass-orb orb-champagne active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>Sign In</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Navigation Tabs */}
+                <div className="flex liquid-glass-input p-1 rounded-full mb-4 shrink-0 gap-1.5">
               <button 
                 onClick={() => {
                   playBubblePop(520);
@@ -3155,9 +3369,23 @@ except Exception as error:
                 </>
               );
             })()}
+              </>
+            )}
           </div>
         </div>
       )}
+
+      {/* 3D Liquid Glass User Auth & Quota Modal */}
+      <UserAuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={(user) => {
+          setCurrentUser(user);
+          setShowAuthModal(false);
+        }}
+        mode={authModalMode}
+        reason={authModalReason}
+      />
     </div>
   );
 }

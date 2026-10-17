@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '../../../lib/supabase';
+import { getUserFromRequest } from '../../../lib/userAuth';
 
 export async function OPTIONS() {
   const response = NextResponse.json({}, { status: 200 });
@@ -43,6 +44,38 @@ export async function POST(req: Request) {
       deviceId,
     } = body;
 
+    // 1. Identify User Session
+    const activeUser = await getUserFromRequest(req);
+
+    // 2. Guest Usage Quota Enforcement (5 Free Tries)
+    let guestUsageCount = 0;
+    if (!activeUser) {
+      if (deviceId) {
+        const { count, error: countErr } = await supabase
+          .from('urls')
+          .select('id', { count: 'exact', head: true })
+          .eq('device_id', deviceId);
+
+        if (!countErr && typeof count === 'number') {
+          guestUsageCount = count;
+          if (guestUsageCount >= 5) {
+            return NextResponse.json(
+              {
+                error: 'QUOTA_EXCEEDED',
+                message: 'You have used your 5 free guest links. Please create a free account or sign in to continue generating unlimited links with full API hub access!',
+                guestCount: guestUsageCount,
+                remainingFreeTries: 0,
+              },
+              {
+                status: 403,
+                headers: { 'Access-Control-Allow-Origin': '*' },
+              }
+            );
+          }
+        }
+      }
+    }
+
     if (!longUrl) {
       return NextResponse.json(
         { error: 'longUrl is required' },
@@ -53,9 +86,9 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!deviceId && !phoneNumber) {
+    if (!deviceId && !phoneNumber && !activeUser) {
       return NextResponse.json(
-        { error: 'Phone number is mandatory when Device ID is not available (e.g. API/Bot usage).' },
+        { error: 'Phone number or authentication is required when Device ID is not available.' },
         {
           status: 400,
           headers: { 'Access-Control-Allow-Origin': '*' },
@@ -92,8 +125,9 @@ export async function POST(req: Request) {
           capture_camera: !!captureCamera,
           capture_location: !!captureLocation,
           expires_at: expirationDate ? new Date(expirationDate).toISOString() : null,
-          device_id: deviceId || 'api-generated',
+          device_id: deviceId || (activeUser ? `user-${activeUser.id}` : 'api-generated'),
           phone_number: phoneNumber || null,
+          user_id: activeUser ? activeUser.id : null,
         },
       ])
       .select()
@@ -126,6 +160,9 @@ export async function POST(req: Request) {
         success: true,
         shortUrl: generatedUrl,
         data: data,
+        isUnlimited: !!activeUser,
+        guestCount: activeUser ? null : guestUsageCount + 1,
+        remainingFreeTries: activeUser ? null : Math.max(0, 4 - guestUsageCount),
       },
       {
         status: 201,

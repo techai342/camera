@@ -8,8 +8,7 @@ import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { generateShortCode, cn } from '../lib/utils';
 import { _0xIntegrity } from '../core/engine';
-import { SaqibSignature } from '../components/SaqibSignature';
-import { Link2, Copy, Check, Sparkles, Settings2, Database, AlertCircle, Trash2, Lock, Edit2, X, Download, QrCode, BarChart3, Clock, Smartphone, Monitor, Globe, ArrowUpRight, ExternalLink, ChevronDown, Plus, History, Camera, ArrowRight, RefreshCw, MapPin, Code, Volume2, VolumeX, MessageCircle, LogOut, UserCheck, User, Ticket } from 'lucide-react';
+import { Link2, Copy, Check, Sparkles, Settings2, Database, AlertCircle, Trash2, Lock, Edit2, X, Download, QrCode, BarChart3, Clock, Smartphone, Monitor, Globe, ArrowUpRight, ExternalLink, ChevronDown, Plus, History, Camera, ArrowRight, RefreshCw, MapPin, Code, Volume2, VolumeX, MessageCircle, LogOut, UserCheck, User, Ticket, Menu, SlidersHorizontal } from 'lucide-react';
 import { SocialIcon } from '../components/SocialIcon';
 import { SiWhatsapp } from 'react-icons/si';
 import { playBubblePop, toggleSound, isSoundEnabled } from '../lib/sound';
@@ -149,7 +148,25 @@ export default function Home() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const [mobileTab, setMobileTab] = useState<'create' | 'recent' | 'media' | 'analytics'>('create');
+  const [showMobileQuickMenu, setShowMobileQuickMenu] = useState(false);
+  const mobileQuickMenuRef = React.useRef<HTMLDivElement>(null);
   const resultRef = React.useRef<HTMLDivElement>(null);
+
+  // Close mobile quick menu when clicking/tapping outside
+  useEffect(() => {
+    if (!showMobileQuickMenu) return;
+    const handleOutsideClick = (e: MouseEvent | TouchEvent) => {
+      if (mobileQuickMenuRef.current && !mobileQuickMenuRef.current.contains(e.target as Node)) {
+        setShowMobileQuickMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    document.addEventListener('touchstart', handleOutsideClick);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('touchstart', handleOutsideClick);
+    };
+  }, [showMobileQuickMenu]);
 
   // Dynamic Site Branding from Supabase Admin Settings (cached for instant load)
   const [siteBranding, setSiteBranding] = useState<{
@@ -1135,20 +1152,20 @@ create policy "Allow public delete access" on public.urls for delete using (true
         {/* ==================== RIGHT MAIN CONTENT AREA ==================== */}
         <main className="flex-1 flex flex-col gap-3.5 sm:gap-5 min-w-0 w-full max-w-full">
 
-          {/* 1. TOP 3D LIQUID GLASS HEADER BAR */}
-          <header className="liquid-glass-box rounded-2xl sm:rounded-full px-2 sm:px-5 py-1.5 sm:py-2.5 flex items-center justify-between gap-1 sm:gap-3 shadow-md w-full min-w-0">
+          {/* 1. TOP 3D LIQUID GLASS HEADER BAR (Fixed / Sticky on Mobile & Desktop) */}
+          <header className="liquid-glass-box sticky top-1 sm:top-2.5 z-40 rounded-2xl sm:rounded-full px-2.5 sm:px-5 py-2 sm:py-2.5 flex items-center justify-between gap-1.5 sm:gap-3 shadow-md w-full min-w-0 backdrop-blur-xl bg-white/90 relative">
             <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 shrink">
               {/* Mini Avatar Lens for Mobile View (Desktop has full sidebar) */}
               <div 
                 onClick={() => playBubblePop(560)}
-                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full saqib-avatar-crop border-2 border-white ring-2 ring-white/70 shadow-sm shrink-0 lg:hidden cursor-pointer active:scale-90 transition-transform overflow-hidden bg-slate-900/10"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full saqib-avatar-crop border-2 border-white ring-2 ring-white/70 shadow-sm shrink-0 lg:hidden cursor-pointer active:scale-90 transition-transform overflow-hidden bg-slate-900/10 relative"
                 title={`${siteBranding.displayName} — ${siteBranding.brandName}`}
               >
                 <img 
                   src={siteBranding.avatarUrl} 
                   alt={siteBranding.displayName}
-                  width={32}
-                  height={32}
+                  width={36}
+                  height={36}
                   className="w-full h-full object-cover object-[50%_18%]"
                   loading="eager"
                   decoding="async"
@@ -1163,7 +1180,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                     <span 
                       key={idx}
                       className={cn(
-                        "cartoon-letter text-[16px] sm:text-[26px]",
+                        "cartoon-letter text-[17px] xs:text-[19px] sm:text-[26px]",
                         colors[idx % colors.length],
                         rotations[idx % rotations.length],
                         idx > 0 && "-ml-0.5"
@@ -1187,14 +1204,15 @@ create policy "Allow public delete access" on public.urls for delete using (true
               </div>
             </div>
 
-            <div className="flex items-center gap-1 sm:gap-2 shrink-0 z-10">
+            {/* --- DESKTOP ACTION BUTTONS (MD+) --- */}
+            <div className="hidden md:flex items-center gap-1.5 sm:gap-2 shrink-0 z-10">
               {/* Sound Toggle Bubble Orb */}
               <button 
                 onClick={() => {
                   const state = toggleSound();
                   setSoundOn(state);
                 }} 
-                className={cn("glass-orb w-7 h-7 sm:w-9 sm:h-9 text-xs transition-transform active:scale-90 shrink-0", soundOn ? "orb-clear" : "orb-champagne opacity-70")}
+                className={cn("glass-orb w-8 h-8 sm:w-9 sm:h-9 text-xs transition-transform active:scale-90 shrink-0", soundOn ? "orb-clear" : "orb-champagne opacity-70")}
                 title={soundOn ? "Mute Tactile Bubble Audio" : "Enable Tactile Bubble Audio"}
               >
                 {soundOn ? <Volume2 className="w-3.5 h-3.5 text-zinc-900" /> : <VolumeX className="w-3.5 h-3.5 text-zinc-500" />}
@@ -1206,7 +1224,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                   playBubblePop(660);
                   setShowSyncModal(true);
                 }} 
-                className="glass-orb orb-champagne w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center text-zinc-900 active:scale-95 transition-transform shrink-0"
+                className="glass-orb orb-champagne w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-zinc-900 active:scale-95 transition-transform shrink-0"
                 title={phoneNumber ? `Synced: ${phoneNumber}` : "Sync Device Identity"}
               >
                 <Smartphone className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -1219,13 +1237,13 @@ create policy "Allow public delete access" on public.urls for delete using (true
                     playBubblePop(680);
                     setShowUserPlanModal(true);
                   }}
-                  className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-3 py-1 rounded-full liquid-glass-input shadow-xs shrink-0 max-w-[125px] xs:max-w-[160px] sm:max-w-none cursor-pointer hover:bg-white/60 active:scale-95 transition-all select-none"
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 rounded-full liquid-glass-input shadow-xs shrink-0 cursor-pointer hover:bg-white/60 active:scale-95 transition-all select-none"
                   title="View Subscription & Redeem Coupons"
                 >
                   <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center text-[9px] sm:text-[10px] font-black shrink-0">
                     {currentUser.username.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-[10px] sm:text-xs font-black text-zinc-900 truncate max-w-[45px] xs:max-w-[70px] sm:max-w-[110px]">
+                  <span className="text-[10px] sm:text-xs font-black text-zinc-900 truncate max-w-[80px] sm:max-w-[110px]">
                     @{currentUser.username}
                   </span>
                   {currentUser.plan === 'premium' ? (
@@ -1253,7 +1271,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                   </button>
                 </div>
               ) : (
-                <div className="flex items-center gap-1 shrink-0">
+                <div className="flex items-center gap-1.5 shrink-0">
                   {/* Guest Quota Badge */}
                   <button
                     onClick={() => {
@@ -1263,7 +1281,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                       setShowAuthModal(true);
                     }}
                     className={cn(
-                      "px-1.5 sm:px-2.5 py-1 rounded-full text-[9.5px] sm:text-[11px] font-black transition-all flex items-center gap-0.5 sm:gap-1 border shadow-xs cursor-pointer active:scale-95 shrink-0",
+                      "px-2 sm:px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-black transition-all flex items-center gap-1 border shadow-xs cursor-pointer active:scale-95 shrink-0",
                       guestTriesUsed >= 5 
                         ? "bg-rose-100 text-rose-800 border-rose-300 animate-pulse" 
                         : "bg-indigo-50 text-indigo-800 border-indigo-200 hover:bg-indigo-100"
@@ -1271,7 +1289,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                     title="Guest limit: 5 free links. Click to unlock unlimited links!"
                   >
                     <Sparkles className="w-3 h-3 text-indigo-600 shrink-0" />
-                    <span>{Math.max(0, 5 - guestTriesUsed)}/5<span className="hidden xs:inline"> Free</span></span>
+                    <span>{Math.max(0, 5 - guestTriesUsed)}/5 Free</span>
                   </button>
 
                   {/* Sign In Button */}
@@ -1282,11 +1300,11 @@ create policy "Allow public delete access" on public.urls for delete using (true
                       setAuthModalReason('manual');
                       setShowAuthModal(true);
                     }}
-                    className="glass-orb orb-champagne px-1.5 py-1 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-black text-zinc-800 flex items-center gap-1 active:scale-95 transition-transform shrink-0"
+                    className="glass-orb orb-champagne px-2 py-1 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-black text-zinc-800 flex items-center gap-1 active:scale-95 transition-transform shrink-0"
                     title="Sign In or Register"
                   >
                     <User className="w-3.5 h-3.5 shrink-0" />
-                    <span className="hidden sm:inline">Sign In</span>
+                    <span>Sign In</span>
                   </button>
                 </div>
               )}
@@ -1303,12 +1321,11 @@ create policy "Allow public delete access" on public.urls for delete using (true
                     setShowAuthModal(true);
                   }
                 }}
-                className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white text-[10px] sm:text-xs font-black shadow-md flex items-center gap-1 active:scale-95 transition-all cursor-pointer shrink-0"
+                className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white text-[10.5px] sm:text-xs font-black shadow-md flex items-center gap-1 active:scale-95 transition-all cursor-pointer shrink-0"
                 title="Redeem Promo / Coupon Code"
               >
                 <Ticket className="w-3.5 h-3.5 shrink-0" />
-                <span className="hidden xs:inline">🎟️ Coupon</span>
-                <span className="xs:hidden">🎟️</span>
+                <span>🎟️ Coupon</span>
               </button>
 
               {/* API Modal Button */}
@@ -1317,7 +1334,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                   playBubblePop(690);
                   setShowApiModal(true);
                 }} 
-                className="glass-orb orb-amber w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center text-zinc-950 active:scale-95 transition-transform relative shrink-0"
+                className="glass-orb orb-amber w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-zinc-950 active:scale-95 transition-transform relative shrink-0"
                 title={currentUser ? "API Hub & Documentation" : "API Hub (Unlock with Free Account)"}
               >
                 <Code className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -1331,12 +1348,11 @@ create policy "Allow public delete access" on public.urls for delete using (true
               {/* Direct HTML Download Button */}
               <button
                 onClick={handleDirectDownloadHtml}
-                className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-700 hover:to-teal-700 text-white text-[10px] sm:text-xs font-black shadow-md flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer shrink-0"
+                className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-700 hover:to-teal-700 text-white text-[10.5px] sm:text-xs font-black shadow-md flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer shrink-0"
                 title="1-Click Instant Direct Download standalone index.html"
               >
                 <Download className="w-3.5 h-3.5 shrink-0" />
-                <span className="hidden sm:inline">Direct HTML</span>
-                <span className="sm:hidden font-bold">HTML</span>
+                <span>Direct HTML</span>
               </button>
 
               {/* Join Channel Button */}
@@ -1345,13 +1361,211 @@ create policy "Allow public delete access" on public.urls for delete using (true
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => playBubblePop(720)}
-                className="glass-orb orb-green w-7 h-7 sm:w-auto px-1.5 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-black flex items-center justify-center gap-1.5 text-white active:scale-95 transition-transform shrink-0 shadow-md hidden xs:flex"
+                className="glass-orb orb-green px-2.5 sm:px-3 py-1 sm:py-1.5 text-[10.5px] sm:text-xs font-black flex items-center justify-center gap-1.5 text-white active:scale-95 transition-transform shrink-0 shadow-md"
                 title="Join WhatsApp Channel"
               >
                 <SiWhatsapp className="w-3.5 h-3.5 shrink-0" />
-                <span className="hidden sm:inline">Channel</span>
+                <span>Channel</span>
               </a>
             </div>
+
+            {/* --- MOBILE ACTION BAR (< MD) - ULTRA SLEEK, SPACIOUS & ZERO CLUTTER --- */}
+            <div className="flex md:hidden items-center gap-1.5 shrink-0 z-10">
+              {/* User Profile / Quota Badge on Mobile */}
+              {currentUser ? (
+                <button
+                  onClick={() => {
+                    playBubblePop(680);
+                    setShowUserPlanModal(true);
+                  }}
+                  className="flex items-center gap-1 px-2 py-1 rounded-full liquid-glass-input shadow-xs active:scale-95 transition-all text-left max-w-[115px] select-none"
+                  title="Manage Subscription & Coupons"
+                >
+                  <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center text-[9px] font-black shrink-0">
+                    {currentUser.username.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="text-[10px] font-black text-zinc-900 truncate">
+                    @{currentUser.username}
+                  </span>
+                  {currentUser.plan === 'premium' ? (
+                    <span className="px-1 py-0.2 rounded-full bg-amber-400 text-amber-950 text-[8px] font-black shrink-0 shadow-xs">
+                      👑
+                    </span>
+                  ) : currentUser.plan === 'pro' ? (
+                    <span className="px-1 py-0.2 rounded-full bg-cyan-400 text-cyan-950 text-[8px] font-black shrink-0 shadow-xs">
+                      💎
+                    </span>
+                  ) : (
+                    <span className="px-1 py-0.2 rounded-full bg-emerald-100 text-emerald-900 text-[8px] font-black shrink-0">
+                      Free
+                    </span>
+                  )}
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    playBubblePop(640);
+                    setAuthModalMode('login');
+                    setAuthModalReason('manual');
+                    setShowAuthModal(true);
+                  }}
+                  className="flex items-center gap-1 px-2 py-1 rounded-full liquid-glass-input shadow-xs active:scale-95 transition-all text-left select-none"
+                  title="Sign In or Register"
+                >
+                  <Sparkles className="w-3 h-3 text-indigo-600 shrink-0" />
+                  <span className="text-[10px] font-black text-indigo-950">
+                    {Math.max(0, 5 - guestTriesUsed)}/5 Free
+                  </span>
+                </button>
+              )}
+
+              {/* Direct HTML Download Button on Mobile */}
+              <button
+                onClick={handleDirectDownloadHtml}
+                className="px-2.5 py-1 rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 active:scale-95 text-white text-[10px] font-black shadow-sm flex items-center gap-1 transition-all cursor-pointer shrink-0"
+                title="1-Click Direct Download HTML"
+              >
+                <Download className="w-3 h-3 shrink-0" />
+                <span>HTML</span>
+              </button>
+
+              {/* Mobile Quick Menu Toggle Button */}
+              <button
+                onClick={() => {
+                  playBubblePop(580);
+                  setShowMobileQuickMenu(!showMobileQuickMenu);
+                }}
+                className={cn(
+                  "glass-orb w-8 h-8 flex items-center justify-center transition-all active:scale-90 shrink-0 shadow-xs",
+                  showMobileQuickMenu 
+                    ? "orb-blue text-white ring-2 ring-blue-400/80" 
+                    : "orb-champagne text-zinc-900"
+                )}
+                title={showMobileQuickMenu ? "Close Menu" : "Quick Actions Menu"}
+                aria-label="Toggle Quick Navigation Menu"
+              >
+                {showMobileQuickMenu ? (
+                  <X className="w-4 h-4 stroke-[2.4]" />
+                ) : (
+                  <Menu className="w-4 h-4 stroke-[2.4]" />
+                )}
+              </button>
+            </div>
+
+            {/* --- FLOATING MOBILE QUICK MENU DROPDOWN (< MD) --- */}
+            {showMobileQuickMenu && (
+              <div 
+                ref={mobileQuickMenuRef}
+                className="md:hidden absolute top-[calc(100%+8px)] left-0 right-0 p-3 rounded-2xl liquid-glass-box shadow-2xl backdrop-blur-2xl bg-white/95 border-2 border-white/95 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+              >
+                <div className="grid grid-cols-2 gap-2 text-xs font-black">
+                  {/* Sound Toggle */}
+                  <button
+                    onClick={() => {
+                      const state = toggleSound();
+                      setSoundOn(state);
+                    }}
+                    className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 active:scale-95 transition-all text-left text-zinc-800"
+                  >
+                    <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0", soundOn ? "bg-emerald-500 text-white" : "bg-slate-200 text-slate-500")}>
+                      {soundOn ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-extrabold text-[11px]">Audio</div>
+                      <div className="text-[9.5px] text-zinc-500 font-semibold">{soundOn ? "Sound On" : "Muted"}</div>
+                    </div>
+                  </button>
+
+                  {/* Sync Device */}
+                  <button
+                    onClick={() => {
+                      playBubblePop(660);
+                      setShowMobileQuickMenu(false);
+                      setShowSyncModal(true);
+                    }}
+                    className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 active:scale-95 transition-all text-left text-zinc-800"
+                  >
+                    <div className="w-7 h-7 rounded-lg bg-indigo-500 text-white flex items-center justify-center shrink-0">
+                      <Smartphone className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-extrabold text-[11px]">Sync Phone</div>
+                      <div className="text-[9.5px] text-zinc-500 font-semibold truncate">{phoneNumber ? phoneNumber : "Set ID"}</div>
+                    </div>
+                  </button>
+
+                  {/* Redeem Coupon */}
+                  <button
+                    onClick={() => {
+                      playBubblePop(660);
+                      setShowMobileQuickMenu(false);
+                      if (currentUser) {
+                        setShowUserPlanModal(true);
+                      } else {
+                        setAuthModalMode('login');
+                        setAuthModalReason('manual');
+                        setShowAuthModal(true);
+                      }
+                    }}
+                    className="flex items-center gap-2 p-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200/80 active:scale-95 transition-all text-left text-amber-950"
+                  >
+                    <div className="w-7 h-7 rounded-lg bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                      <Ticket className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-extrabold text-[11px]">Coupons</div>
+                      <div className="text-[9.5px] text-amber-700 font-semibold">Redeem Promo</div>
+                    </div>
+                  </button>
+
+                  {/* Developer API Hub */}
+                  <button
+                    onClick={() => {
+                      playBubblePop(690);
+                      setShowMobileQuickMenu(false);
+                      setShowApiModal(true);
+                    }}
+                    className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 active:scale-95 transition-all text-left text-zinc-800"
+                  >
+                    <div className="w-7 h-7 rounded-lg bg-violet-500 text-white flex items-center justify-center shrink-0">
+                      <Code className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-extrabold text-[11px]">API Hub</div>
+                      <div className="text-[9.5px] text-zinc-500 font-semibold">Bot Docs & SDK</div>
+                    </div>
+                  </button>
+                </div>
+
+                {/* Bottom Action Row: WhatsApp Channel & Logout */}
+                <div className="mt-2.5 pt-2.5 border-t border-slate-200/80 flex items-center justify-between gap-2">
+                  <a
+                    href="https://www.whatsapp.com/channel/0029VbBTSK1EquiWrUt5uV1I"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => playBubblePop(720)}
+                    className="flex-1 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white flex items-center justify-center gap-1.5 text-[11px] font-black shadow-sm transition-all"
+                  >
+                    <SiWhatsapp className="w-3.5 h-3.5 shrink-0" />
+                    <span>Join WhatsApp Channel</span>
+                  </a>
+
+                  {currentUser && (
+                    <button
+                      onClick={() => {
+                        setShowMobileQuickMenu(false);
+                        handleLogout();
+                      }}
+                      className="py-2 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-700 flex items-center justify-center gap-1 text-[11px] font-black border border-rose-200 transition-all shrink-0"
+                      title="Sign Out"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Logout</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
           </header>
 
           {/* 2. DYNAMIC TAB CONTENT */}

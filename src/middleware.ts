@@ -40,8 +40,9 @@ function checkRateLimit(key: string, limit: number, windowMs: number): { allowed
   return { allowed: true, retryAfter: 0 };
 }
 
-// Known malicious vulnerability scanner and scraper signatures
-const BLOCKED_BOT_REGEX = /(sqlmap|nikto|acunetix|masscan|wpscan|dirbuster|nmap|zgrab|morfeus|havij|nessus|scrapy|httrack|wget|python-requests|aiohttp|httpx|go-http-client|urllib|libwww-perl|phantomjs|teleport|webcopy|offline\s*explorer)/i;
+// Known malicious vulnerability scanner, website ripper, and scraper signatures
+const BLOCKED_BOT_REGEX = /(sqlmap|nikto|acunetix|masscan|wpscan|dirbuster|nmap|zgrab|morfeus|havij|nessus|scrapy|httrack|wget|phantomjs|teleport|webcopy|offline\s*explorer|cyotek|site-sucker|web-mirror|email-collector|copier|ripper|page-grabber|ia_archiver)/i;
+const SCRIPT_TOOL_REGEX = /(python-requests|aiohttp|httpx|go-http-client|urllib|libwww-perl|curl)/i;
 
 export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
@@ -51,9 +52,14 @@ export async function middleware(req: NextRequest) {
              '127.0.0.1';
   const userAgent = req.headers.get('user-agent') || '';
 
-  // 1. Attack Signature & Malicious Scanner Shield
+  // 1. Attack Signature & Malicious Scanner / Ripper Shield
   if (BLOCKED_BOT_REGEX.test(userAgent)) {
-    return new NextResponse('Access Denied: Malicious activity detected', { status: 403 });
+    return new NextResponse('Access Denied: Automated ripper or scraper detected', { status: 403 });
+  }
+
+  // Script tools (curl, python) are only allowed on /api/shorten for legitimate bot integrations
+  if (SCRIPT_TOOL_REGEX.test(userAgent) && !pathname.startsWith('/api/shorten')) {
+    return new NextResponse('Access Denied: Direct scraping of pages or internal endpoints is prohibited', { status: 403 });
   }
 
   // Block path traversal and null bytes

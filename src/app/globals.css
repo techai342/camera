@@ -739,3 +739,13 @@ body {
     bottom: calc(env(safe-area-inset-bottom, 0px) + 0.65rem) !important;
   }
 }
+
+/* Anti-Print & Anti-Save-to-PDF Protection */
+@media print {
+  html, body {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+}

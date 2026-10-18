@@ -6,7 +6,7 @@ const nextConfig = {
   output: 'standalone',
   productionBrowserSourceMaps: false,
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
+    removeConsole: process.env.NODE_ENV === 'production' ? true : false,
   },
   experimental: {
     optimizePackageImports: [

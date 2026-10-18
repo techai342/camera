@@ -1,6 +1,5 @@
 import { cookies } from 'next/headers';
 import { verifySessionToken, COOKIE_NAME } from '../../lib/auth';
-import MrAdminClient from './MrAdminClient';
 import MrAdminLogin from './MrAdminLogin';
 
 export const dynamic = 'force-dynamic';
@@ -16,6 +15,7 @@ export default async function MrAdminPage() {
     return <MrAdminLogin />;
   }
 
-  // Once authenticated, serve the full MrAdmin dashboard
+  // Once authenticated, dynamically load and serve the full MrAdmin dashboard
+  const MrAdminClient = (await import('./MrAdminClient')).default;
   return <MrAdminClient />;
 }

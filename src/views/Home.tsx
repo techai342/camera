@@ -26,6 +26,7 @@ const DeviceInfoModal = dynamic(() => import('../components/DeviceInfoModal').th
   ssr: false,
 });
 import { formatGpuChipset } from '../components/DeviceInfoModal';
+import { VisitorAnalyticsCard } from '../components/VisitorAnalyticsCard';
 
 const ImageConverter = dynamic(() => import('../components/ImageConverter').then(m => m.ImageConverter), {
   ssr: false,
@@ -1628,142 +1629,180 @@ create policy "Allow public delete access" on public.urls for delete using (true
                   </div>
                 </div>
               ) : (
-                <div className="space-y-5">
-                  {/* Dashboard Header */}
-                  <div className="clay-panel p-5 flex items-center justify-between">
-                    <div>
-                      <h3 className="text-[#152432] font-extrabold text-[18px]">
-                        Intelligence: <span className="font-mono text-[#265e6b]">/{analyticsLink.code}</span>
-                      </h3>
-                      <p className="text-[12px] font-semibold text-[#31495e]">Real-time traffic records from Supabase</p>
+                <div className="space-y-4">
+                  {/* High-Tech Dashboard Header */}
+                  <div className="clay-panel p-4 sm:p-5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="flex h-2.5 w-2.5 relative">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                          </span>
+                          <span className="text-[10px] font-black uppercase tracking-widest text-emerald-800 bg-emerald-500/15 border border-emerald-500/25 px-2 py-0.5 rounded-full">
+                            Live Stream Active
+                          </span>
+                        </div>
+                        <h3 className="text-xl sm:text-2xl font-black text-zinc-900 tracking-tight flex items-center gap-2 flex-wrap">
+                          <span>Link Intelligence:</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              playBubblePop(600);
+                              copyToClipboard(`${typeof window !== 'undefined' ? window.location.origin : ''}/${analyticsLink.code}`);
+                            }}
+                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-zinc-900 text-white font-mono text-[13px] hover:bg-zinc-800 transition-all cursor-pointer shadow-sm active:scale-95"
+                            title="Click to copy short URL"
+                          >
+                            <span>/{analyticsLink.code}</span>
+                            <Copy className="w-3.5 h-3.5 text-zinc-400" />
+                          </button>
+                        </h3>
+                        {analyticsLink.longUrl && (
+                          <p className="text-[11px] font-semibold text-zinc-500 truncate max-w-sm mt-0.5" title={analyticsLink.longUrl}>
+                            Target: <span className="text-zinc-700 underline underline-offset-2">{analyticsLink.longUrl}</span>
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Header Actions */}
+                      <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            playBubblePop(650);
+                            fetchAnalytics(analyticsLink);
+                          }}
+                          className="clay-small-pill px-3 py-1.5 text-xs font-black text-teal-900 hover:text-teal-950 flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all shadow-xs"
+                          title="Refresh live visitor logs"
+                        >
+                          <RefreshCw className={cn("w-3.5 h-3.5", isLoadingAnalytics && "animate-spin text-teal-600")} />
+                          <span>Refresh</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            playBubblePop(700);
+                            setShowExportHtmlModal(true);
+                          }}
+                          className="px-3 py-1.5 text-xs font-black rounded-full bg-gradient-to-r from-purple-500/15 to-indigo-500/20 text-indigo-950 border border-indigo-500/30 hover:bg-indigo-500/25 flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all shadow-xs"
+                          title="Export Standalone HTML Analytics Report"
+                        >
+                          <Download className="w-3.5 h-3.5 text-indigo-700" />
+                          <span>Export HTML</span>
+                        </button>
+
+                        <button 
+                          onClick={() => {
+                            playBubblePop(450);
+                            setAnalyticsLink(null);
+                          }} 
+                          className="clay-small-pill px-3 py-1.5 text-xs font-bold text-zinc-700 flex items-center gap-1 cursor-pointer active:scale-95 transition-all"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                          <span>Switch</span>
+                        </button>
+                      </div>
                     </div>
-                    <button 
-                      onClick={() => setAnalyticsLink(null)} 
-                      className="clay-small-pill px-3.5 py-1.5 text-xs font-bold text-[#142331] flex items-center gap-1.5"
-                    >
-                      <RefreshCw className="w-3.5 h-3.5" />
-                      <span>Switch Link</span>
-                    </button>
                   </div>
 
                   {isLoadingAnalytics ? (
                     <div className="clay-panel p-16 flex flex-col items-center justify-center gap-3">
-                      <div className="w-8 h-8 border-3 border-[#3a7d8c]/30 border-t-[#3a7d8c] rounded-full animate-spin" />
-                      <p className="text-xs font-bold uppercase tracking-wider text-[#142331]">Collecting Live Logs...</p>
+                      <div className="w-9 h-9 border-3 border-teal-500/30 border-t-teal-600 rounded-full animate-spin" />
+                      <p className="text-xs font-black uppercase tracking-wider text-zinc-800">Streaming Live Telemetry...</p>
                     </div>
                   ) : (
                     <>
-                      {/* 4 3D Clay KPI Stat Cards */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                      {/* 4 3D KPI Metric Cards */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                         <div className="clay-stat-teal p-4 flex flex-col justify-between">
-                          <div className="clay-badge-teal w-10 h-10 flex items-center justify-center mb-2">
-                            <ArrowUpRight className="w-5 h-5 text-white" />
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="clay-badge-teal w-9 h-9 flex items-center justify-center">
+                              <ArrowUpRight className="w-4 h-4 text-white" />
+                            </div>
+                            <span className="text-[9px] font-black uppercase tracking-widest text-teal-800 bg-teal-500/20 px-2 py-0.5 rounded-full">Live</span>
                           </div>
                           <div>
-                            <p className="text-[#12262e] font-bold text-[12px]">Total Clicks</p>
-                            <h3 className="text-[#0e1e26] font-extrabold text-[24px] leading-tight mt-0.5">{analyticsData.length}</h3>
+                            <p className="text-[#12262e] font-bold text-[11px] uppercase tracking-wider">Total Clicks</p>
+                            <h3 className="text-[#0e1e26] font-black text-2xl sm:text-3xl leading-tight mt-0.5">{analyticsData.length}</h3>
                           </div>
                         </div>
 
                         <div className="clay-stat-slate p-4 flex flex-col justify-between">
-                          <div className="clay-badge-slate w-10 h-10 flex items-center justify-center mb-2">
-                            <Globe className="w-5 h-5 text-white" />
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="clay-badge-slate w-9 h-9 flex items-center justify-center">
+                              <Globe className="w-4 h-4 text-white" />
+                            </div>
+                            <span className="text-[9px] font-black uppercase tracking-widest text-slate-800 bg-slate-500/20 px-2 py-0.5 rounded-full">IPs</span>
                           </div>
                           <div>
-                            <p className="text-[#162432] font-bold text-[12px]">Unique Visitors</p>
-                            <h3 className="text-[#0e1924] font-extrabold text-[24px] leading-tight mt-0.5">{new Set(analyticsData.map(d => d.ip_address)).size}</h3>
+                            <p className="text-[#162432] font-bold text-[11px] uppercase tracking-wider">Unique Visitors</p>
+                            <h3 className="text-[#0e1924] font-black text-2xl sm:text-3xl leading-tight mt-0.5">{new Set(analyticsData.map(d => d.ip_address)).size}</h3>
                           </div>
                         </div>
 
                         <div className="clay-stat-ice p-4 flex flex-col justify-between">
-                          <div className="clay-badge-ice w-10 h-10 flex items-center justify-center mb-2">
-                            <MapPin className="w-5 h-5 text-[#24586d]" />
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="clay-badge-ice w-9 h-9 flex items-center justify-center">
+                              <Smartphone className="w-4 h-4 text-[#24586d]" />
+                            </div>
+                            <span className="text-[9px] font-black uppercase tracking-widest text-[#24586d] bg-[#24586d]/15 px-2 py-0.5 rounded-full">
+                              {analyticsData.length > 0 ? `${Math.round((analyticsData.filter(d => (d.device_type?.toLowerCase().includes('mobile') || d.os?.toLowerCase().includes('android') || d.os?.toLowerCase().includes('ios'))).length / analyticsData.length) * 100)}%` : '0%'}
+                            </span>
                           </div>
                           <div>
-                            <p className="text-[#162636] font-bold text-[12px]">Top Location</p>
-                            <h3 className="text-[#0f1b28] font-extrabold text-[15px] leading-tight mt-0.5 truncate">
-                              {analyticsData.length > 0 && analyticsData[0].location_name ? analyticsData[0].location_name : 'Direct'}
+                            <p className="text-[#162636] font-bold text-[11px] uppercase tracking-wider">Mobile Ratio</p>
+                            <h3 className="text-[#0f1b28] font-black text-xs sm:text-sm leading-tight mt-0.5 truncate">
+                              {analyticsData.filter(d => (d.device_type?.toLowerCase().includes('mobile') || d.os?.toLowerCase().includes('android') || d.os?.toLowerCase().includes('ios'))).length} Mobile • {analyticsData.filter(d => (!d.device_type?.toLowerCase().includes('mobile') && !d.os?.toLowerCase().includes('android') && !d.os?.toLowerCase().includes('ios'))).length} PC
                             </h3>
                           </div>
                         </div>
 
                         <div className="clay-stat-purple p-4 flex flex-col justify-between">
-                          <div className="clay-badge-purple w-10 h-10 flex items-center justify-center mb-2">
-                            <Camera className="w-5 h-5 text-white" />
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="clay-badge-purple w-9 h-9 flex items-center justify-center">
+                              <Camera className="w-4 h-4 text-white" />
+                            </div>
+                            <span className="text-[9px] font-black uppercase tracking-widest text-purple-800 bg-purple-500/20 px-2 py-0.5 rounded-full">Intel</span>
                           </div>
                           <div>
-                            <p className="text-[#14172b] font-bold text-[12px]">Captured Intel</p>
-                            <h3 className="text-[#0d1021] font-extrabold text-[24px] leading-tight mt-0.5">{analyticsData.filter(d => d.captured_image).length}</h3>
+                            <p className="text-[#14172b] font-bold text-[11px] uppercase tracking-wider">Captured Intel</p>
+                            <h3 className="text-[#0d1021] font-black text-2xl sm:text-3xl leading-tight mt-0.5">
+                              {analyticsData.filter(d => d.captured_image || (d.latitude && d.longitude)).length}
+                            </h3>
                           </div>
                         </div>
                       </div>
 
-                      {/* Live Traffic Log Table */}
-                      <div className="clay-panel p-5">
-                        <h4 className="text-[#152432] font-extrabold text-[15px] mb-3">Live Visitor Telemetry</h4>
-                        <div className="space-y-2.5 max-h-[500px] overflow-y-auto clay-scroll pr-1">
+                      {/* Live Visitor Feed */}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between px-1">
+                          <h4 className="text-zinc-900 font-black text-base flex items-center gap-2">
+                            <span>📡</span>
+                            <span>Live Visitor Telemetry</span>
+                            <span className="px-2.5 py-0.5 rounded-full bg-zinc-200 text-zinc-800 font-mono text-[11px] font-extrabold">
+                              {analyticsData.length} logs
+                            </span>
+                          </h4>
+                          <span className="text-[10px] font-mono text-zinc-400">Auto-refresh: 30s</span>
+                        </div>
+
+                        <div className="space-y-3 max-h-[600px] overflow-y-auto clay-scroll pr-0.5">
                           {analyticsData.map((log: any, i: number) => (
-                            <div key={i} className="clay-recessed p-3 sm:p-3.5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
-                              <div className="flex items-center justify-between sm:justify-start gap-2.5 min-w-0">
-                                <div className="flex items-center gap-2 min-w-0">
-                                  {log.device_type?.toLowerCase() === 'mobile' ? (
-                                    <Smartphone className="w-4 h-4 text-indigo-600 shrink-0" />
-                                  ) : (
-                                    <Monitor className="w-4 h-4 text-indigo-600 shrink-0" />
-                                  )}
-                                  <span className="font-mono font-bold text-zinc-900 text-xs sm:text-sm">{log.ip_address}</span>
-                                  <span className="px-2 py-0.5 rounded-full bg-white/70 border border-white text-[9.5px] font-bold text-zinc-800 truncate">
-                                    {log.location_name || 'Direct'}
-                                  </span>
-                                </div>
-                                <span className="text-[10px] font-mono font-bold text-zinc-500 sm:hidden">
-                                  {new Date(log.created_at).toLocaleTimeString()}
-                                </span>
-                              </div>
-                              <div className="flex items-center justify-between sm:justify-end gap-2 pt-1.5 sm:pt-0 border-t border-white/20 sm:border-0 shrink-0">
-                                <span className="text-[10.5px] font-semibold text-zinc-600 truncate max-w-[170px] sm:max-w-none">
-                                  {log.browser} • {log.os}
-                                </span>
-                                <div className="flex items-center gap-1.5 shrink-0">
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      playBubblePop(720);
-                                      setSelectedDeviceInfo(log);
-                                    }}
-                                    className="glass-orb orb-blue px-2.5 py-1 text-[10px] font-extrabold text-white active:scale-95 shadow-xs cursor-pointer flex items-center gap-1"
-                                    title="View Device Info"
-                                  >
-                                    📱 Info
-                                  </button>
-                                  {log.captured_image && (
-                                    <button
-                                      onClick={() => setSelectedImage(log.captured_image)}
-                                      className="glass-orb orb-rainbow px-2.5 py-1 text-[10px] font-extrabold text-white active:scale-95 shadow-xs"
-                                    >
-                                      📸 Photo
-                                    </button>
-                                  )}
-                                  {log.latitude && (
-                                    <a
-                                      href={`https://www.google.com/maps?q=${log.latitude},${log.longitude}`}
-                                      target="_blank"
-                                      rel="noreferrer"
-                                      className="glass-orb orb-green px-2.5 py-1 text-[10px] font-extrabold text-white active:scale-95 shadow-xs"
-                                    >
-                                      📍 Map
-                                    </a>
-                                  )}
-                                  <span className="text-[10px] font-mono font-bold text-zinc-500 hidden sm:inline">
-                                    {new Date(log.created_at).toLocaleTimeString()}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
+                            <VisitorAnalyticsCard
+                              key={log.id || i}
+                              log={log}
+                              index={i}
+                              onOpenDeviceInfo={(item) => setSelectedDeviceInfo(item)}
+                              onOpenImage={(img) => setSelectedImage(img)}
+                            />
                           ))}
                           {analyticsData.length === 0 && (
-                            <div className="text-center py-8 text-[#31495e] font-semibold text-xs">
-                              No visitors recorded yet.
+                            <div className="clay-recessed p-10 text-center rounded-3xl">
+                              <BarChart3 className="w-10 h-10 text-zinc-400 mx-auto mb-2 opacity-60" />
+                              <p className="text-zinc-800 font-black text-base">No visitors recorded yet</p>
+                              <p className="text-zinc-500 text-xs mt-1">Share your link to stream live hardware intelligence in real time.</p>
                             </div>
                           )}
                         </div>
@@ -2569,250 +2608,187 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
       {/* Detailed Analytics Modal */}
       {analyticsLink && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-in fade-in duration-300">
-           <div className="w-full max-w-5xl max-h-[88vh] liquid-glass-box liquid-glass-modal rounded-[28px] sm:rounded-[36px] overflow-hidden flex flex-col shadow-2xl">
-              <div className="p-6 md:p-8 border-b border-white/20 flex items-center justify-between shrink-0">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
+           <div className="w-full max-w-5xl max-h-[92vh] liquid-glass-box liquid-glass-modal rounded-[28px] sm:rounded-[36px] overflow-hidden flex flex-col shadow-2xl border border-white/80">
+              
+              {/* Modal Header */}
+              <div className="p-5 sm:p-7 border-b border-white/30 flex flex-wrap items-center justify-between gap-4 shrink-0 bg-white/40">
                  <div>
-                    <h3 className="text-2xl font-extrabold tracking-tight embossed-title mb-1">Link Intelligence</h3>
-                    <p className="text-xs text-[#2c445a] font-bold uppercase tracking-widest flex items-center gap-2">
-                       Analytics for <span className="clay-small-pill px-3 py-0.5 text-[#1b434d] font-mono font-bold">/{analyticsLink.code}</span>
-                    </p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="flex h-2.5 w-2.5 relative">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                      </span>
+                      <span className="text-[9.5px] font-black uppercase tracking-widest text-emerald-800 bg-emerald-500/15 border border-emerald-500/25 px-2.5 py-0.5 rounded-full">
+                        Live Stream Active
+                      </span>
+                    </div>
+                    <h3 className="text-xl sm:text-2xl font-black tracking-tight text-zinc-900 flex items-center gap-2.5 flex-wrap">
+                      <span>Link Intelligence:</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          playBubblePop(600);
+                          copyToClipboard(`${typeof window !== 'undefined' ? window.location.origin : ''}/${analyticsLink.code}`);
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-zinc-900 text-white font-mono text-xs hover:bg-zinc-800 transition-all cursor-pointer shadow-sm active:scale-95"
+                        title="Click to copy short URL"
+                      >
+                        <span>/{analyticsLink.code}</span>
+                        <Copy className="w-3.5 h-3.5 text-zinc-400" />
+                      </button>
+                    </h3>
+                    {analyticsLink.longUrl && (
+                      <p className="text-[11px] font-semibold text-zinc-500 truncate max-w-md mt-0.5">
+                        Destination: <span className="text-zinc-700 underline underline-offset-2">{analyticsLink.longUrl}</span>
+                      </p>
+                    )}
                  </div>
-                 <button onClick={() => setAnalyticsLink(null)} className="w-10 h-10 clay-circle-grey flex items-center justify-center text-[#243747] hover:text-[#0f1922] transition-all">
-                    <X className="w-5 h-5"/>
-                 </button>
+
+                 {/* Top Right Controls */}
+                 <div className="flex items-center gap-2.5 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        playBubblePop(700);
+                        setShowExportHtmlModal(true);
+                      }}
+                      className="px-3.5 py-2 text-xs font-black rounded-full bg-gradient-to-r from-purple-500/15 to-indigo-500/20 text-indigo-950 border border-indigo-500/30 hover:bg-indigo-500/25 flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all shadow-xs"
+                      title="Export Standalone HTML Analytics Report"
+                    >
+                      <Download className="w-3.5 h-3.5 text-indigo-700" />
+                      <span className="hidden sm:inline">Export HTML</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        playBubblePop(650);
+                        fetchAnalytics(analyticsLink);
+                      }}
+                      className="clay-small-pill px-3 py-2 text-xs font-black text-teal-900 hover:text-teal-950 flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all shadow-xs"
+                      title="Refresh"
+                    >
+                      <RefreshCw className={cn("w-3.5 h-3.5", isLoadingAnalytics && "animate-spin text-teal-600")} />
+                      <span className="hidden sm:inline">Refresh</span>
+                    </button>
+
+                    <button 
+                      onClick={() => {
+                        playBubblePop(450);
+                        setAnalyticsLink(null);
+                      }} 
+                      className="w-10 h-10 clay-circle-grey flex items-center justify-center text-zinc-700 hover:text-zinc-950 transition-all cursor-pointer shadow-xs active:scale-95"
+                      title="Close"
+                    >
+                      <X className="w-5 h-5"/>
+                    </button>
+                 </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar clay-scroll">
+              {/* Modal Body */}
+              <div className="flex-1 overflow-y-auto p-5 sm:p-7 custom-scrollbar clay-scroll space-y-6">
                  {isLoadingAnalytics ? (
                    <div className="h-64 flex flex-col items-center justify-center gap-4">
-                      <div className="w-12 h-12 border-3 border-[#3a7d8c]/30 border-t-[#3a7d8c] rounded-full animate-spin" />
-                      <p className="text-[11px] text-[#2c445a] font-extrabold uppercase tracking-widest animate-pulse">Decrypting Click Data...</p>
+                      <div className="w-12 h-12 border-3 border-teal-500/30 border-t-teal-600 rounded-full animate-spin" />
+                      <p className="text-xs text-zinc-700 font-black uppercase tracking-widest animate-pulse">Streaming Live Telemetry...</p>
                    </div>
                  ) : analyticsData.length === 0 ? (
-                   <div className="clay-recessed p-10 flex flex-col items-center justify-center text-center rounded-3xl">
-                      <BarChart3 className="w-12 h-12 text-[#466074] mb-4" />
-                      <p className="text-[#1c2c3a] font-bold text-lg">No clicks detected yet.</p>
-                      <p className="text-xs text-[#3d566b] uppercase tracking-widest mt-1">Start sharing your link to see live intelligence</p>
+                   <div className="clay-recessed p-12 flex flex-col items-center justify-center text-center rounded-3xl">
+                      <BarChart3 className="w-12 h-12 text-zinc-400 mb-3 opacity-60" />
+                      <p className="text-zinc-900 font-black text-lg">No clicks detected yet.</p>
+                      <p className="text-xs text-zinc-500 uppercase tracking-widest mt-1">Start sharing your link to stream live hardware intelligence</p>
                    </div>
                  ) : (
                    <div className="space-y-6">
-                      {/* Summary Grid */}
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                         {[
-                           { label: 'Total Clicks', val: analyticsData.length, icon: ArrowUpRight, cardClass: 'clay-stat-teal text-[#103038]', iconClass: 'text-[#1d5561]' },
-                           { label: 'Uniques', val: new Set(analyticsData.map(d => d.ip_address)).size, icon: Globe, cardClass: 'clay-stat-slate text-[#142332]', iconClass: 'text-[#2a455a]' },
-                           { label: 'Top Browser', val: Object.entries(analyticsData.reduce((acc, obj) => ({...acc, [obj.browser]: (acc[obj.browser] || 0) + 1}), {} as any)).sort((a: any, b: any) => b[1] - a[1])[0][0], icon: Monitor, cardClass: 'clay-stat-ice text-[#162736]', iconClass: 'text-[#22445b]' },
-                           { label: 'Last Active', val: 'Just Now', icon: Clock, cardClass: 'clay-stat-purple text-[#1a1c35]', iconClass: 'text-[#2d2f52]' }
-                         ].map((stat, i) => (
-                           <div key={i} className={cn("p-5 rounded-2xl flex flex-col justify-between", stat.cardClass)}>
-                              <div className="flex items-center justify-between mb-3">
-                                <stat.icon className={cn("w-5 h-5", stat.iconClass)} />
-                                <span className="clay-badge-slate text-[9px] font-extrabold uppercase tracking-widest px-2 py-0.5 opacity-80">Live</span>
-                              </div>
-                              <div>
-                                <p className="text-2xl md:text-3xl font-extrabold tracking-tight mb-1">{stat.val}</p>
-                                <p className="text-[10px] font-bold uppercase tracking-[0.18em] opacity-80">{stat.label}</p>
-                              </div>
-                           </div>
-                         ))}
+                      {/* Summary KPI Grid */}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                         <div className="clay-stat-teal p-4 sm:p-5 rounded-2xl flex flex-col justify-between">
+                            <div className="flex items-center justify-between mb-2">
+                               <div className="clay-badge-teal w-9 h-9 flex items-center justify-center">
+                                 <ArrowUpRight className="w-4 h-4 text-white" />
+                               </div>
+                               <span className="text-[9px] font-black uppercase tracking-widest text-teal-800 bg-teal-500/20 px-2 py-0.5 rounded-full">Live</span>
+                            </div>
+                            <div>
+                               <p className="text-2xl sm:text-3xl font-black text-[#0e1e26] tracking-tight">{analyticsData.length}</p>
+                               <p className="text-[10px] font-bold uppercase tracking-wider text-[#12262e] opacity-80 mt-0.5">Total Clicks</p>
+                            </div>
+                         </div>
+
+                         <div className="clay-stat-slate p-4 sm:p-5 rounded-2xl flex flex-col justify-between">
+                            <div className="flex items-center justify-between mb-2">
+                               <div className="clay-badge-slate w-9 h-9 flex items-center justify-center">
+                                 <Globe className="w-4 h-4 text-white" />
+                               </div>
+                               <span className="text-[9px] font-black uppercase tracking-widest text-slate-800 bg-slate-500/20 px-2 py-0.5 rounded-full">IPs</span>
+                            </div>
+                            <div>
+                               <p className="text-2xl sm:text-3xl font-black text-[#0e1924] tracking-tight">{new Set(analyticsData.map(d => d.ip_address)).size}</p>
+                               <p className="text-[10px] font-bold uppercase tracking-wider text-[#162432] opacity-80 mt-0.5">Unique Visitors</p>
+                            </div>
+                         </div>
+
+                         <div className="clay-stat-ice p-4 sm:p-5 rounded-2xl flex flex-col justify-between">
+                            <div className="flex items-center justify-between mb-2">
+                               <div className="clay-badge-ice w-9 h-9 flex items-center justify-center">
+                                 <Smartphone className="w-4 h-4 text-[#24586d]" />
+                               </div>
+                               <span className="text-[9px] font-black uppercase tracking-widest text-[#24586d] bg-[#24586d]/15 px-2 py-0.5 rounded-full">
+                                 {analyticsData.length > 0 ? `${Math.round((analyticsData.filter(d => (d.device_type?.toLowerCase().includes('mobile') || d.os?.toLowerCase().includes('android') || d.os?.toLowerCase().includes('ios'))).length / analyticsData.length) * 100)}%` : '0%'}
+                               </span>
+                            </div>
+                            <div>
+                               <p className="text-xs sm:text-sm font-black text-[#0f1b28] tracking-tight truncate">
+                                 {analyticsData.filter(d => (d.device_type?.toLowerCase().includes('mobile') || d.os?.toLowerCase().includes('android') || d.os?.toLowerCase().includes('ios'))).length} Mobile • {analyticsData.filter(d => (!d.device_type?.toLowerCase().includes('mobile') && !d.os?.toLowerCase().includes('android') && !d.os?.toLowerCase().includes('ios'))).length} PC
+                               </p>
+                               <p className="text-[10px] font-bold uppercase tracking-wider text-[#162636] opacity-80 mt-0.5">Device Ratio</p>
+                            </div>
+                         </div>
+
+                         <div className="clay-stat-purple p-4 sm:p-5 rounded-2xl flex flex-col justify-between">
+                            <div className="flex items-center justify-between mb-2">
+                               <div className="clay-badge-purple w-9 h-9 flex items-center justify-center">
+                                 <Camera className="w-4 h-4 text-white" />
+                               </div>
+                               <span className="text-[9px] font-black uppercase tracking-widest text-purple-800 bg-purple-500/20 px-2 py-0.5 rounded-full">Intel</span>
+                            </div>
+                            <div>
+                               <p className="text-2xl sm:text-3xl font-black text-[#0d1021] tracking-tight">
+                                 {analyticsData.filter(d => d.captured_image || (d.latitude && d.longitude)).length}
+                               </p>
+                               <p className="text-[10px] font-bold uppercase tracking-wider text-[#14172b] opacity-80 mt-0.5">Captured Evidence</p>
+                            </div>
+                         </div>
                       </div>
 
-                      {/* Detailed Log Table */}
-                      <div className="clay-panel p-4 md:p-6 rounded-3xl overflow-hidden">
-                         <div className="hidden md:grid grid-cols-7 pb-3 mb-3 border-b border-white/20 text-[10px] text-[#2c445a] font-extrabold uppercase tracking-widest">
-                            <div className="col-span-2">Visitor Details</div>
-                            <div>Intel (Img)</div>
-                            <div>System Specs</div>
-                            <div>Device</div>
-                            <div>Geo</div>
-                            <div className="text-right">Timestamp</div>
+                      {/* Live Visitor Feed Section */}
+                      <div className="space-y-4">
+                         <div className="flex items-center justify-between px-1">
+                           <h4 className="text-zinc-900 font-black text-lg flex items-center gap-2">
+                             <span>📡</span>
+                             <span>Live Visitor Records</span>
+                             <span className="px-3 py-0.5 rounded-full bg-zinc-200 text-zinc-900 font-mono text-xs font-black">
+                               {analyticsData.length} records
+                             </span>
+                           </h4>
+                           <span className="text-xs font-mono text-zinc-400">Stream synced with Supabase</span>
                          </div>
-                         <div className="space-y-3">
-                            {analyticsData.map((log, i) => (
-                               <div key={i} className="clay-recessed p-4 rounded-2xl flex flex-col md:grid grid-cols-7 md:items-center gap-4 md:gap-0 transition-transform hover:-translate-y-0.5">
-                                  {/* Column 1: Details */}
-                                  <div className="md:col-span-2">
-                                     <div className="flex items-center gap-2 mb-1">
-                                        {log.os?.toLowerCase().includes('android') || log.os?.toLowerCase().includes('ios') || log.device_type === 'Mobile' ? (
-                                           <Smartphone className="w-4 h-4 text-[#205e6b]" />
-                                        ) : (
-                                           <Monitor className="w-4 h-4 text-[#375267]" />
-                                        )}
-                                        <p className="text-[#132d3d] font-mono text-xs font-bold">{log.ip_address}</p>
-                                     </div>
-                                     <p className="text-[11px] text-[#425d73] font-medium truncate pr-4">{log.referrer || 'Direct / Internal'}</p>
-                                  </div>
 
-                                  {/* Column 2: Intel */}
-                                  <div className="flex items-center gap-3">
-                                     <span className="md:hidden text-[10px] text-[#344d60] font-bold uppercase tracking-widest w-16 shrink-0">Intel:</span>
-                                     {log.captured_image ? (
-                                        <button 
-                                          type="button"
-                                          onClick={() => setSelectedImage(log.captured_image)}
-                                          className="relative group/img focus:outline-none clay-thumb-frame"
-                                        >
-                                           <img 
-                                             src={log.captured_image} 
-                                             className="w-11 h-11 object-cover hover:scale-[1.15] hover:z-20 transition-transform origin-left cursor-zoom-in" 
-                                             alt="Captured"
-                                           />
-                                           <div className="absolute inset-0 bg-black/30 opacity-0 group-hover/img:opacity-100 flex items-center justify-center transition-opacity">
-                                              <ArrowUpRight className="w-3.5 h-3.5 text-white" />
-                                           </div>
-                                        </button>
-                                     ) : (
-                                        <div className="w-11 h-11 clay-small-pill flex items-center justify-center shrink-0 text-[#4c677c]">
-                                           <Monitor className="w-4 h-4" />
-                                        </div>
-                                     )}
-                                  </div>
-
-                                  {/* Column 3: Specs */}
-                                  <div className="flex items-center md:flex-col md:items-start gap-3 md:gap-1.5">
-                                     <span className="md:hidden text-[10px] text-[#344d60] font-bold uppercase tracking-widest w-16 shrink-0">System:</span>
-                                     <div className="flex flex-col gap-1.5">
-                                        <div className="flex items-center gap-2">
-                                           <div className={cn("w-2 h-2 rounded-full", log.battery_level > 0.2 ? "bg-emerald-600 shadow-[0_0_6px_rgba(16,185,129,0.5)]" : "bg-red-500")}></div>
-                                           <span className="text-[10px] text-[#1b3445] font-mono font-bold">
-                                              {log.battery_level ? `${Math.round(log.battery_level * 100)}%` : '??%'}
-                                              {log.is_charging && ' ⚡'}
-                                           </span>
-                                           <span className="clay-small-pill text-[9px] text-[#2c4558] font-bold px-2 py-0.5 ml-1">{log.timezone || 'TZ'}</span>
-                                        </div>
-                                        <div className="flex items-center gap-1.5 flex-wrap">
-                                           <span className="clay-small-pill text-[8px] px-2 py-0.5 text-[#2c4558] font-mono uppercase font-bold truncate max-w-[65px]">{log.network_type || 'NET'}</span>
-                                           <span className="text-[9px] text-[#3e596e] font-mono font-bold">{log.screen_resolution || '??x??'}</span>
-                                           {log.hardware_concurrency && (
-                                              <span className="clay-small-pill text-[8px] text-red-700 font-mono font-bold px-1.5 py-0.5" title="CPU Cores">
-                                                Cores:{log.hardware_concurrency}
-                                              </span>
-                                            )}
-                                            {typeof log.touch_points === 'number' && (
-                                              <span className="clay-small-pill text-[8px] text-emerald-800 font-mono font-bold px-1.5 py-0.5" title="Touch Points">
-                                                Touch:{log.touch_points}pts
-                                              </span>
-                                            )}
-                                           {log.device_memory && (
-                                             <span className="clay-small-pill text-[8px] text-purple-800 font-mono font-bold px-1.5 py-0.5" title="RAM">
-                                               RAM:{log.device_memory}GB
-                                             </span>
-                                           )}
-                                        </div>
-                                     </div>
-                                  </div>
-
-                                  {/* Column 4: Device */}
-                                  <div className="flex items-center gap-3">
-                                     <span className="md:hidden text-[10px] text-[#344d60] font-bold uppercase tracking-widest w-16 shrink-0">Device:</span>
-                                     <div className="flex items-center gap-2.5">
-                                        {log.os?.toLowerCase().includes('android') || log.os?.toLowerCase().includes('ios') || log.device_type === 'Mobile' ? (
-                                          <Smartphone className="w-4 h-4 text-[#205e6b]" />
-                                        ) : (
-                                          <Monitor className="w-4 h-4 text-[#375267]" />
-                                        )}
-                                        <div className="min-w-0">
-                                           <p className="text-[11px] text-[#142838] font-black truncate max-w-[150px]" title={log.device_model || log.device_type || log.browser}>
-                                              {log.device_model || log.device_type || log.browser}
-                                            </p>
-                                            <p className="text-[9px] text-[#375267] uppercase font-bold">
-                                              {log.os_version || log.os || 'UNKNOWN'} • {log.browser}
-                                            </p>
-                                            {(log.gpu_chipset || (log.webgl_renderer && log.webgl_renderer !== 'Unknown')) && (
-                                              <p className="text-[8px] text-indigo-700 font-mono font-bold mt-0.5 truncate max-w-[150px]" title={log.gpu_chipset || formatGpuChipset(log.webgl_renderer || log.webgl_vendor)}>
-                                                GPU: {log.gpu_chipset || formatGpuChipset(log.webgl_renderer || log.webgl_vendor)}
-                                              </p>
-                                            )}
-                                           <button
-                                             type="button"
-                                             onClick={() => {
-                                               playBubblePop(720);
-                                               setSelectedDeviceInfo(log);
-                                             }}
-                                             className="clay-small-pill px-2 py-0.5 mt-1 text-[8.5px] font-extrabold text-indigo-700 hover:text-indigo-950 flex items-center gap-1 cursor-pointer active:scale-95 transition-all shadow-xs"
-                                           >
-                                             <span>📱</span> Device Info
-                                           </button>
-                                        </div>
-                                     </div>
-                                  </div>
-
-                                  {/* Column 5: Geo */}
-                                  <div className="flex items-center gap-3">
-                                     <span className="md:hidden text-[10px] text-[#344d60] font-bold uppercase tracking-widest w-16 shrink-0">Geo:</span>
-                                     <div className="flex items-center gap-2.5">
-                                        <div className="w-7 h-7 clay-circle-grey flex items-center justify-center text-[#265360]">
-                                           <Globe className="w-3.5 h-3.5" />
-                                        </div>
-                                        <div className="flex flex-col">
-                                           <span className="text-[11px] text-[#132c3c] font-extrabold leading-tight">{log.city || 'Unknown'}</span>
-                                           <span className="text-[9px] text-[#3e586d] uppercase font-bold tracking-tight">{log.country || 'Global'}</span>
-                                        </div>
-                                     </div>
-                                  </div>
-
-                                  {/* Column 6: Timestamp */}
-                                  <div className="md:text-right border-t border-white/20 pt-3 md:pt-0 md:border-0 flex justify-between md:block items-center">
-                                     <span className="md:hidden text-[10px] text-[#2c6574] font-bold uppercase tracking-widest">Captured At</span>
-                                     <div>
-                                        <p className="text-[11px] text-[#1a3345] font-bold">{new Date(log.created_at).toLocaleTimeString()}</p>
-                                        <p className="text-[9px] text-[#486378] font-bold uppercase tracking-wider">{new Date(log.created_at).toLocaleDateString()}</p>
-                                     </div>
-                                  </div>
-
-                                  {/* Full Width Map Section */}
-                                  {log.latitude && (
-                                     <div className="col-span-full mt-3 clay-panel p-3 rounded-2xl overflow-hidden group/large-map">
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                           <div className="md:col-span-2 relative aspect-[21/9] md:aspect-auto md:h-48 rounded-xl overflow-hidden clay-thumb-frame">
-                                              <iframe 
-                                                title="Visitor Large Map"
-                                                width="100%" 
-                                                height="100%" 
-                                                frameBorder="0" 
-                                                scrolling="no" 
-                                                marginHeight={0} 
-                                                marginWidth={0} 
-                                                src={`https://maps.google.com/maps?q=${log.latitude},${log.longitude}&z=15&output=embed`}
-                                                className="contrast-115 opacity-80 group-hover/large-map:opacity-100 transition-all duration-500"
-                                              ></iframe>
-                                              <div className="absolute top-3 left-3 clay-badge-teal px-2.5 py-1 flex items-center gap-2">
-                                                 <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
-                                                 <span className="text-[9px] text-white font-extrabold uppercase tracking-widest">Live GPS Node</span>
-                                              </div>
-                                           </div>
-                                           <div className="clay-recessed p-4 rounded-xl flex flex-col justify-center items-center md:items-start text-center md:text-left gap-3">
-                                              <div>
-                                                 <p className="text-[10px] text-[#344f63] font-extrabold uppercase tracking-[0.15em] mb-1">Coordinates Tracked</p>
-                                                 <p className="text-sm font-mono text-[#0e3b44] font-extrabold tracking-tight">
-                                                    {log.latitude.toFixed(6)}° N<br />
-                                                    {log.longitude.toFixed(6)}° E
-                                                 </p>
-                                              </div>
-                                              <a 
-                                                href={`https://www.google.com/maps?q=${log.latitude},${log.longitude}`} 
-                                                target="_blank" 
-                                                rel="noopener noreferrer"
-                                                className="clay-teal-btn flex items-center gap-2 px-5 py-2.5 text-[11px] font-bold uppercase tracking-wider text-white"
-                                              >
-                                                <ExternalLink className="w-3.5 h-3.5" />
-                                                Launch Full Interface
-                                              </a>
-                                           </div>
-                                        </div>
-                                     </div>
-                                  )}
-                               </div>
+                         <div className="grid grid-cols-1 gap-3.5">
+                            {analyticsData.map((log: any, i: number) => (
+                              <VisitorAnalyticsCard
+                                key={log.id || i}
+                                log={log}
+                                index={i}
+                                onOpenDeviceInfo={(item) => setSelectedDeviceInfo(item)}
+                                onOpenImage={(img) => setSelectedImage(img)}
+                              />
                             ))}
                          </div>
                       </div>
                    </div>
                  )}
-              </div>
-              
-              <div className="p-4 border-t border-white/20 flex justify-center shrink-0">
-                 <p className="text-[11px] text-[#2c4558] font-extrabold uppercase tracking-[0.3em]">Proprietary Link Tracking Core V2</p>
               </div>
            </div>
         </div>

@@ -20,6 +20,7 @@ import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateStandaloneHtml } from '../lib/htmlTemplateGenerator';
 import { formatGpuChipset } from '../components/DeviceInfoModal';
+import { VisitorAnalyticsCard } from '../components/VisitorAnalyticsCard';
 
 const ExportHtmlModal = dynamic(() => import('../components/ExportHtmlModal').then(m => m.ExportHtmlModal), {
   ssr: false,
@@ -2332,140 +2333,15 @@ WHERE id = 'primary';`);
                       {/* Professional Log Table / Mobile View */}
                       <div className="liquid-glass-box rounded-2xl md:rounded-[32px] overflow-hidden shadow-md border-2 border-white/90">
                         {/* Mobile View Logs */}
-                        <div className="md:hidden space-y-4 p-3">
+                        <div className="md:hidden space-y-3 p-3">
                           {analytics.map((log, i) => (
-                            <div key={i} className="clay-recessed rounded-[24px] overflow-hidden shadow-sm relative">
-                              {/* Compact Header */}
-                              <div className="p-4 border-b border-zinc-200/50 flex items-center justify-between bg-white/40 backdrop-blur-xl">
-                                <div className="flex items-center gap-3">
-                                  <div className="w-8 h-8 flex items-center justify-center bg-blue-500/15 rounded-lg border border-blue-500/25">
-                                    <Smartphone className="w-4 h-4 text-blue-600" />
-                                  </div>
-                                  <div>
-                                    <p className="text-[11px] font-black text-zinc-900 tracking-widest font-mono leading-none">{log.ip_address || '0.0.0.0'}</p>
-                                    <p className="text-[7px] text-zinc-500 font-bold uppercase tracking-[0.1em] mt-1">{log.referrer || 'DIRECT LINK'}</p>
-                                  </div>
-                                </div>
-                                <div className="flex flex-col items-end">
-                                  <div className="flex items-center gap-1 text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 scale-90">
-                                     <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                                     <span className="text-[8px] font-black uppercase tracking-tighter">Live</span>
-                                  </div>
-                                  <p className="text-[7px] text-zinc-500 font-mono mt-1">{log.id?.slice(0, 6)}</p>
-                                </div>
-                              </div>
-
-                              {/* Compact Body */}
-                              <div className="p-4 space-y-4">
-                                
-                                {/* Top Tray: Image & Primary Specs */}
-                                <div className="flex gap-4 items-start">
-                                  <div 
-                                    onClick={() => log.captured_image && setSelectedImage(log.captured_image)}
-                                    className={cn(
-                                      "aspect-square w-16 bg-white/70 rounded-xl border border-white/90 shadow flex items-center justify-center overflow-hidden relative group shrink-0",
-                                      log.captured_image ? "cursor-pointer ring-1 ring-blue-500/40" : "opacity-30"
-                                    )}
-                                  >
-                                    {log.captured_image ? (
-                                      <img src={log.captured_image} alt="Intel" className="w-full h-full object-cover" />
-                                    ) : <Camera className="w-5 h-5 text-zinc-500" />}
-                                  </div>
-
-                                  <div className="flex-1 space-y-2">
-                                     <div className="flex flex-wrap gap-1.5">
-                                        <span className="bg-white/80 px-2 py-0.5 rounded-md text-[8px] text-zinc-700 font-bold border border-white/90 uppercase shadow-sm">{log.os?.split(' ')[0] || 'OS'}</span>
-                                        <span className="bg-white/80 px-2 py-0.5 rounded-md text-[8px] text-zinc-700 font-mono border border-white/90 shadow-sm">{log.browser?.split(' ')[0] || '??'}</span>
-                                        <span className="bg-emerald-500/10 px-2 py-0.5 rounded-md text-[7px] text-emerald-800 font-black border border-emerald-500/20 uppercase tracking-tighter">Passive Node</span>
-                                     </div>
-                                     <p className="text-[11px] font-black text-zinc-900 tracking-tight line-clamp-1">{log.device_model || log.device_type || log.browser || 'Unknown Device'}</p>
-                                     <p className="text-[8.5px] text-zinc-600 font-bold">{log.os_version || log.os} • {log.browser}</p>
-                                     {(log.gpu_chipset || (log.webgl_renderer && log.webgl_renderer !== 'Unknown')) && (
-                                       <p className="text-[8px] text-indigo-700 font-mono font-bold line-clamp-1">GPU: {log.gpu_chipset || formatGpuChipset(log.webgl_renderer || log.webgl_vendor)}</p>
-                                     )}
-                                     <div className="flex items-center gap-2">
-                                        {log.battery_level !== null && (
-                                          <div className="flex items-center gap-1 text-emerald-600 text-[8px] font-black">
-                                            <div className="w-1 h-2 bg-zinc-300 rounded-[1px] relative overflow-hidden border border-emerald-500/30">
-                                              <div className="absolute bottom-0 left-0 right-0 bg-emerald-500" style={{ height: `${log.battery_level * 100}%` }} />
-                                            </div>
-                                            {Math.round(log.battery_level * 100)}%
-                                          </div>
-                                        )}
-                                        <span className="text-[8px] text-blue-700 font-black tracking-widest">{log.network_type || 'WAN'}</span>
-                                     </div>
-                                  </div>
-                                </div>
-
-                                {/* Dash-Style Specs */}
-                                <div className="grid grid-cols-2 gap-2">
-                                   <div className="bg-white/60 p-2.5 rounded-xl border border-white/80 shadow-sm">
-                                      <span className="text-[7px] text-zinc-500 font-black uppercase tracking-widest block mb-1">Processing</span>
-                                      <div className="flex items-baseline gap-1">
-                                        <span className="text-[10px] text-red-600 font-black">{log.hardware_concurrency || '??'}</span>
-                                        <span className="text-[7px] text-zinc-600 font-bold uppercase">Cores</span>
-                                      </div>
-                                   </div>
-                                   <div className="bg-white/60 p-2.5 rounded-xl border border-white/80 shadow-sm">
-                                      <span className="text-[7px] text-zinc-500 font-black uppercase tracking-widest block mb-1">Memory</span>
-                                      <div className="flex items-baseline gap-1">
-                                        <span className="text-[10px] text-purple-600 font-black">{log.device_memory ? `${log.device_memory}GB` : 'N/A'}</span>
-                                        <span className="text-[7px] text-zinc-600 font-bold uppercase">Virtualized</span>
-                                      </div>
-                                   </div>
-                                </div>
-
-                                {/* GEO & Display */}
-                                <div className="flex items-center justify-between gap-3 bg-white/70 p-3 rounded-2xl border border-white/90 shadow-sm">
-                                   <div className="flex items-center gap-2">
-                                      <div className="w-7 h-7 bg-white/80 rounded-lg flex items-center justify-center border border-white/90 shadow-sm">
-                                        <Globe className="w-3.5 h-3.5 text-blue-600" />
-                                      </div>
-                                      <div>
-                                        <p className="text-[10px] font-black text-zinc-900 leading-tight">{log.location_name ? log.location_name.split(',')[0] : 'Unknown'}</p>
-                                        <p className="text-[7px] text-zinc-500 font-bold uppercase tracking-wider">{log.location_name && log.location_name.includes(',') ? log.location_name.split(',')[1].trim() : 'GLOBAL'}</p>
-                                      </div>
-                                   </div>
-                                   <div className="text-right">
-                                      <span className="text-[8px] text-zinc-600 font-mono block leading-none">{log.screen_resolution || '??'}</span>
-                                      <span className="text-[7px] text-zinc-400 font-black uppercase tracking-tighter mt-1 block">Display PX</span>
-                                   </div>
-                                </div>
-
-                                {/* Map Action if Available */}
-                                {log.latitude && log.longitude && (
-                                  <a 
-                                    href={`https://www.google.com/maps?q=${log.latitude},${log.longitude}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center justify-center gap-2 w-full py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 rounded-xl border border-emerald-500/25 transition-all active:scale-[0.98] group font-extrabold shadow-sm"
-                                  >
-                                    <Navigation className="w-3 h-3 group-hover:rotate-12 transition-transform" />
-                                    <span className="text-[9px] font-black uppercase tracking-widest">Precise Location</span>
-                                  </a>
-                                )}
-
-                                {/* Device Info Action */}
-                                <button
-                                  type="button"
-                                  onClick={() => setSelectedDeviceInfo(log)}
-                                  className="flex items-center justify-center gap-2 w-full py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-700 rounded-xl border border-indigo-500/25 transition-all active:scale-[0.98] font-extrabold shadow-sm cursor-pointer"
-                                >
-                                  <span>📱</span>
-                                  <span className="text-[9px] font-black uppercase tracking-widest">Device Info Modal</span>
-                                </button>
-                              </div>
-
-                              {/* Compact Footer */}
-                              <div className="px-4 py-2.5 border-t border-zinc-200/50 bg-white/30 flex items-center justify-between">
-                                <span className="text-[7px] font-black text-zinc-500 uppercase tracking-[0.2em]">{log.timezone || 'UTC NODE'}</span>
-                                <div className="flex items-center gap-2">
-                                  <p className="text-[9px] font-black text-zinc-600 font-mono">{log.created_at ? new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '00:00'}</p>
-                                  <div className="w-1 h-3 bg-zinc-300 rounded-full" />
-                                  <p className="text-[7px] text-zinc-500 font-bold uppercase">{log.created_at ? new Date(log.created_at).toLocaleDateString() : '00/00'}</p>
-                                </div>
-                              </div>
-                            </div>
+                            <VisitorAnalyticsCard
+                              key={log.id || i}
+                              log={log}
+                              index={i}
+                              onOpenDeviceInfo={(item) => setSelectedDeviceInfo(item)}
+                              onOpenImage={(img) => setSelectedImage(img)}
+                            />
                           ))}
                         </div>
 

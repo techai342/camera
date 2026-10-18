@@ -44,13 +44,13 @@ CREATE TABLE IF NOT EXISTS public.admin_settings (
     free_daily_limit INTEGER NOT NULL DEFAULT 5,
     pro_daily_limit INTEGER NOT NULL DEFAULT 50,
     premium_daily_limit INTEGER NOT NULL DEFAULT 99999,
-    guest_limit INTEGER NOT NULL DEFAULT 5,
-    plan_limits JSONB DEFAULT '{"free": 5, "pro": 50, "premium": 99999, "guest": 5}'::jsonb,
+    guest_limit INTEGER NOT NULL DEFAULT 2,
+    plan_limits JSONB DEFAULT '{"free": 5, "pro": 50, "premium": 99999, "guest": 2}'::jsonb,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
 INSERT INTO public.admin_settings (id, username, password_hash, salt, display_name, brand_name, avatar_url, free_daily_limit, pro_daily_limit, premium_daily_limit, guest_limit)
-VALUES ('primary', 'admin', '291bc793dcbaf0596b11612bcc1412d6afaccf726c417a5a6e4cff068326bf56', 'mradmin_super_secure_salt_99', 'Muhammad Saqib', 'Saqib Visuals', 'https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png', 5, 50, 99999, 5)
+VALUES ('primary', 'admin', '291bc793dcbaf0596b11612bcc1412d6afaccf726c417a5a6e4cff068326bf56', 'mradmin_super_secure_salt_99', 'Muhammad Saqib', 'Saqib Visuals', 'https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png', 5, 50, 99999, 2)
 ON CONFLICT (id) DO NOTHING;
 
 -- Migration to add plan limits columns if admin_settings already exists
@@ -58,8 +58,8 @@ ALTER TABLE public.admin_settings
 ADD COLUMN IF NOT EXISTS free_daily_limit INTEGER NOT NULL DEFAULT 5,
 ADD COLUMN IF NOT EXISTS pro_daily_limit INTEGER NOT NULL DEFAULT 50,
 ADD COLUMN IF NOT EXISTS premium_daily_limit INTEGER NOT NULL DEFAULT 99999,
-ADD COLUMN IF NOT EXISTS guest_limit INTEGER NOT NULL DEFAULT 5,
-ADD COLUMN IF NOT EXISTS plan_limits JSONB DEFAULT '{"free": 5, "pro": 50, "premium": 99999, "guest": 5}'::jsonb;
+ADD COLUMN IF NOT EXISTS guest_limit INTEGER NOT NULL DEFAULT 2,
+ADD COLUMN IF NOT EXISTS plan_limits JSONB DEFAULT '{"free": 5, "pro": 50, "premium": 99999, "guest": 2}'::jsonb;
 
 ALTER TABLE public.admin_settings ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow public read admin branding" ON public.admin_settings;
@@ -144,7 +144,7 @@ export default function Admin() {
   const [freePlanLimit, setFreePlanLimit] = useState<number>(5);
   const [proPlanLimit, setProPlanLimit] = useState<number>(50);
   const [premiumPlanLimit, setPremiumPlanLimit] = useState<number>(99999);
-  const [guestLimit, setGuestLimit] = useState<number>(5);
+  const [guestLimit, setGuestLimit] = useState<number>(2);
   const [syncUsersOnSave, setSyncUsersOnSave] = useState<boolean>(true);
   const [loadingPlanLimits, setLoadingPlanLimits] = useState<boolean>(false);
   const [savingPlanLimits, setSavingPlanLimits] = useState<boolean>(false);
@@ -2155,7 +2155,7 @@ export function useMyDomainAnalytics() {
 
                 <div className="mt-6 pt-3 border-t border-rose-200/60 flex items-center justify-between text-[10px] text-zinc-500 font-bold">
                   <span>Prompt Signup After</span>
-                  <span className="text-rose-600 font-black">Default: 5</span>
+                  <span className="text-rose-600 font-black">Default: 2</span>
                 </div>
               </div>
             </div>
@@ -2214,8 +2214,8 @@ ALTER TABLE public.admin_settings
 ADD COLUMN IF NOT EXISTS free_daily_limit INTEGER NOT NULL DEFAULT 5,
 ADD COLUMN IF NOT EXISTS pro_daily_limit INTEGER NOT NULL DEFAULT 50,
 ADD COLUMN IF NOT EXISTS premium_daily_limit INTEGER NOT NULL DEFAULT 99999,
-ADD COLUMN IF NOT EXISTS guest_limit INTEGER NOT NULL DEFAULT 5,
-ADD COLUMN IF NOT EXISTS plan_limits JSONB DEFAULT '{"free": 5, "pro": 50, "premium": 99999, "guest": 5}'::jsonb;
+ADD COLUMN IF NOT EXISTS guest_limit INTEGER NOT NULL DEFAULT 2,
+ADD COLUMN IF NOT EXISTS plan_limits JSONB DEFAULT '{"free": 5, "pro": 50, "premium": 99999, "guest": 2}'::jsonb;
 
 -- Update primary settings row with active defaults
 UPDATE public.admin_settings 
@@ -2223,7 +2223,7 @@ SET
   free_daily_limit = COALESCE(free_daily_limit, 5),
   pro_daily_limit = COALESCE(pro_daily_limit, 50),
   premium_daily_limit = COALESCE(premium_daily_limit, 99999),
-  guest_limit = COALESCE(guest_limit, 5)
+  guest_limit = COALESCE(guest_limit, 2)
 WHERE id = 'primary';`}
                       </pre>
                       <button
@@ -2233,15 +2233,15 @@ WHERE id = 'primary';`}
 ADD COLUMN IF NOT EXISTS free_daily_limit INTEGER NOT NULL DEFAULT 5,
 ADD COLUMN IF NOT EXISTS pro_daily_limit INTEGER NOT NULL DEFAULT 50,
 ADD COLUMN IF NOT EXISTS premium_daily_limit INTEGER NOT NULL DEFAULT 99999,
-ADD COLUMN IF NOT EXISTS guest_limit INTEGER NOT NULL DEFAULT 5,
-ADD COLUMN IF NOT EXISTS plan_limits JSONB DEFAULT '{"free": 5, "pro": 50, "premium": 99999, "guest": 5}'::jsonb;
+ADD COLUMN IF NOT EXISTS guest_limit INTEGER NOT NULL DEFAULT 2,
+ADD COLUMN IF NOT EXISTS plan_limits JSONB DEFAULT '{"free": 5, "pro": 50, "premium": 99999, "guest": 2}'::jsonb;
 
 UPDATE public.admin_settings 
 SET 
   free_daily_limit = COALESCE(free_daily_limit, 5),
   pro_daily_limit = COALESCE(pro_daily_limit, 50),
   premium_daily_limit = COALESCE(premium_daily_limit, 99999),
-  guest_limit = COALESCE(guest_limit, 5)
+  guest_limit = COALESCE(guest_limit, 2)
 WHERE id = 'primary';`);
                           setSqlCopied(true);
                           setTimeout(() => setSqlCopied(false), 2000);

@@ -11,7 +11,7 @@ export const DEFAULT_PLAN_LIMITS: PlanLimits = {
   free: 5,
   pro: 50,
   premium: 99999,
-  guest: 5,
+  guest: 2,
 };
 
 // In-memory sliding cache for high performance

@@ -281,9 +281,25 @@ export default function Home() {
       const savedPhone = localStorage.getItem('supashort_phone');
       if (savedPhone) setPhoneNumber(savedPhone);
       const savedHistory = localStorage.getItem('supashort_history');
-      if (savedHistory) setHistory(JSON.parse(savedHistory));
-      const savedGuestTries = localStorage.getItem('supashort_guest_tries');
-      if (savedGuestTries) setGuestTriesUsed(parseInt(savedGuestTries, 10) || 0);
+      let histLen = 0;
+      if (savedHistory) {
+        try {
+          const parsed = JSON.parse(savedHistory);
+          setHistory(parsed);
+          histLen = Array.isArray(parsed) ? parsed.length : 0;
+        } catch {}
+      }
+      let savedGuestTries = localStorage.getItem('supashort_guest_tries');
+      if (!savedGuestTries && typeof document !== 'undefined') {
+        const cookieMatch = document.cookie.match(/(?:^|;\s*)supashort_guest_tries=(\d+)/);
+        if (cookieMatch) savedGuestTries = cookieMatch[1];
+      }
+      const parsedTries = savedGuestTries ? parseInt(savedGuestTries, 10) || 0 : 0;
+      const finalGuestTries = Math.max(parsedTries, histLen);
+      setGuestTriesUsed(finalGuestTries);
+      try {
+        localStorage.setItem('supashort_guest_tries', String(finalGuestTries));
+      } catch {}
 
       // Instant UI restore from cache (Zero loading delay / flicker!)
       const cachedUser = localStorage.getItem('supashort_user_cache');
@@ -524,12 +540,12 @@ export default function Home() {
       return;
     }
 
-    // Free Quota Guard for Unregistered/Guest Users
-    if (!currentUser && guestTriesUsed >= 5) {
+    // Free Quota Guard for Unregistered/Guest Users (Strict 2 Free Tries)
+    if (!currentUser && guestTriesUsed >= 2) {
       setAuthModalMode('register');
       setAuthModalReason('quota');
       setShowAuthModal(true);
-      setError('You have reached the 5 free link limit! Please create a free account to unlock unlimited short links.');
+      setError('You have used your 2 free guest links! Please create an account or sign in to continue.');
       return;
     }
 
@@ -579,15 +595,16 @@ export default function Home() {
       const result = await response.json();
 
       if (!response.ok) {
-        if (response.status === 403 && (result.code === 'QUOTA_EXCEEDED' || result.error?.includes('5 free link creations'))) {
-          setGuestTriesUsed(5);
+        if (response.status === 403 && (result.code === 'QUOTA_EXCEEDED' || result.error === 'QUOTA_EXCEEDED' || result.error?.includes('free guest links') || result.message?.includes('free guest links'))) {
+          setGuestTriesUsed(2);
           try {
-            localStorage.setItem('supashort_guest_tries', '5');
+            localStorage.setItem('supashort_guest_tries', '2');
+            document.cookie = 'supashort_guest_tries=2; path=/; max-age=31536000; SameSite=Lax';
           } catch {}
           setAuthModalMode('register');
           setAuthModalReason('quota');
           setShowAuthModal(true);
-          setError(result.error || 'Free 5-try limit reached! Create an account for unlimited link creations.');
+          setError(result.message || 'Free 2-try limit reached! Create an account for unlimited link creations.');
         } else if (response.status === 409) {
           setError(`The code "${customCode}" is already taken. Please choose another one.`);
         } else if (result.error?.includes('relation "urls" does not exist') || result.error?.includes('column "domain" of relation "urls" does not exist')) {
@@ -606,16 +623,28 @@ export default function Home() {
       const generatedUrl = result.shortUrl;
       setShortUrl(generatedUrl);
 
-      // Track guest tries
+      // Track guest tries (Strictly 2 Free Tries)
       if (!currentUser) {
         let newTries = (guestTriesUsed || 0) + 1;
+        if (typeof result.guestCount === 'number') {
+          newTries = Math.max(newTries, result.guestCount);
+        }
         if (typeof result.remainingFreeTries === 'number') {
-          newTries = Math.max(newTries, 5 - result.remainingFreeTries);
+          newTries = Math.max(newTries, 2 - result.remainingFreeTries);
         }
         setGuestTriesUsed(newTries);
         try {
           localStorage.setItem('supashort_guest_tries', String(newTries));
+          document.cookie = `supashort_guest_tries=${newTries}; path=/; max-age=31536000; SameSite=Lax`;
         } catch {}
+
+        if (newTries >= 2) {
+          setTimeout(() => {
+            setAuthModalMode('register');
+            setAuthModalReason('quota');
+            setShowAuthModal(true);
+          }, 1400);
+        }
       }
       
       const newHistoryItem = { 
@@ -1331,14 +1360,14 @@ create policy "Allow public delete access" on public.urls for delete using (true
                     }}
                     className={cn(
                       "px-2 sm:px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-black transition-all flex items-center gap-1 border shadow-xs cursor-pointer active:scale-95 shrink-0",
-                      guestTriesUsed >= 5 
+                      guestTriesUsed >= 2 
                         ? "bg-rose-100 text-rose-800 border-rose-300 animate-pulse" 
                         : "bg-indigo-50 text-indigo-800 border-indigo-200 hover:bg-indigo-100"
                     )}
-                    title="Guest limit: 5 free links. Click to unlock unlimited links!"
+                    title="Guest limit: 2 free links. Click to unlock unlimited links!"
                   >
                     <Sparkles className="w-3 h-3 text-indigo-600 shrink-0" />
-                    <span>{Math.max(0, 5 - guestTriesUsed)}/5 Free</span>
+                    <span>{Math.max(0, 2 - guestTriesUsed)}/2 Free</span>
                   </button>
 
                   {/* Sign In Button */}
@@ -1463,7 +1492,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                 >
                   <Sparkles className="w-3 h-3 text-indigo-600 shrink-0" />
                   <span className="text-[10px] font-black text-indigo-950">
-                    {Math.max(0, 5 - guestTriesUsed)}/5 Free
+                    {Math.max(0, 2 - guestTriesUsed)}/2 Free
                   </span>
                 </button>
               )}
@@ -1937,25 +1966,42 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
                   {/* 3. Primary Action Button with 3D Glass Bubble Styling */}
                   <div>
-                    <button
-                      type="submit"
-                      disabled={isSubmitting || !longUrl.trim()}
-                      onClick={() => playBubblePop(740)}
-                      className="glass-orb orb-blue w-full min-h-[52px] py-3.5 text-[14px] sm:text-[15px] font-black uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-2xl transition-all disabled:opacity-50 text-white cursor-pointer"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          <span>Generating 3D Liquid Link...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="w-4 h-4" />
-                          <span>Shorten &amp; Generate Link</span>
-                          <ArrowRight className="w-4 h-4" />
-                        </>
-                      )}
-                    </button>
+                    {!currentUser && guestTriesUsed >= 2 ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          playBubblePop(650);
+                          setAuthModalMode('register');
+                          setAuthModalReason('quota');
+                          setShowAuthModal(true);
+                        }}
+                        className="glass-orb orb-purple w-full min-h-[52px] py-3.5 text-[14px] sm:text-[15px] font-black uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-2xl transition-all text-white cursor-pointer animate-pulse"
+                      >
+                        <Lock className="w-4 h-4" />
+                        <span>2 Free Tries Used — Sign In / Create Account</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                    ) : (
+                      <button
+                        type="submit"
+                        disabled={isSubmitting || !longUrl.trim()}
+                        onClick={() => playBubblePop(740)}
+                        className="glass-orb orb-blue w-full min-h-[52px] py-3.5 text-[14px] sm:text-[15px] font-black uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-2xl transition-all disabled:opacity-50 text-white cursor-pointer"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            <span>Generating 3D Liquid Link...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-4 h-4" />
+                            <span>Shorten &amp; Generate Link</span>
+                            <ArrowRight className="w-4 h-4" />
+                          </>
+                        )}
+                      </button>
+                    )}
                   </div>
 
                   {/* 4. Add More Customizations Accordion */}

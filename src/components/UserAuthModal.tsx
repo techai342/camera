@@ -203,7 +203,7 @@ export function UserAuthModal({
         {reason === 'quota' && (
           <div className="mb-3.5 p-2.5 sm:p-3 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-950 text-[11px] font-bold flex items-center gap-2 shadow-sm">
             <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
-            <span>You reached your <strong>5 free guest links</strong>! Sign up in 5 seconds to unlock <strong>unlimited link creations</strong>.</span>
+            <span>You reached your <strong>2 free guest links</strong>! Sign up in 5 seconds to unlock <strong>unlimited link creations</strong>.</span>
           </div>
         )}
 

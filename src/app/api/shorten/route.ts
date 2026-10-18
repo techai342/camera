@@ -144,9 +144,31 @@ export async function POST(req: Request) {
         console.error('Error verifying user plan quota:', err);
       }
     } else {
-      // 3. Guest Usage Quota Enforcement (Free Tries per device)
+      // 3. Guest Usage Quota Enforcement (Strict 2 Free Tries per device/cookie)
       const planLimits = await getPlanLimits();
-      const guestQuota = planLimits.guest;
+      const guestQuota = typeof planLimits.guest === 'number' ? planLimits.guest : 2;
+
+      // Check cookie for persistent guest count across reloads
+      const cookieHeader = req.headers.get('cookie') || '';
+      const cookieMatch = cookieHeader.match(/supashort_guest_tries=(\d+)/);
+      const cookieTries = cookieMatch ? parseInt(cookieMatch[1], 10) : 0;
+
+      if (cookieTries >= guestQuota) {
+        return NextResponse.json(
+          {
+            code: 'QUOTA_EXCEEDED',
+            error: 'QUOTA_EXCEEDED',
+            message: `You have used your ${guestQuota} free guest links. Please create a free account or sign in to continue generating links with full API hub access!`,
+            guestCount: cookieTries,
+            remainingFreeTries: 0,
+          },
+          {
+            status: 403,
+            headers: { 'Access-Control-Allow-Origin': '*' },
+          }
+        );
+      }
+
       if (deviceId) {
         const { count, error: countErr } = await supabaseAdmin
           .from('urls')
@@ -154,10 +176,11 @@ export async function POST(req: Request) {
           .eq('device_id', deviceId);
 
         if (!countErr && typeof count === 'number') {
-          guestUsageCount = count;
+          guestUsageCount = Math.max(count, cookieTries);
           if (guestUsageCount >= guestQuota) {
             return NextResponse.json(
               {
+                code: 'QUOTA_EXCEEDED',
                 error: 'QUOTA_EXCEEDED',
                 message: `You have used your ${guestQuota} free guest links. Please create a free account or sign in to continue generating links with full API hub access!`,
                 guestCount: guestUsageCount,
@@ -170,6 +193,8 @@ export async function POST(req: Request) {
             );
           }
         }
+      } else if (cookieTries > 0) {
+        guestUsageCount = cookieTries;
       }
     }
 
@@ -251,21 +276,33 @@ export async function POST(req: Request) {
     }
 
     const generatedUrl = `${origin}/${shortCode}`;
+    const newGuestCount = activeUser ? null : guestUsageCount + 1;
+    const remaining = activeUser ? null : Math.max(0, 2 - (newGuestCount || 0));
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         success: true,
         shortUrl: generatedUrl,
         data: data,
         isUnlimited: !!activeUser,
-        guestCount: activeUser ? null : guestUsageCount + 1,
-        remainingFreeTries: activeUser ? null : Math.max(0, (await getPlanLimits()).guest - 1 - guestUsageCount),
+        guestCount: newGuestCount,
+        remainingFreeTries: remaining,
       },
       {
         status: 201,
         headers: { 'Access-Control-Allow-Origin': '*' },
       }
     );
+
+    if (!activeUser && newGuestCount !== null) {
+      response.cookies.set('supashort_guest_tries', String(newGuestCount), {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 365, // 1 year
+        sameSite: 'lax',
+      });
+    }
+
+    return response;
   } catch (err) {
     console.error('Internal API Error:', err);
     return NextResponse.json(

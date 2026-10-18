@@ -65,14 +65,14 @@ export async function PUT(req: Request) {
     if (freeDailyLimit !== undefined) updatePayload.free_daily_limit = Math.max(1, Number(freeDailyLimit) || 5);
     if (proDailyLimit !== undefined) updatePayload.pro_daily_limit = Math.max(1, Number(proDailyLimit) || 50);
     if (premiumDailyLimit !== undefined) updatePayload.premium_daily_limit = Math.max(1, Number(premiumDailyLimit) || 99999);
-    if (guestLimit !== undefined) updatePayload.guest_limit = Math.max(1, Number(guestLimit) || 5);
+    if (guestLimit !== undefined) updatePayload.guest_limit = Math.max(1, Number(guestLimit) || 2);
 
     if (freeDailyLimit !== undefined || proDailyLimit !== undefined || premiumDailyLimit !== undefined || guestLimit !== undefined) {
       updatePayload.plan_limits = {
         free: Math.max(1, Number(freeDailyLimit ?? currentSettings?.free_daily_limit ?? 5)),
         pro: Math.max(1, Number(proDailyLimit ?? currentSettings?.pro_daily_limit ?? 50)),
         premium: Math.max(1, Number(premiumDailyLimit ?? currentSettings?.premium_daily_limit ?? 99999)),
-        guest: Math.max(1, Number(guestLimit ?? currentSettings?.guest_limit ?? 5)),
+        guest: Math.max(1, Number(guestLimit ?? currentSettings?.guest_limit ?? 2)),
       };
       const { invalidatePlanLimitsCache } = await import('../../../../lib/planLimits');
       invalidatePlanLimitsCache();

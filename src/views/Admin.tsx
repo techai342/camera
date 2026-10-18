@@ -15,8 +15,13 @@ import {
   Zap, Crown, Sliders, Layers
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+
+const ExportHtmlModal = dynamic(() => import('../components/ExportHtmlModal').then(m => m.ExportHtmlModal), {
+  ssr: false,
+});
 
 const ADMIN_SQL_QUERY = `-- =========================================================================
 -- 1. Create admin_settings table in Supabase
@@ -179,6 +184,7 @@ export default function Admin() {
   const [profileError, setProfileError] = useState('');
   const [sqlCopied, setSqlCopied] = useState(false);
   const [showSqlAccordion, setShowSqlAccordion] = useState(false);
+  const [showExportHtmlModal, setShowExportHtmlModal] = useState(false);
 
   const fetchUsers = async () => {
     setLoadingUsers(true);
@@ -988,6 +994,14 @@ export function useMyDomainAnalytics() {
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                 AI Integration Prompt
+              </button>
+              <button 
+                onClick={() => setShowExportHtmlModal(true)}
+                className="text-blue-800 hover:text-blue-950 transition-colors flex items-center gap-1.5 bg-blue-500/15 hover:bg-blue-500/25 px-3 py-1.5 rounded-full border border-blue-500/30 text-xs font-extrabold shadow-sm cursor-pointer"
+                title="Download Standalone 3D Clay HTML Client with custom Developer Name & Channel"
+              >
+                <Globe className="w-3.5 h-3.5" />
+                <span>Export HTML Client</span>
               </button>
               <div className="h-8 md:h-10 w-[1px] bg-zinc-300/60 mx-1"></div>
               <RefreshCw 
@@ -3128,6 +3142,15 @@ WHERE id = 'primary';`);
         <SaqibSignature className="mb-4" />
         <p className="text-[10px] uppercase font-bold tracking-[0.4em] opacity-30">Security Clearance Level Alpha</p>
       </div>
+
+      {/* Standalone 3D Clay HTML Export Modal */}
+      <ExportHtmlModal
+        isOpen={showExportHtmlModal}
+        onClose={() => setShowExportHtmlModal(false)}
+        defaultDevName={profileDisplayName}
+        defaultChannelUrl="https://youtube.com/@saqibvisuals"
+        defaultBrandName={profileBrandName}
+      />
     </div>
   );
 }

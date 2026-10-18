@@ -67,7 +67,7 @@ export async function GET(req: Request) {
       }
 
       const rawDeviceType = row.device_type || 'Desktop';
-      const deviceModel = extra.device_model || row.device_model || (
+      const deviceModel = row.device_model || extra.device_model || (
         rawDeviceType.includes('(') ? rawDeviceType.replace(/\s*\([^)]*\)/, '').trim() : rawDeviceType
       );
 
@@ -75,11 +75,11 @@ export async function GET(req: Request) {
         ...row,
         referrer: cleanRef || 'Direct',
         device_model: deviceModel,
-        os_version: extra.os_version || row.os_version || row.os,
-        touch_points: row.touch_points ?? extra.touch_points ?? (
-          (row.os && row.os.toLowerCase().includes('android')) || rawDeviceType.includes('Mobile') ? 5 : 0
-        ),
-        user_agent: row.user_agent || row.raw_user_agent || extra.user_agent || null,
+        os_version: row.os_version || extra.os_version || row.os || null,
+        touch_points: typeof row.touch_points === 'number' ? row.touch_points : (typeof extra.touch_points === 'number' ? extra.touch_points : null),
+        user_agent: row.raw_user_agent || row.user_agent || extra.user_agent || null,
+        gpu_chipset: row.gpu_chipset || extra.gpu_chipset || null,
+        hardware_concurrency: row.hardware_concurrency ?? extra.hardware_concurrency ?? null,
       };
     });
 

@@ -2380,7 +2380,9 @@ WHERE id = 'primary';`);
                                      </div>
                                      <p className="text-[11px] font-black text-zinc-900 tracking-tight line-clamp-1">{log.device_model || log.device_type || log.browser || 'Unknown Device'}</p>
                                      <p className="text-[8.5px] text-zinc-600 font-bold">{log.os_version || log.os} • {log.browser}</p>
-                                     <p className="text-[8px] text-indigo-700 font-mono font-bold line-clamp-1">GPU: {formatGpuChipset(log.webgl_renderer || log.webgl_vendor)}</p>
+                                     {(log.gpu_chipset || (log.webgl_renderer && log.webgl_renderer !== 'Unknown')) && (
+                                       <p className="text-[8px] text-indigo-700 font-mono font-bold line-clamp-1">GPU: {log.gpu_chipset || formatGpuChipset(log.webgl_renderer || log.webgl_vendor)}</p>
+                                     )}
                                      <div className="flex items-center gap-2">
                                         {log.battery_level !== null && (
                                           <div className="flex items-center gap-1 text-emerald-600 text-[8px] font-black">
@@ -2538,7 +2540,9 @@ WHERE id = 'primary';`);
                                     <div className="space-y-1.5 inline-block text-left max-w-[200px]">
                                       <p className="text-sm font-black text-zinc-900 tracking-widest leading-none truncate">{log.device_model || log.device_type || log.browser || 'Unknown'}</p>
                                       <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest border-t border-zinc-200/50 pt-1 inline-block w-full">{log.os_version || log.os || 'UNKNOWN'} • {log.browser}</p>
-                                      <p className="text-[8px] text-indigo-700 line-clamp-1 font-mono leading-tight font-bold">GPU: {formatGpuChipset(log.webgl_renderer || log.webgl_vendor)}</p>
+                                      {(log.gpu_chipset || (log.webgl_renderer && log.webgl_renderer !== 'Unknown')) && (
+                                        <p className="text-[8px] text-indigo-700 line-clamp-1 font-mono leading-tight font-bold">GPU: {log.gpu_chipset || formatGpuChipset(log.webgl_renderer || log.webgl_vendor)}</p>
+                                      )}
                                       <button
                                         type="button"
                                         onClick={() => setSelectedDeviceInfo(log)}

@@ -10,71 +10,32 @@ interface DeviceInfoModalProps {
   shortUrl?: string;
 }
 
-export function formatGpuChipset(rawGpu?: string | null): string {
-  if (!rawGpu || rawGpu === 'Unknown' || rawGpu === 'Generic') {
-    return 'ARM — MediaTek Helio G88 / G85';
-  }
-
-  // MediaTek Helio / Dimensity / Mali
-  if (/mali[- ]?g52/i.test(rawGpu)) return 'ARM — MediaTek Helio G88 / G85';
-  if (/mali[- ]?g57/i.test(rawGpu)) return 'ARM — MediaTek Dimensity 700 / 810';
-  if (/mali[- ]?g77/i.test(rawGpu)) return 'ARM — MediaTek Dimensity 8050 / 1200';
-  if (/mali[- ]?g68/i.test(rawGpu)) return 'ARM — MediaTek Dimensity 900 / 1080';
-  if (/mali[- ]?g78/i.test(rawGpu)) return 'ARM — MediaTek Dimensity 9000';
-  if (/mali[- ]?g710/i.test(rawGpu)) return 'ARM — MediaTek Dimensity 9200';
-  if (/mali/i.test(rawGpu)) {
-    const match = rawGpu.match(/Mali-[A-Za-z0-9\s]+/i);
-    return `ARM — ${match ? match[0] : 'Mali GPU'}`;
-  }
-
-  // Qualcomm Adreno
-  if (/adreno/i.test(rawGpu)) {
-    const match = rawGpu.match(/Adreno\s*\(TM\)?\s*(\d+)/i);
-    return `Qualcomm Adreno ${match ? match[1] : ''} — Snapdragon`;
-  }
-
-  // Apple GPU
-  if (/apple/i.test(rawGpu)) return 'Apple — Bionic GPU';
-
-  // Intel Graphics
-  if (/intel/i.test(rawGpu)) {
-    const match = rawGpu.match(/Intel\(R\)\s*[^,\)]+/i);
-    return match ? match[0] : 'Intel UHD Graphics';
-  }
-
-  // NVIDIA
-  if (/nvidia|geforce/i.test(rawGpu)) {
-    const match = rawGpu.match(/(GeForce\s*[^,\)]+|RTX\s*[^,\)]+|GTX\s*[^,\)]+)/i);
-    return `NVIDIA — ${match ? match[0] : 'GeForce GPU'}`;
-  }
-
-  // Clean ANGLE wrappers
-  const cleaned = rawGpu
-    .replace(/^ANGLE \(([^,]+),\s*([^,\)]+).*\)$/, '$1 — $2')
-    .replace(/^Google Inc\. \((.+)\)$/, '$1');
-
-  return cleaned || 'ARM — MediaTek Helio G88 / G85';
-}
+import { formatGpuChipset } from '../lib/deviceDetector';
+export { formatGpuChipset };
 
 export function DeviceInfoModal({ isOpen, onClose, log, shortUrl }: DeviceInfoModalProps) {
   const [copiedIp, setCopiedIp] = useState(false);
 
   if (!isOpen || !log) return null;
 
-  const ip = log.ip_address || '127.0.0.1';
+  const ip = log.ip_address && log.ip_address !== 'Hidden' && log.ip_address !== 'Auto' ? log.ip_address : '127.0.0.1';
 
-  // Extract or clean device model
+  // Extract real device model without fake placeholders
   const rawDeviceType = log.device_type || 'Desktop';
   let deviceModel = log.device_model;
   if (!deviceModel) {
     if (rawDeviceType.includes('(')) {
       deviceModel = rawDeviceType.replace(/\s*\([^)]*\)/, '').trim();
     } else if (log.os?.toLowerCase().includes('android')) {
-      deviceModel = 'Tecno Camon 20 Premier';
+      deviceModel = 'Android Device';
     } else if (log.os?.toLowerCase().includes('ios')) {
-      deviceModel = 'Apple iPhone 14';
-    } else {
+      deviceModel = 'Apple iPhone';
+    } else if (log.os?.toLowerCase().includes('windows')) {
       deviceModel = 'Windows PC';
+    } else if (log.os?.toLowerCase().includes('mac')) {
+      deviceModel = 'Apple Mac';
+    } else {
+      deviceModel = rawDeviceType || 'Desktop PC';
     }
   }
 
@@ -83,36 +44,32 @@ export function DeviceInfoModal({ isOpen, onClose, log, shortUrl }: DeviceInfoMo
     : `${deviceModel} (${rawDeviceType === 'Desktop' ? 'Desktop' : 'Mobile'})`;
 
   // OS Version
-  const osVersion = log.os_version || log.os || 'Android 14';
+  const osVersion = log.os_version || log.os || 'Not Detected';
 
   // Browser
-  const browser = log.browser || 'Chrome';
+  const browser = log.browser || 'Not Detected';
 
   // Screen
-  const screen = (log.screen_resolution || '360x800').replace(/x/i, '×');
+  const screen = log.screen_resolution && log.screen_resolution !== 'Unknown'
+    ? log.screen_resolution.replace(/x/i, '×')
+    : 'Not Detected';
 
   // GPU / Chipset
-  const gpuChipset = formatGpuChipset(log.webgl_renderer || log.webgl_vendor);
+  const gpuChipset = formatGpuChipset(log.gpu_chipset || log.webgl_renderer || log.webgl_vendor);
 
   // Timezone
-  const timezone = log.timezone && log.timezone !== 'Unknown' ? log.timezone : 'Asia/Karachi';
+  const timezone = log.timezone && log.timezone !== 'Unknown' ? log.timezone : 'Not Available';
 
   // CPU Cores
-  const cpuCores = `${log.hardware_concurrency || 8} cores`;
+  const cpuCores = log.hardware_concurrency ? `${log.hardware_concurrency} cores` : 'Not Detected';
 
   // Touch
   const touchPoints = typeof log.touch_points === 'number'
     ? `${log.touch_points} points`
-    : log.os?.toLowerCase().includes('android') || rawDeviceType.toLowerCase().includes('mobile')
-      ? '5 points'
-      : '0 points';
+    : 'Not Detected';
 
   // User Agent
-  const userAgent = log.user_agent || log.raw_user_agent || (
-    log.os?.toLowerCase().includes('android')
-      ? `Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36`
-      : `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36`
-  );
+  const userAgent = log.raw_user_agent || log.user_agent || 'Not Available';
 
   const displayUrl = shortUrl || (typeof window !== 'undefined' ? `${window.location.host}/${log.short_code || 'link'}` : 'mrsaqib242.vercel.app/contact');
 

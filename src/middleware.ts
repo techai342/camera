@@ -154,6 +154,12 @@ export async function middleware(req: NextRequest) {
   res.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
   res.headers.set('X-Download-Options', 'noopen');
 
+  // Prevent browser caching of application logic and pages (Fixes stale cache across browsers)
+  res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+  res.headers.set('Pragma', 'no-cache');
+  res.headers.set('Expires', '0');
+  res.headers.set('Surrogate-Control', 'no-store');
+
   return res;
 }
 

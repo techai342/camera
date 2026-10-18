@@ -7,12 +7,16 @@ echo     STARTING SHORTYOS 3D CLAY - SAQIB VISUALS
 echo ===================================================
 echo.
 echo  Local PC URL:   http://localhost:3001
-echo  Mobile URL:     http://192.168.1.4:3001
+echo  Mobile Wi-Fi:   http://192.168.1.5:3001
+echo.
 echo  Admin Panel:    http://localhost:3001/mradmin
 echo  Username:       admin
 echo  Password:       saqib99
 echo.
 echo ===================================================
+echo.
+echo Opening browser in 3 seconds...
+start "" http://localhost:3001
 echo.
 npm run dev
 pause

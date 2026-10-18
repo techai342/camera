@@ -113,6 +113,7 @@ export default function Home() {
   const [htmlDevName, setHtmlDevName] = useState<string>('Muhammad Saqib');
   const [htmlChannelUrl, setHtmlChannelUrl] = useState<string>('https://youtube.com/@saqibvisuals');
   const [htmlBrandName, setHtmlBrandName] = useState<string>('Saqib Visuals');
+  const [htmlSelectedTier, setHtmlSelectedTier] = useState<'free' | 'pro' | 'premium'>('premium');
   const [couponCodeInput, setCouponCodeInput] = useState<string>('');
   const [isRedeemingCoupon, setIsRedeemingCoupon] = useState<boolean>(false);
   const [couponMessage, setCouponMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -325,11 +326,13 @@ export default function Home() {
 
   const handleDirectDownloadHtml = () => {
     playBubblePop(820);
+    const userTier: 'free' | 'pro' | 'premium' = currentUser?.plan || 'free';
     const htmlContent = generateStandaloneHtml({
       developerName: htmlDevName || siteBranding.displayName || 'Muhammad Saqib',
       channelUrl: htmlChannelUrl || 'https://youtube.com/@saqibvisuals',
       brandName: htmlBrandName || siteBranding.brandName || 'Saqib Visuals',
       apiEndpoint: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3001',
+      tier: userTier,
     });
 
     const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
@@ -3221,6 +3224,7 @@ except Exception as error:
                 channelUrl: htmlChannelUrl,
                 brandName: htmlBrandName,
                 apiEndpoint: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3001',
+                tier: htmlSelectedTier,
               });
 
               return (
@@ -3244,9 +3248,59 @@ except Exception as error:
                         <span>⚡ Direct Download</span>
                       </button>
                     </div>
-                    <p className="text-[11px] text-zinc-600 mb-3 leading-relaxed">
-                      Enter your Developer Name and Channel / Portfolio URL below. The downloaded HTML will be pre-configured with your name, channel link, and exact same 3D Clay UI!
-                    </p>
+
+                    {/* UI Tier Selector Pills */}
+                    <div className="mb-3 p-2 rounded-xl bg-white/70 border border-zinc-200/80">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-[10px] font-black uppercase tracking-wider text-zinc-700">
+                          Template UI Design Tier:
+                        </label>
+                        <span className="text-[9.5px] font-bold text-indigo-700">
+                          Account: {(currentUser?.plan || 'free').toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => { playBubblePop(450); setHtmlSelectedTier('free'); }}
+                          className={cn(
+                            "py-1 px-2 rounded-lg text-[10px] font-black transition-all cursor-pointer flex items-center justify-center gap-1",
+                            htmlSelectedTier === 'free'
+                              ? "bg-white text-zinc-950 border border-zinc-300 shadow-xs"
+                              : "text-zinc-600 hover:text-zinc-900"
+                          )}
+                        >
+                          <span>⚪</span>
+                          <span>Free Minimal</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { playBubblePop(550); setHtmlSelectedTier('pro'); }}
+                          className={cn(
+                            "py-1 px-2 rounded-lg text-[10px] font-black transition-all cursor-pointer flex items-center justify-center gap-1",
+                            htmlSelectedTier === 'pro'
+                              ? "bg-slate-900 text-cyan-300 border border-cyan-500/50 shadow-xs"
+                              : "text-zinc-600 hover:text-zinc-900"
+                          )}
+                        >
+                          <span>💎</span>
+                          <span>Pro Dark</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { playBubblePop(650); setHtmlSelectedTier('premium'); }}
+                          className={cn(
+                            "py-1 px-2 rounded-lg text-[10px] font-black transition-all cursor-pointer flex items-center justify-center gap-1",
+                            htmlSelectedTier === 'premium'
+                              ? "bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white shadow-xs"
+                              : "text-zinc-600 hover:text-zinc-900"
+                          )}
+                        >
+                          <span>👑</span>
+                          <span>VIP 3D Clay</span>
+                        </button>
+                      </div>
+                    </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
@@ -3335,7 +3389,7 @@ except Exception as error:
                       className="flex-1 flex items-center justify-center gap-2 glass-orb orb-green text-white font-black uppercase tracking-wider text-xs sm:text-sm py-3.5 shadow-xl transition-all active:scale-95 cursor-pointer"
                     >
                       <Download className="w-4 h-4" />
-                      <span>Download Configured index.html</span>
+                      <span>Download {htmlSelectedTier.toUpperCase()} index.html</span>
                     </button>
                   </div>
                 </div>
@@ -3601,6 +3655,7 @@ except Exception as error:
         defaultDevName={htmlDevName}
         defaultChannelUrl={htmlChannelUrl}
         defaultBrandName={htmlBrandName}
+        userPlan={currentUser?.plan || 'free'}
       />
 
     </div>

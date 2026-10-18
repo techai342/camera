@@ -517,6 +517,7 @@ export default function Admin() {
         channelUrl: 'https://youtube.com/@saqibvisuals',
         brandName: profileBrandName || 'Saqib Visuals',
         apiEndpoint: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3001',
+        tier: 'premium',
       });
 
       const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
@@ -3182,6 +3183,7 @@ WHERE id = 'primary';`);
         defaultDevName={profileDisplayName}
         defaultChannelUrl="https://youtube.com/@saqibvisuals"
         defaultBrandName={profileBrandName}
+        userPlan="premium"
       />
     </div>
   );

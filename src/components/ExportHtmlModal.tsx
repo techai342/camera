@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Download, X, Globe, Sparkles, Check, ExternalLink, User, Radio, Code2 } from 'lucide-react';
+import { Download, X, Globe, Sparkles, Check, ExternalLink, User, Radio, Crown, Lock, Zap } from 'lucide-react';
 import { generateStandaloneHtml } from '../lib/htmlTemplateGenerator';
 import { saveAs } from 'file-saver';
+import { cn } from '../lib/utils';
 
 interface ExportHtmlModalProps {
   isOpen: boolean;
@@ -10,6 +11,7 @@ interface ExportHtmlModalProps {
   defaultDevName?: string;
   defaultChannelUrl?: string;
   defaultBrandName?: string;
+  userPlan?: 'free' | 'pro' | 'premium';
 }
 
 export function ExportHtmlModal({
@@ -18,21 +20,28 @@ export function ExportHtmlModal({
   defaultDevName = 'Muhammad Saqib',
   defaultChannelUrl = 'https://youtube.com/@saqibvisuals',
   defaultBrandName = 'Saqib Visuals',
+  userPlan = 'premium',
 }: ExportHtmlModalProps) {
   const [devName, setDevName] = useState(defaultDevName);
   const [channelUrl, setChannelUrl] = useState(defaultChannelUrl);
   const [brandName, setBrandName] = useState(defaultBrandName);
   const [apiEndpoint, setApiEndpoint] = useState(typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3001');
+  const [selectedTier, setSelectedTier] = useState<'free' | 'pro' | 'premium'>(userPlan);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
 
-  const handleDownload = (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
+    setSelectedTier(userPlan);
+  }, [userPlan]);
+
+  const handleDownload = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     try {
       const htmlContent = generateStandaloneHtml({
         developerName: devName.trim() || 'Muhammad Saqib',
         channelUrl: channelUrl.trim() || 'https://youtube.com/@saqibvisuals',
         brandName: brandName.trim() || 'Saqib Visuals',
         apiEndpoint: apiEndpoint.trim() || window.location.origin,
+        tier: selectedTier,
       });
 
       const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
@@ -89,7 +98,7 @@ export function ExportHtmlModal({
                   Export Standalone HTML Webpage
                 </h3>
                 <p className="text-[11px] text-zinc-500 font-bold">
-                  Pre-configured with your Developer Name &amp; Channel Link
+                  Pre-configured with your Developer Name, Channel &amp; UI Tier
                 </p>
               </div>
             </div>
@@ -102,28 +111,126 @@ export function ExportHtmlModal({
           </div>
 
           <form onSubmit={handleDownload} className="space-y-4">
-            {/* Info notice */}
-            <div className="p-3.5 rounded-2xl bg-purple-500/10 border border-purple-500/25 flex items-start gap-2.5 text-xs text-purple-950">
-              <Sparkles className="w-4 h-4 text-purple-600 shrink-0 mt-0.5" />
-              <p className="font-semibold leading-relaxed">
-                Download a single, standalone <code className="font-mono font-bold bg-white/70 px-1.5 py-0.5 rounded text-purple-800">index.html</code> file with the exact same 3D Clay UI. You can open it in any browser or upload to any static hosting without modifying any code!
-              </p>
-            </div>
-
             {/* Quick Direct Download Banner */}
             <div className="p-3 rounded-2xl bg-gradient-to-r from-emerald-500/15 via-teal-500/15 to-emerald-500/15 border border-emerald-500/30 flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <span className="text-xs font-black text-emerald-950 block">⚡ Instant 1-Click Download</span>
-                <span className="text-[10.5px] text-emerald-800 font-semibold truncate block">Bina form bhare foran index.html download karein</span>
+                <span className="text-[10.5px] text-emerald-800 font-semibold truncate block">
+                  Download index.html with current settings
+                </span>
               </div>
               <button
                 type="button"
-                onClick={handleDownload}
+                onClick={() => handleDownload()}
                 className="shrink-0 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-md flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Direct Download</span>
               </button>
+            </div>
+
+            {/* UI Tier Selector Tabs */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-[11px] font-extrabold uppercase tracking-wider text-zinc-800 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>Choose HTML Client UI Theme:</span>
+                </label>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">
+                  Your Plan: {userPlan.toUpperCase()}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 p-1.5 rounded-2xl bg-zinc-100/80 border border-zinc-200">
+                {/* 1. Free Tier Tab */}
+                <button
+                  type="button"
+                  onClick={() => setSelectedTier('free')}
+                  className={cn(
+                    "p-2.5 rounded-xl flex flex-col items-center text-center gap-1 transition-all cursor-pointer",
+                    selectedTier === 'free'
+                      ? "bg-white text-zinc-950 shadow-md font-black border border-zinc-300"
+                      : "text-zinc-600 hover:text-zinc-950 font-bold"
+                  )}
+                >
+                  <span className="text-sm">⚪</span>
+                  <span className="text-xs font-black">Free Simple</span>
+                  <span className="text-[9.5px] text-zinc-400 font-medium">Minimal Flat UI</span>
+                </button>
+
+                {/* 2. Pro Tier Tab */}
+                <button
+                  type="button"
+                  onClick={() => setSelectedTier('pro')}
+                  className={cn(
+                    "p-2.5 rounded-xl flex flex-col items-center text-center gap-1 transition-all cursor-pointer",
+                    selectedTier === 'pro'
+                      ? "bg-slate-900 text-cyan-300 shadow-md font-black border border-cyan-500/50"
+                      : "text-zinc-600 hover:text-zinc-950 font-bold"
+                  )}
+                >
+                  <span className="text-sm">💎</span>
+                  <span className="text-xs font-black">Pro Dark</span>
+                  <span className="text-[9.5px] text-zinc-400 font-medium">Cyber-Glass UI</span>
+                </button>
+
+                {/* 3. Premium VIP Tier Tab */}
+                <button
+                  type="button"
+                  onClick={() => setSelectedTier('premium')}
+                  className={cn(
+                    "p-2.5 rounded-xl flex flex-col items-center text-center gap-1 transition-all cursor-pointer relative overflow-hidden",
+                    selectedTier === 'premium'
+                      ? "bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white shadow-md font-black"
+                      : "text-zinc-600 hover:text-zinc-950 font-bold"
+                  )}
+                >
+                  <span className="text-sm">👑</span>
+                  <span className="text-xs font-black">VIP Premium</span>
+                  <span className="text-[9.5px] opacity-90 font-medium">3D Liquid Glass OS</span>
+                </button>
+              </div>
+
+              {/* Selected Tier Description Card */}
+              <div className={cn(
+                "p-3 rounded-2xl text-xs space-y-1 transition-all",
+                selectedTier === 'premium' && "bg-gradient-to-r from-purple-500/15 via-indigo-500/10 to-pink-500/15 border border-purple-500/30 text-purple-950",
+                selectedTier === 'pro' && "bg-slate-900 border border-cyan-500/40 text-cyan-300",
+                selectedTier === 'free' && "bg-slate-100 border border-slate-300 text-slate-800"
+              )}>
+                {selectedTier === 'premium' && (
+                  <>
+                    <div className="flex items-center gap-1.5 font-black text-purple-900">
+                      <Crown className="w-3.5 h-3.5 text-amber-500" />
+                      <span>Exact 3D Claymorphic Liquid Glass OS (Same as Main App)</span>
+                    </div>
+                    <p className="text-[11px] text-purple-800 font-medium">
+                      Includes tactile Web Audio bubble pop sounds, animated ambient refraction blobs, dual-shadow clay boxes, embedded Google Maps GPS preview, camera photo lightbox, and QR code generator!
+                    </p>
+                  </>
+                )}
+                {selectedTier === 'pro' && (
+                  <>
+                    <div className="flex items-center gap-1.5 font-black text-cyan-400">
+                      <Zap className="w-3.5 h-3.5" />
+                      <span>Sleek Cyber-Glass Dark UI</span>
+                    </div>
+                    <p className="text-[11px] text-slate-300 font-medium">
+                      Deep dark tech theme with neon cyan glowing borders, glassmorphism telemetry cards, and futuristic fonts.
+                    </p>
+                  </>
+                )}
+                {selectedTier === 'free' && (
+                  <>
+                    <div className="flex items-center gap-1.5 font-black text-slate-800">
+                      <span>Standard Minimalist Flat UI</span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 font-medium">
+                      Clean and lightweight design with standard forms and basic log stream.
+                    </p>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* Input 1: Developer Name */}
@@ -160,7 +267,7 @@ export function ExportHtmlModal({
                 className="w-full text-xs font-mono font-bold px-3.5 py-2.5 rounded-xl bg-white/80 border border-zinc-300/80 focus:ring-2 focus:ring-purple-500 text-zinc-900 shadow-inner"
               />
               <span className="text-[10px] text-zinc-500 font-semibold block">
-                Visitors who click &quot;Join Channel&quot; will be redirected here
+                Visitors who click &quot;Official Channel&quot; will be redirected here
               </span>
             </div>
 
@@ -198,7 +305,7 @@ export function ExportHtmlModal({
             {/* Live Preview Box */}
             <div className="p-3.5 rounded-2xl bg-white/70 border border-white/90 shadow-sm space-y-2">
               <span className="text-[10px] font-black uppercase tracking-wider text-zinc-500 block">
-                Live Badge Preview (As Seen in Downloaded HTML):
+                Live Badge Preview (In Downloaded HTML):
               </span>
               <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl bg-zinc-100/80 border border-zinc-200">
                 <div className="flex items-center gap-1.5 text-xs font-extrabold text-indigo-950">
@@ -217,7 +324,7 @@ export function ExportHtmlModal({
             {downloadSuccess && (
               <div className="p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-900 text-xs font-bold flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Downloaded index.html successfully! Check your browser Downloads folder.</span>
+                <span>Downloaded {selectedTier.toUpperCase()} index.html successfully! Check your browser Downloads folder.</span>
               </div>
             )}
 
@@ -235,7 +342,7 @@ export function ExportHtmlModal({
                 className="px-5 py-2.5 rounded-xl text-xs font-black text-white bg-gradient-to-r from-purple-600 via-indigo-600 to-pink-600 hover:from-purple-700 hover:to-indigo-700 active:scale-95 shadow-lg shadow-purple-500/25 transition-all flex items-center gap-2 cursor-pointer"
               >
                 <Download className="w-4 h-4" />
-                <span>Download index.html</span>
+                <span>Download {selectedTier.toUpperCase()} index.html</span>
               </button>
             </div>
           </form>

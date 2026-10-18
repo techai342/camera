@@ -92,6 +92,16 @@ export function UserAuthModal({
         }
 
         playBubblePop(880);
+        if (data.token) {
+          try {
+            localStorage.setItem('supashort_user_token', data.token);
+          } catch {}
+        }
+        if (data.user) {
+          try {
+            localStorage.setItem('supashort_user_cache', JSON.stringify(data.user));
+          } catch {}
+        }
         // Automatically logged in!
         onSuccess(data.user);
         onClose();
@@ -136,6 +146,16 @@ export function UserAuthModal({
         }
 
         playBubblePop(880);
+        if (data.token) {
+          try {
+            localStorage.setItem('supashort_user_token', data.token);
+          } catch {}
+        }
+        if (data.user) {
+          try {
+            localStorage.setItem('supashort_user_cache', JSON.stringify(data.user));
+          } catch {}
+        }
         onSuccess(data.user);
         onClose();
       } catch {

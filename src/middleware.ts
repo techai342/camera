@@ -71,11 +71,30 @@ export async function middleware(req: NextRequest) {
   if (['POST', 'PATCH', 'DELETE'].includes(method) && pathname.startsWith('/api/')) {
     const origin = req.headers.get('origin');
     const host = req.headers.get('host');
+    const xForwardedHost = req.headers.get('x-forwarded-host');
     if (origin && host) {
       try {
         const originUrl = new URL(origin);
-        // Ensure request comes from same host or trusted internal origin
-        if (originUrl.host !== host && !originUrl.host.includes('localhost') && !originUrl.host.includes('127.0.0.1')) {
+        const originHostname = originUrl.hostname.toLowerCase();
+        const originHost = originUrl.host.toLowerCase();
+        const hostLower = host.toLowerCase();
+
+        const isLocalOrLan = 
+          originHostname === 'localhost' ||
+          originHostname === '127.0.0.1' ||
+          originHostname === '::1' ||
+          originHostname === '0.0.0.0' ||
+          /^192\.168\./.test(originHostname) ||
+          /^10\./.test(originHostname) ||
+          /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(originHostname);
+
+        const isHostMatch = 
+          originHost === hostLower || 
+          originHostname === hostLower || 
+          hostLower.startsWith(originHostname) ||
+          (xForwardedHost && (originHost === xForwardedHost.toLowerCase() || originHostname === xForwardedHost.toLowerCase()));
+
+        if (!isHostMatch && !isLocalOrLan) {
           return NextResponse.json({ error: 'Cross-Site Request Forgery (CSRF) blocked' }, { status: 403 });
         }
       } catch {
@@ -85,12 +104,34 @@ export async function middleware(req: NextRequest) {
   }
 
   // 3. Rate Limiting Protection
-  // Strict rate limit on Admin Login (Brute-Force Shield: 5 requests per 15 min)
+  const isLocalOrLanIp = 
+    ip === '127.0.0.1' || 
+    ip === '::1' || 
+    ip.startsWith('192.168.') || 
+    ip.startsWith('10.');
+
+  // Admin login brute-force protection (25 requests per 5 minutes for remote, 100 for local)
   if (pathname === '/api/admin/auth' && method === 'POST') {
-    const rateCheck = checkRateLimit(`login:${ip}`, 5, 15 * 60 * 1000);
+    const adminLimit = isLocalOrLanIp ? 100 : 25;
+    const rateCheck = checkRateLimit(`login:${ip}`, adminLimit, 5 * 60 * 1000);
     if (!rateCheck.allowed) {
       return NextResponse.json(
-        { error: 'Rate limit exceeded: Too many login attempts. Please wait 15 minutes.' },
+        { error: 'Rate limit exceeded: Too many login attempts. Please wait a few minutes.' },
+        { 
+          status: 429,
+          headers: {
+            'Retry-After': rateCheck.retryAfter.toString(),
+          }
+        }
+      );
+    }
+  } else if (pathname === '/api/user/auth' && method === 'POST') {
+    // User login/register rate limit (40 requests per 2 minutes, 120 for local)
+    const userAuthLimit = isLocalOrLanIp ? 120 : 40;
+    const rateCheck = checkRateLimit(`userauth:${ip}`, userAuthLimit, 2 * 60 * 1000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        { error: 'Too many authentication attempts. Please slow down.' },
         { 
           status: 429,
           headers: {
@@ -100,8 +141,8 @@ export async function middleware(req: NextRequest) {
       );
     }
   } else if (pathname.startsWith('/api/')) {
-    // General API rate limit: 120 requests per minute
-    const rateCheck = checkRateLimit(`api:${ip}`, 120, 60 * 1000);
+    // General API rate limit: 150 requests per minute
+    const rateCheck = checkRateLimit(`api:${ip}`, 150, 60 * 1000);
     if (!rateCheck.allowed) {
       return NextResponse.json(
         { error: 'Too many requests. Please slow down.' },
@@ -117,7 +158,13 @@ export async function middleware(req: NextRequest) {
 
   // 4. Admin API Protection (Zero Direct API Access without Active Session)
   if (pathname.startsWith('/api/admin/') && pathname !== '/api/admin/auth') {
-    const token = req.cookies.get(COOKIE_NAME)?.value;
+    let token = req.cookies.get(COOKIE_NAME)?.value;
+    if (!token) {
+      const authHeader = req.headers.get('authorization');
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7).trim();
+      }
+    }
     const { valid } = await verifySessionToken(token);
 
     if (!valid) {

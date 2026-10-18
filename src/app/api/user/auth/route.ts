@@ -8,6 +8,19 @@ import {
   USER_COOKIE_NAME,
 } from '../../../../lib/userAuth';
 
+function isRequestSecure(req: Request): boolean {
+  const proto = req.headers.get('x-forwarded-proto');
+  if (proto) {
+    return proto.toLowerCase() === 'https';
+  }
+  try {
+    const url = new URL(req.url);
+    return url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 export async function OPTIONS() {
   const response = NextResponse.json({}, { status: 200 });
   response.headers.set('Access-Control-Allow-Origin', '*');
@@ -49,6 +62,8 @@ export async function POST(req: Request) {
       );
     }
 
+    const isSecure = isRequestSecure(req);
+
     // ========================================================
     // ACTION: REGISTER
     // ========================================================
@@ -72,11 +87,11 @@ export async function POST(req: Request) {
         );
       }
 
-      // 1. Check if username already exists
-      const { data: existingUser } = await supabase
+      // 1. Check if username already exists (case-insensitive)
+      const { data: existingUser } = await supabaseAdmin
         .from('app_users')
         .select('id')
-        .eq('username', cleanUsername)
+        .ilike('username', cleanUsername)
         .maybeSingle();
 
       if (existingUser) {
@@ -86,12 +101,12 @@ export async function POST(req: Request) {
         );
       }
 
-      // 2. Check if email already exists
+      // 2. Check if email already exists (case-insensitive)
       try {
-        const { data: existingEmail } = await supabase
+        const { data: existingEmail } = await supabaseAdmin
           .from('app_users')
           .select('id')
-          .eq('email', cleanEmail)
+          .ilike('email', cleanEmail)
           .maybeSingle();
 
         if (existingEmail) {
@@ -112,7 +127,7 @@ export async function POST(req: Request) {
       let insertError: any = null;
 
       try {
-        const res = await supabase
+        const res = await supabaseAdmin
           .from('app_users')
           .insert([
             {
@@ -131,7 +146,7 @@ export async function POST(req: Request) {
 
       // Fallback if email column not created yet in DB
       if (insertError && (insertError.message?.includes('column "email"') || insertError.code === '42703')) {
-        const fallbackRes = await supabase
+        const fallbackRes = await supabaseAdmin
           .from('app_users')
           .insert([
             {
@@ -148,7 +163,7 @@ export async function POST(req: Request) {
       if (insertError || !newUser) {
         console.error('Registration DB error:', insertError);
         return NextResponse.json(
-          { error: 'Failed to create user account. Please run the SQL query in Supabase to create or update app_users table.' },
+          { error: 'Failed to create user account. Please check database connectivity.' },
           { status: 500 }
         );
       }
@@ -163,16 +178,17 @@ export async function POST(req: Request) {
       const response = NextResponse.json({
         success: true,
         message: 'Account created and logged in successfully!',
+        token,
         user: { id: newUser.id, username: newUser.username, email: newUser.email || cleanEmail },
       });
 
-      // Set HTTP-Only Session Cookie
+      // Set HTTP-Only Session Cookie with dynamic HTTPS security
       response.cookies.set({
         name: USER_COOKIE_NAME,
         value: token,
         httpOnly: true,
         sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
+        secure: isSecure,
         path: '/',
         maxAge: 60 * 60 * 24 * 30, // 30 days
       });
@@ -186,22 +202,22 @@ export async function POST(req: Request) {
     if (action === 'login') {
       let user: any = null;
 
-      // 1. Check by username
+      // 1. Check by username (case-insensitive)
       const { data: userByUsername } = await supabaseAdmin
         .from('app_users')
         .select('id, username, email, password_hash, is_banned')
-        .eq('username', identifier)
+        .ilike('username', identifier)
         .maybeSingle();
 
       if (userByUsername) {
         user = userByUsername;
       } else {
-        // 2. Check by email if username didn't match
+        // 2. Check by email if username didn't match (case-insensitive)
         try {
           const { data: userByEmail } = await supabaseAdmin
             .from('app_users')
             .select('id, username, email, password_hash, is_banned')
-            .eq('email', identifier)
+            .ilike('email', identifier)
             .maybeSingle();
           if (userByEmail) user = userByEmail;
         } catch {
@@ -224,8 +240,14 @@ export async function POST(req: Request) {
         );
       }
 
-      // Salt uses user.username
-      const isValid = await verifyUserPassword(password, user.username, user.password_hash);
+      // Salt uses user.username from DB record
+      let isValid = await verifyUserPassword(password, user.username, user.password_hash);
+      
+      // Fallback: check if user accidentally included trailing/leading whitespace in password
+      if (!isValid && password.trim() !== password) {
+        isValid = await verifyUserPassword(password.trim(), user.username, user.password_hash);
+      }
+
       if (!isValid) {
         return NextResponse.json(
           { error: 'Invalid username/email or password.' },
@@ -243,6 +265,7 @@ export async function POST(req: Request) {
       const response = NextResponse.json({
         success: true,
         message: 'Logged in successfully!',
+        token,
         user: { id: user.id, username: user.username, email: user.email },
       });
 
@@ -251,7 +274,7 @@ export async function POST(req: Request) {
         value: token,
         httpOnly: true,
         sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
+        secure: isSecure,
         path: '/',
         maxAge: 60 * 60 * 24 * 30, // 30 days
       });
@@ -266,14 +289,15 @@ export async function POST(req: Request) {
   }
 }
 
-export async function DELETE() {
+export async function DELETE(req: Request) {
+  const isSecure = isRequestSecure(req);
   const response = NextResponse.json({ success: true, message: 'Logged out successfully.' });
   response.cookies.set({
     name: USER_COOKIE_NAME,
     value: '',
     httpOnly: true,
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    secure: isSecure,
     path: '/',
     maxAge: 0,
   });

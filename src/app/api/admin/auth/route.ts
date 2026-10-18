@@ -1,6 +1,19 @@
 import { NextResponse } from 'next/server';
 import { verifyCredentials, createSessionToken, verifySessionToken, COOKIE_NAME } from '../../../../lib/auth';
 
+function isRequestSecure(req: Request): boolean {
+  const proto = req.headers.get('x-forwarded-proto');
+  if (proto) {
+    return proto.toLowerCase() === 'https';
+  }
+  try {
+    const url = new URL(req.url);
+    return url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -23,9 +36,9 @@ export async function POST(req: Request) {
 
     const { token, expiresAt } = await createSessionToken(username);
 
-    const isProduction = process.env.NODE_ENV === 'production';
+    const isSecure = isRequestSecure(req);
     const response = NextResponse.json(
-      { success: true, message: 'Handshake authenticated successfully' },
+      { success: true, message: 'Handshake authenticated successfully', token },
       { status: 200 }
     );
 
@@ -33,8 +46,8 @@ export async function POST(req: Request) {
       name: COOKIE_NAME,
       value: token,
       httpOnly: true,
-      secure: isProduction,
-      sameSite: 'strict',
+      secure: isSecure,
+      sameSite: 'lax',
       path: '/',
       expires: new Date(expiresAt),
       maxAge: 60 * 60 * 24, // 24 hours
@@ -51,9 +64,17 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   try {
+    let token: string | null = null;
     const cookieHeader = req.headers.get('cookie') || '';
     const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${COOKIE_NAME}=([^;]+)`));
-    const token = match ? match[1] : null;
+    if (match) token = match[1];
+
+    if (!token) {
+      const auth = req.headers.get('authorization');
+      if (auth && auth.startsWith('Bearer ')) {
+        token = auth.substring(7).trim();
+      }
+    }
 
     const { valid, user } = await verifySessionToken(token);
     if (!valid) {
@@ -66,13 +87,15 @@ export async function GET(req: Request) {
   }
 }
 
-export async function DELETE() {
+export async function DELETE(req: Request) {
+  const isSecure = isRequestSecure(req);
   const response = NextResponse.json({ success: true, message: 'Session terminated' });
   response.cookies.set({
     name: COOKIE_NAME,
     value: '',
     httpOnly: true,
-    sameSite: 'strict',
+    sameSite: 'lax',
+    secure: isSecure,
     path: '/',
     maxAge: 0,
     expires: new Date(0),

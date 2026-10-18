@@ -24,6 +24,10 @@ const ExportHtmlModal = dynamic(() => import('../components/ExportHtmlModal').th
   ssr: false,
 });
 
+const DeviceInfoModal = dynamic(() => import('../components/DeviceInfoModal').then(m => m.DeviceInfoModal), {
+  ssr: false,
+});
+
 const ADMIN_SQL_QUERY = `-- =========================================================================
 -- 1. Create admin_settings table in Supabase
 -- =========================================================================
@@ -127,6 +131,7 @@ export default function Admin() {
   const [selectedLink, setSelectedLink] = useState<any>(null);
   const [analytics, setAnalytics] = useState<any[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedDeviceInfo, setSelectedDeviceInfo] = useState<any | null>(null);
   const [stats, setStats] = useState({ totalLinks: 0, totalClicks: 0, totalAdmins: 0, totalVisitors: 0 });
   const router = useRouter();
 
@@ -491,6 +496,11 @@ export default function Admin() {
       });
       const json = await res.json();
       if (res.ok && json.success) {
+        if (json.token) {
+          try {
+            sessionStorage.setItem('mradmin_token', json.token);
+          } catch {}
+        }
         setIsAuthenticated(true);
         fetchGlobalData();
       } else {
@@ -505,7 +515,13 @@ export default function Admin() {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/admin/auth', { method: 'DELETE' });
+      const token = typeof window !== 'undefined' ? sessionStorage.getItem('mradmin_token') : null;
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      await fetch('/api/admin/auth', { method: 'DELETE', headers });
+    } catch {}
+    try {
+      sessionStorage.removeItem('mradmin_token');
     } catch {}
     window.location.reload();
   };
@@ -537,7 +553,11 @@ export default function Admin() {
   const fetchGlobalData = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/links');
+      const token = typeof window !== 'undefined' ? sessionStorage.getItem('mradmin_token') : null;
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const res = await fetch('/api/admin/links', { headers });
       if (res.status === 401) {
         setIsAuthenticated(false);
         return;
@@ -2419,6 +2439,16 @@ WHERE id = 'primary';`);
                                     <span className="text-[9px] font-black uppercase tracking-widest">Precise Location</span>
                                   </a>
                                 )}
+
+                                {/* Device Info Action */}
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedDeviceInfo(log)}
+                                  className="flex items-center justify-center gap-2 w-full py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-700 rounded-xl border border-indigo-500/25 transition-all active:scale-[0.98] font-extrabold shadow-sm cursor-pointer"
+                                >
+                                  <span>📱</span>
+                                  <span className="text-[9px] font-black uppercase tracking-widest">Device Info Modal</span>
+                                </button>
                               </div>
 
                               {/* Compact Footer */}
@@ -2506,6 +2536,13 @@ WHERE id = 'primary';`);
                                       <p className="text-sm font-black text-zinc-900 tracking-widest leading-none truncate">{log.browser || 'Unknown'}</p>
                                       <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest border-t border-zinc-200/50 pt-1 inline-block w-full">{log.os || 'UNKNOWN'}</p>
                                       <p className="text-[8px] text-zinc-400 line-clamp-1 font-mono leading-tight italic">GPU: {log.webgl_renderer || 'Generic'}</p>
+                                      <button
+                                        type="button"
+                                        onClick={() => setSelectedDeviceInfo(log)}
+                                        className="mt-1 px-2.5 py-1 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[9.5px] font-black border border-indigo-200/60 shadow-xs flex items-center gap-1 active:scale-95 transition-all cursor-pointer"
+                                      >
+                                        <span>📱</span> Device Info
+                                      </button>
                                     </div>
                                   </td>
 
@@ -2593,6 +2630,14 @@ WHERE id = 'primary';`);
             </div>
           )}
         </AnimatePresence>
+
+        {/* Visitor Intelligence Device Info Modal */}
+        <DeviceInfoModal
+          isOpen={!!selectedDeviceInfo}
+          onClose={() => setSelectedDeviceInfo(null)}
+          log={selectedDeviceInfo}
+          shortUrl={selectedLink ? `${typeof window !== 'undefined' ? window.location.host : ''}/${selectedLink.short_code}` : undefined}
+        />
 
         {/* Admin Profile & Settings Modal */}
         <AnimatePresence>

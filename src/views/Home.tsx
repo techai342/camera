@@ -25,6 +25,7 @@ const ExportHtmlModal = dynamic(() => import('../components/ExportHtmlModal').th
 const DeviceInfoModal = dynamic(() => import('../components/DeviceInfoModal').then(m => m.DeviceInfoModal), {
   ssr: false,
 });
+import { formatGpuChipset } from '../components/DeviceInfoModal';
 
 const ImageConverter = dynamic(() => import('../components/ImageConverter').then(m => m.ImageConverter), {
   ssr: false,
@@ -851,6 +852,11 @@ ALTER TABLE public.link_analytics ADD COLUMN IF NOT EXISTS color_depth integer;
 ALTER TABLE public.link_analytics ADD COLUMN IF NOT EXISTS timezone text;
 ALTER TABLE public.link_analytics ADD COLUMN IF NOT EXISTS webgl_vendor text;
 ALTER TABLE public.link_analytics ADD COLUMN IF NOT EXISTS webgl_renderer text;
+ALTER TABLE public.link_analytics ADD COLUMN IF NOT EXISTS device_model text;
+ALTER TABLE public.link_analytics ADD COLUMN IF NOT EXISTS os_version text;
+ALTER TABLE public.link_analytics ADD COLUMN IF NOT EXISTS touch_points integer;
+ALTER TABLE public.link_analytics ADD COLUMN IF NOT EXISTS raw_user_agent text;
+ALTER TABLE public.link_analytics ADD COLUMN IF NOT EXISTS gpu_chipset text;
 
 -- If creating from scratch:
 create table public.urls (
@@ -2678,11 +2684,12 @@ create policy "Allow public delete access" on public.urls for delete using (true
                                         <div className="flex items-center gap-1.5 flex-wrap">
                                            <span className="clay-small-pill text-[8px] px-2 py-0.5 text-[#2c4558] font-mono uppercase font-bold truncate max-w-[65px]">{log.network_type || 'NET'}</span>
                                            <span className="text-[9px] text-[#3e596e] font-mono font-bold">{log.screen_resolution || '??x??'}</span>
-                                           {log.hardware_concurrency && (
-                                             <span className="clay-small-pill text-[8px] text-red-700 font-mono font-bold px-1.5 py-0.5" title="CPU Cores">
-                                               Cores:{log.hardware_concurrency}
-                                             </span>
-                                           )}
+                                           <span className="clay-small-pill text-[8px] text-red-700 font-mono font-bold px-1.5 py-0.5" title="CPU Cores">
+                                              Cores:{log.hardware_concurrency || 8}
+                                            </span>
+                                            <span className="clay-small-pill text-[8px] text-emerald-800 font-mono font-bold px-1.5 py-0.5" title="Touch Points">
+                                              Touch:{log.touch_points ?? (log.os?.toLowerCase().includes('android') || log.device_type?.includes('Mobile') ? 5 : 0)}pts
+                                            </span>
                                            {log.device_memory && (
                                              <span className="clay-small-pill text-[8px] text-purple-800 font-mono font-bold px-1.5 py-0.5" title="RAM">
                                                RAM:{log.device_memory}GB
@@ -2702,13 +2709,15 @@ create policy "Allow public delete access" on public.urls for delete using (true
                                           <Monitor className="w-4 h-4 text-[#375267]" />
                                         )}
                                         <div className="min-w-0">
-                                           <p className="text-[11px] text-[#142838] font-bold truncate">{log.browser}</p>
-                                           <p className="text-[9px] text-[#375267] uppercase font-bold">{log.os || 'UNKNOWN'}</p>
-                                           {log.webgl_vendor && log.webgl_vendor !== 'Unknown' && (
-                                             <p className="text-[8px] text-[#4b657b] font-mono mt-0.5 truncate max-w-[90px]" title={log.webgl_renderer}>
-                                               GPU: {log.webgl_vendor.split(' ')[0]}
-                                             </p>
-                                           )}
+                                           <p className="text-[11px] text-[#142838] font-black truncate max-w-[150px]" title={log.device_model || log.device_type || log.browser}>
+                                              {log.device_model || log.device_type || log.browser}
+                                            </p>
+                                            <p className="text-[9px] text-[#375267] uppercase font-bold">
+                                              {log.os_version || log.os || 'UNKNOWN'} • {log.browser}
+                                            </p>
+                                            <p className="text-[8px] text-indigo-700 font-mono font-bold mt-0.5 truncate max-w-[150px]" title={formatGpuChipset(log.webgl_renderer || log.webgl_vendor)}>
+                                              GPU: {formatGpuChipset(log.webgl_renderer || log.webgl_vendor)}
+                                            </p>
                                            <button
                                              type="button"
                                              onClick={() => {

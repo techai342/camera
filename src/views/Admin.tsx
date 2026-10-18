@@ -19,6 +19,7 @@ import dynamic from 'next/dynamic';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateStandaloneHtml } from '../lib/htmlTemplateGenerator';
+import { formatGpuChipset } from '../components/DeviceInfoModal';
 
 const ExportHtmlModal = dynamic(() => import('../components/ExportHtmlModal').then(m => m.ExportHtmlModal), {
   ssr: false,
@@ -2377,7 +2378,9 @@ WHERE id = 'primary';`);
                                         <span className="bg-white/80 px-2 py-0.5 rounded-md text-[8px] text-zinc-700 font-mono border border-white/90 shadow-sm">{log.browser?.split(' ')[0] || '??'}</span>
                                         <span className="bg-emerald-500/10 px-2 py-0.5 rounded-md text-[7px] text-emerald-800 font-black border border-emerald-500/20 uppercase tracking-tighter">Passive Node</span>
                                      </div>
-                                     <p className="text-[10px] font-black text-zinc-800 tracking-tight line-clamp-1">{log.browser || 'Unknown Browser'}</p>
+                                     <p className="text-[11px] font-black text-zinc-900 tracking-tight line-clamp-1">{log.device_model || log.device_type || log.browser || 'Unknown Device'}</p>
+                                     <p className="text-[8.5px] text-zinc-600 font-bold">{log.os_version || log.os} • {log.browser}</p>
+                                     <p className="text-[8px] text-indigo-700 font-mono font-bold line-clamp-1">GPU: {formatGpuChipset(log.webgl_renderer || log.webgl_vendor)}</p>
                                      <div className="flex items-center gap-2">
                                         {log.battery_level !== null && (
                                           <div className="flex items-center gap-1 text-emerald-600 text-[8px] font-black">
@@ -2533,9 +2536,9 @@ WHERE id = 'primary';`);
 
                                   <td className="px-8 py-6 text-center">
                                     <div className="space-y-1.5 inline-block text-left max-w-[200px]">
-                                      <p className="text-sm font-black text-zinc-900 tracking-widest leading-none truncate">{log.browser || 'Unknown'}</p>
-                                      <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest border-t border-zinc-200/50 pt-1 inline-block w-full">{log.os || 'UNKNOWN'}</p>
-                                      <p className="text-[8px] text-zinc-400 line-clamp-1 font-mono leading-tight italic">GPU: {log.webgl_renderer || 'Generic'}</p>
+                                      <p className="text-sm font-black text-zinc-900 tracking-widest leading-none truncate">{log.device_model || log.device_type || log.browser || 'Unknown'}</p>
+                                      <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest border-t border-zinc-200/50 pt-1 inline-block w-full">{log.os_version || log.os || 'UNKNOWN'} • {log.browser}</p>
+                                      <p className="text-[8px] text-indigo-700 line-clamp-1 font-mono leading-tight font-bold">GPU: {formatGpuChipset(log.webgl_renderer || log.webgl_vendor)}</p>
                                       <button
                                         type="button"
                                         onClick={() => setSelectedDeviceInfo(log)}

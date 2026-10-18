@@ -110,6 +110,22 @@ export function ExportHtmlModal({
               </p>
             </div>
 
+            {/* Quick Direct Download Banner */}
+            <div className="p-3 rounded-2xl bg-gradient-to-r from-emerald-500/15 via-teal-500/15 to-emerald-500/15 border border-emerald-500/30 flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <span className="text-xs font-black text-emerald-950 block">⚡ Instant 1-Click Download</span>
+                <span className="text-[10.5px] text-emerald-800 font-semibold truncate block">Bina form bhare foran index.html download karein</span>
+              </div>
+              <button
+                type="button"
+                onClick={handleDownload}
+                className="shrink-0 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-md flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Direct Download</span>
+              </button>
+            </div>
+
             {/* Input 1: Developer Name */}
             <div className="space-y-1">
               <label className="text-[11px] font-extrabold uppercase tracking-wider text-zinc-800 flex items-center gap-1.5">

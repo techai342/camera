@@ -323,6 +323,26 @@ export default function Home() {
     setCurrentUser(null);
   };
 
+  const handleDirectDownloadHtml = () => {
+    playBubblePop(820);
+    const htmlContent = generateStandaloneHtml({
+      developerName: htmlDevName || siteBranding.displayName || 'Muhammad Saqib',
+      channelUrl: htmlChannelUrl || 'https://youtube.com/@saqibvisuals',
+      brandName: htmlBrandName || siteBranding.brandName || 'Saqib Visuals',
+      apiEndpoint: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3001',
+    });
+
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'index.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   useEffect(() => {
     if (!analyticsLink) return;
 
@@ -1015,19 +1035,33 @@ create policy "Allow public delete access" on public.urls for delete using (true
                 </span>
               </button>
               <button
+                onClick={handleDirectDownloadHtml}
+                className="w-full flex items-center justify-between px-4 py-2.5 text-[14px] font-bold rounded-full bg-gradient-to-r from-emerald-500/25 via-teal-500/20 to-emerald-500/25 border border-emerald-500/40 hover:bg-emerald-500/35 text-emerald-950 transition-all cursor-pointer shadow-xs active:scale-98 group"
+                title="1-Click Direct Download Standalone index.html Webpage"
+              >
+                <div className="flex items-center gap-3.5">
+                  <Download className="w-5 h-5 text-emerald-600 shrink-0 group-hover:translate-y-0.5 transition-transform" />
+                  <span className="font-black">Direct Download HTML</span>
+                </div>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[9px] font-black uppercase tracking-wider shadow-xs animate-pulse">
+                  1-CLICK
+                </span>
+              </button>
+
+              <button
                 onClick={() => {
                   playBubblePop(700);
                   setShowExportHtmlModal(true);
                 }}
                 className="w-full flex items-center justify-between px-4 py-2.5 text-[14px] font-bold rounded-full bg-gradient-to-r from-purple-500/20 via-indigo-500/15 to-pink-500/20 border border-purple-500/40 hover:bg-purple-500/25 text-purple-950 transition-all cursor-pointer shadow-xs active:scale-98"
-                title="Download Standalone Single HTML Webpage"
+                title="Customize Developer Name & Channel before Downloading"
               >
                 <div className="flex items-center gap-3.5">
                   <Globe className="w-5 h-5 text-purple-600 shrink-0" />
-                  <span className="font-black">Download HTML</span>
+                  <span className="font-black">Customize HTML</span>
                 </div>
-                <span className="px-2 py-0.5 rounded-full bg-purple-600 text-white text-[9.5px] font-black uppercase tracking-wider shadow-xs">
-                  CLIENT
+                <span className="px-2 py-0.5 rounded-full bg-purple-600 text-white text-[9px] font-black uppercase tracking-wider shadow-xs">
+                  SETUP
                 </span>
               </button>
             </nav>
@@ -1289,6 +1323,17 @@ create policy "Allow public delete access" on public.urls for delete using (true
                     <Lock className="w-2 h-2" />
                   </span>
                 )}
+              </button>
+
+              {/* Direct HTML Download Button */}
+              <button
+                onClick={handleDirectDownloadHtml}
+                className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-700 hover:to-teal-700 text-white text-[10px] sm:text-xs font-black shadow-md flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer shrink-0"
+                title="1-Click Instant Direct Download standalone index.html"
+              >
+                <Download className="w-3.5 h-3.5 shrink-0" />
+                <span className="hidden sm:inline">Direct HTML</span>
+                <span className="sm:hidden font-bold">HTML</span>
               </button>
 
               {/* Join Channel Button */}
@@ -3182,14 +3227,22 @@ except Exception as error:
                 <div className="flex flex-col gap-4">
                   {/* Developer Customization Inputs */}
                   <div className="bg-indigo-50/70 border border-indigo-200/80 rounded-2xl p-4 shadow-sm">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Sparkles className="w-4 h-4 text-indigo-600" />
-                      <h4 className="text-xs sm:text-sm font-black text-indigo-950 uppercase tracking-wide">
-                        Set Developer Name & Channel Link
-                      </h4>
-                      <span className="ml-auto text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700">
-                        Zero Code Editing
-                      </span>
+                    <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-indigo-600" />
+                        <h4 className="text-xs sm:text-sm font-black text-indigo-950 uppercase tracking-wide">
+                          Set Developer Name &amp; Channel Link
+                        </h4>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleDirectDownloadHtml}
+                        className="text-[10.5px] font-black px-3 py-1 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm flex items-center gap-1 active:scale-95 transition-all cursor-pointer"
+                        title="Download index.html right away without editing"
+                      >
+                        <Download className="w-3 h-3" />
+                        <span>⚡ Direct Download</span>
+                      </button>
                     </div>
                     <p className="text-[11px] text-zinc-600 mb-3 leading-relaxed">
                       Enter your Developer Name and Channel / Portfolio URL below. The downloaded HTML will be pre-configured with your name, channel link, and exact same 3D Clay UI!

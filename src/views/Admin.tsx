@@ -12,12 +12,13 @@ import {
   MapPin, Camera, Navigation, ArrowUpRight, X, Clock, Pin, PinOff,
   LogOut, User, Settings, Check, Copy, Sparkles, Ticket, Users, 
   Plus, Ban, Edit3, Link2, CheckCircle2, AlertTriangle, Key, Tag,
-  Zap, Crown, Sliders, Layers
+  Zap, Crown, Sliders, Layers, Download
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { generateStandaloneHtml } from '../lib/htmlTemplateGenerator';
 
 const ExportHtmlModal = dynamic(() => import('../components/ExportHtmlModal').then(m => m.ExportHtmlModal), {
   ssr: false,
@@ -507,6 +508,29 @@ export default function Admin() {
       await fetch('/api/admin/auth', { method: 'DELETE' });
     } catch {}
     window.location.reload();
+  };
+
+  const handleDirectDownloadHtml = () => {
+    try {
+      const htmlContent = generateStandaloneHtml({
+        developerName: profileDisplayName || 'Muhammad Saqib',
+        channelUrl: 'https://youtube.com/@saqibvisuals',
+        brandName: profileBrandName || 'Saqib Visuals',
+        apiEndpoint: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3001',
+      });
+
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'index.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error('Direct download failed:', e);
+    }
   };
 
   const fetchGlobalData = async () => {
@@ -1002,6 +1026,14 @@ export function useMyDomainAnalytics() {
               >
                 <Globe className="w-3.5 h-3.5" />
                 <span>Export HTML Client</span>
+              </button>
+              <button 
+                onClick={handleDirectDownloadHtml}
+                className="text-emerald-800 hover:text-emerald-950 transition-colors flex items-center gap-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 px-3 py-1.5 rounded-full border border-emerald-500/30 text-xs font-extrabold shadow-sm cursor-pointer"
+                title="1-Click Direct Download standalone index.html"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Direct Download HTML</span>
               </button>
               <div className="h-8 md:h-10 w-[1px] bg-zinc-300/60 mx-1"></div>
               <RefreshCw 

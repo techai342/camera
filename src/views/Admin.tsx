@@ -11,7 +11,8 @@ import {
   Trash2, ArrowLeft, RefreshCw, Globe, Smartphone, Monitor,
   MapPin, Camera, Navigation, ArrowUpRight, X, Clock, Pin, PinOff,
   LogOut, User, Settings, Check, Copy, Sparkles, Ticket, Users, 
-  Plus, Ban, Edit3, Link2, CheckCircle2, AlertTriangle, Key, Tag
+  Plus, Ban, Edit3, Link2, CheckCircle2, AlertTriangle, Key, Tag,
+  Zap, Crown, Sliders, Layers
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '../lib/utils';
@@ -28,12 +29,25 @@ CREATE TABLE IF NOT EXISTS public.admin_settings (
     display_name TEXT NOT NULL DEFAULT 'Muhammad Saqib',
     brand_name TEXT NOT NULL DEFAULT 'Saqib Visuals',
     avatar_url TEXT NOT NULL DEFAULT 'https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png',
+    free_daily_limit INTEGER NOT NULL DEFAULT 5,
+    pro_daily_limit INTEGER NOT NULL DEFAULT 50,
+    premium_daily_limit INTEGER NOT NULL DEFAULT 99999,
+    guest_limit INTEGER NOT NULL DEFAULT 5,
+    plan_limits JSONB DEFAULT '{"free": 5, "pro": 50, "premium": 99999, "guest": 5}'::jsonb,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
-INSERT INTO public.admin_settings (id, username, password_hash, salt, display_name, brand_name, avatar_url)
-VALUES ('primary', 'admin', '291bc793dcbaf0596b11612bcc1412d6afaccf726c417a5a6e4cff068326bf56', 'mradmin_super_secure_salt_99', 'Muhammad Saqib', 'Saqib Visuals', 'https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png')
+INSERT INTO public.admin_settings (id, username, password_hash, salt, display_name, brand_name, avatar_url, free_daily_limit, pro_daily_limit, premium_daily_limit, guest_limit)
+VALUES ('primary', 'admin', '291bc793dcbaf0596b11612bcc1412d6afaccf726c417a5a6e4cff068326bf56', 'mradmin_super_secure_salt_99', 'Muhammad Saqib', 'Saqib Visuals', 'https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png', 5, 50, 99999, 5)
 ON CONFLICT (id) DO NOTHING;
+
+-- Migration to add plan limits columns if admin_settings already exists
+ALTER TABLE public.admin_settings 
+ADD COLUMN IF NOT EXISTS free_daily_limit INTEGER NOT NULL DEFAULT 5,
+ADD COLUMN IF NOT EXISTS pro_daily_limit INTEGER NOT NULL DEFAULT 50,
+ADD COLUMN IF NOT EXISTS premium_daily_limit INTEGER NOT NULL DEFAULT 99999,
+ADD COLUMN IF NOT EXISTS guest_limit INTEGER NOT NULL DEFAULT 5,
+ADD COLUMN IF NOT EXISTS plan_limits JSONB DEFAULT '{"free": 5, "pro": 50, "premium": 99999, "guest": 5}'::jsonb;
 
 ALTER TABLE public.admin_settings ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow public read admin branding" ON public.admin_settings;
@@ -111,7 +125,18 @@ export default function Admin() {
   const router = useRouter();
 
   // Navigation Tab State
-  const [adminTab, setAdminTab] = useState<'links' | 'users' | 'coupons'>('links');
+  const [adminTab, setAdminTab] = useState<'links' | 'users' | 'coupons' | 'plans'>('links');
+
+  // Subscription Plan Limits State
+  const [freePlanLimit, setFreePlanLimit] = useState<number>(5);
+  const [proPlanLimit, setProPlanLimit] = useState<number>(50);
+  const [premiumPlanLimit, setPremiumPlanLimit] = useState<number>(99999);
+  const [guestLimit, setGuestLimit] = useState<number>(5);
+  const [syncUsersOnSave, setSyncUsersOnSave] = useState<boolean>(true);
+  const [loadingPlanLimits, setLoadingPlanLimits] = useState<boolean>(false);
+  const [savingPlanLimits, setSavingPlanLimits] = useState<boolean>(false);
+  const [planLimitsSuccess, setPlanLimitsSuccess] = useState<string>('');
+  const [planLimitsError, setPlanLimitsError] = useState<string>('');
 
   // User Accounts State
   const [usersList, setUsersList] = useState<any[]>([]);
@@ -329,6 +354,62 @@ export default function Admin() {
     setCouponCodeInput(`${prefix}-${rand}`);
   };
 
+  const fetchPlanLimits = async () => {
+    setLoadingPlanLimits(true);
+    setPlanLimitsError('');
+    try {
+      const res = await fetch('/api/admin/plan-limits');
+      const json = await res.json();
+      if (res.ok && json.planLimits) {
+        setFreePlanLimit(json.planLimits.free);
+        setProPlanLimit(json.planLimits.pro);
+        setPremiumPlanLimit(json.planLimits.premium);
+        setGuestLimit(json.planLimits.guest);
+      }
+    } catch {
+      setPlanLimitsError('Failed to fetch plan limits');
+    } finally {
+      setLoadingPlanLimits(false);
+    }
+  };
+
+  const handleSavePlanLimits = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setSavingPlanLimits(true);
+    setPlanLimitsSuccess('');
+    setPlanLimitsError('');
+    try {
+      const res = await fetch('/api/admin/plan-limits', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          freeDailyLimit: freePlanLimit,
+          proDailyLimit: proPlanLimit,
+          premiumDailyLimit: premiumPlanLimit,
+          guestLimit: guestLimit,
+          syncExistingUsers: syncUsersOnSave,
+        }),
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setPlanLimitsSuccess(`Plan limits saved successfully!${json.usersUpdatedCount ? ` (${json.usersUpdatedCount} accounts synced)` : ''}`);
+        if (json.needsSql) {
+          setShowSqlAccordion(true);
+        }
+        setTimeout(() => setPlanLimitsSuccess(''), 4000);
+      } else {
+        setPlanLimitsError(json.error || 'Failed to save plan limits');
+        if (json.needsSql) {
+          setShowSqlAccordion(true);
+        }
+      }
+    } catch {
+      setPlanLimitsError('Network error while saving limits');
+    } finally {
+      setSavingPlanLimits(false);
+    }
+  };
+
   const openProfileModal = async () => {
     setShowProfileModal(true);
     setProfileSuccess('');
@@ -343,6 +424,10 @@ export default function Admin() {
         setProfileDisplayName(json.profile.displayName || 'Muhammad Saqib');
         setProfileBrandName(json.profile.brandName || 'Saqib Visuals');
         setProfileAvatarUrl(json.profile.avatarUrl || 'https://ik.imagekit.io/mrsaqib/mrsaqib242-img25_7oG52NZUY.png');
+        if (typeof json.profile.freeDailyLimit === 'number') setFreePlanLimit(json.profile.freeDailyLimit);
+        if (typeof json.profile.proDailyLimit === 'number') setProPlanLimit(json.profile.proDailyLimit);
+        if (typeof json.profile.premiumDailyLimit === 'number') setPremiumPlanLimit(json.profile.premiumDailyLimit);
+        if (typeof json.profile.guestLimit === 'number') setGuestLimit(json.profile.guestLimit);
       }
     } catch {} finally {
       setProfileLoading(false);
@@ -434,9 +519,10 @@ export default function Admin() {
           setStats(json.stats);
         }
       }
-      // Also automatically populate users and coupons counts
+      // Also automatically populate users, coupons, and plan limits
       fetchUsers();
       fetchCoupons();
+      fetchPlanLimits();
     } catch (e) {
       console.error(e);
     } finally {
@@ -763,6 +849,16 @@ export function useMyDomainAnalytics() {
                 <Users className="w-3.5 h-3.5" />
               </button>
               <button 
+                onClick={() => {
+                  setAdminTab('plans');
+                  fetchPlanLimits();
+                }}
+                className="p-1.5 text-purple-700 hover:text-purple-900 bg-purple-500/15 rounded-full border border-purple-500/30 active:scale-95 shadow-sm cursor-pointer"
+                title="Plan Limits (Free/Pro/VIP)"
+              >
+                <Zap className="w-3.5 h-3.5" />
+              </button>
+              <button 
                 onClick={openProfileModal}
                 className="p-1.5 text-indigo-700 hover:text-indigo-900 bg-indigo-500/15 rounded-full border border-indigo-500/30 active:scale-95 shadow-sm"
                 title="Profile & Settings"
@@ -865,6 +961,17 @@ export function useMyDomainAnalytics() {
                 <Ticket className="w-3.5 h-3.5" />
                 <span>Coupons ({couponStats.totalCoupons || couponsList.length})</span>
               </button>
+              <button 
+                onClick={() => {
+                  setAdminTab('plans');
+                  fetchPlanLimits();
+                }}
+                className="text-purple-950 bg-purple-500/20 hover:bg-purple-500/30 px-3 py-1.5 rounded-full border border-purple-500/40 text-xs font-black shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all"
+                title="Edit Plan Limits (Free / Pro / Premium)"
+              >
+                <Zap className="w-3.5 h-3.5 text-purple-700" />
+                <span>Plan Limits</span>
+              </button>
               <div className="h-8 md:h-10 w-[1px] bg-zinc-300/60 mx-0.5"></div>
               <button 
                 onClick={openProfileModal}
@@ -947,6 +1054,22 @@ export function useMyDomainAnalytics() {
             >
               <Ticket className="w-4 h-4" />
               <span>Coupon Engine ({couponStats.totalCoupons || couponsList.length})</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setAdminTab('plans');
+                fetchPlanLimits();
+              }}
+              className={cn(
+                "flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer select-none shrink-0",
+                adminTab === 'plans'
+                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-500/25 scale-[1.02]"
+                  : "text-zinc-700 hover:text-zinc-950 hover:bg-white/40"
+              )}
+            >
+              <Zap className="w-4 h-4 text-amber-500" />
+              <span>Plan Limits (Free/Pro/VIP)</span>
             </button>
           </div>
 
@@ -1708,6 +1831,361 @@ export function useMyDomainAnalytics() {
                     </div>
                   );
                 })}
+            </div>
+          </div>
+        )}
+
+        {adminTab === 'plans' && (
+          <div className="space-y-6">
+            {/* Header / Intro Card */}
+            <div className="liquid-glass-box rounded-[32px] p-5 sm:p-6 md:p-8 border-2 border-white/90 shadow-xl relative overflow-hidden">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-900 text-xs font-black uppercase tracking-wider mb-2">
+                    <Zap className="w-3.5 h-3.5 text-purple-600 animate-pulse" />
+                    <span>Dynamic Tier Quota Manager</span>
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-black text-zinc-950 tracking-tight">
+                    Subscription Plans &amp; Daily Request Limits
+                  </h2>
+                  <p className="text-xs sm:text-sm text-zinc-600 font-semibold mt-1 max-w-2xl">
+                    Configure daily link generation quotas for Free, Pro, Premium tiers and unregistered guests in real time. Changes take effect across all API endpoints instantly.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2.5 shrink-0">
+                  <button
+                    onClick={fetchPlanLimits}
+                    disabled={loadingPlanLimits}
+                    className="px-4 py-2.5 rounded-2xl bg-white/70 hover:bg-white border border-zinc-300/80 text-zinc-800 text-xs font-black shadow-sm flex items-center gap-2 cursor-pointer active:scale-95 transition-all"
+                  >
+                    <RefreshCw className={cn("w-3.5 h-3.5", loadingPlanLimits && "animate-spin")} />
+                    <span>Reload Limits</span>
+                  </button>
+                  <button
+                    onClick={() => handleSavePlanLimits()}
+                    disabled={savingPlanLimits}
+                    className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs font-black shadow-lg shadow-purple-500/25 flex items-center gap-2 cursor-pointer active:scale-95 transition-all disabled:opacity-50"
+                  >
+                    {savingPlanLimits ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+                    <span>Save Plan Limits</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Success / Error Alerts */}
+              {planLimitsSuccess && (
+                <div className="mt-4 p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-900 text-xs font-black flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>{planLimitsSuccess}</span>
+                </div>
+              )}
+              {planLimitsError && (
+                <div className="mt-4 p-3.5 rounded-2xl bg-red-500/15 border border-red-500/30 text-red-900 text-xs font-black flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
+                  <span>{planLimitsError}</span>
+                </div>
+              )}
+            </div>
+
+            {/* 4 Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+              {/* Card 1: Free Tier */}
+              <div className="liquid-glass-box rounded-[28px] p-5 sm:p-6 border-2 border-white/90 shadow-md relative overflow-hidden flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-zinc-200 text-zinc-800 border border-zinc-300">
+                      Tier 1: Free
+                    </span>
+                    <span className="text-xl">🥉</span>
+                  </div>
+                  <h3 className="text-lg font-black text-zinc-900">Free Account</h3>
+                  <p className="text-[11px] text-zinc-500 font-semibold mt-0.5 leading-relaxed">
+                    Standard plan assigned to all registered users upon signup.
+                  </p>
+
+                  <div className="mt-5 space-y-2">
+                    <label className="text-[10.5px] font-black text-zinc-700 uppercase tracking-wider block">
+                      Daily Requests Limit
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        min="1"
+                        max="10000"
+                        value={freePlanLimit}
+                        onChange={(e) => setFreePlanLimit(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                        className="w-full text-lg font-mono font-black px-4 py-2.5 rounded-2xl bg-white/80 border border-zinc-300/80 focus:ring-2 focus:ring-indigo-500 text-zinc-900 shadow-inner"
+                      />
+                      <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 pointer-events-none">
+                        links / day
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 pt-3 border-t border-zinc-200/60 flex items-center justify-between text-[10px] text-zinc-500 font-bold">
+                  <span>Resets at UTC 00:00</span>
+                  <span className="text-indigo-600 font-black">Default: 5</span>
+                </div>
+              </div>
+
+              {/* Card 2: Pro Tier */}
+              <div className="liquid-glass-box rounded-[28px] p-5 sm:p-6 border-2 border-indigo-400/40 shadow-md relative overflow-hidden flex flex-col justify-between bg-gradient-to-b from-indigo-50/40 to-transparent">
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-900 border border-indigo-500/30">
+                      Tier 2: Pro
+                    </span>
+                    <span className="text-xl">🥈</span>
+                  </div>
+                  <h3 className="text-lg font-black text-indigo-950">Pro Creator</h3>
+                  <p className="text-[11px] text-zinc-500 font-semibold mt-0.5 leading-relaxed">
+                    Unlocked via Pro coupon code or manually assigned by admin.
+                  </p>
+
+                  <div className="mt-5 space-y-2">
+                    <label className="text-[10.5px] font-black text-zinc-700 uppercase tracking-wider block">
+                      Daily Requests Limit
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        min="1"
+                        max="50000"
+                        value={proPlanLimit}
+                        onChange={(e) => setProPlanLimit(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                        className="w-full text-lg font-mono font-black px-4 py-2.5 rounded-2xl bg-white/80 border border-indigo-300/80 focus:ring-2 focus:ring-indigo-500 text-indigo-950 shadow-inner"
+                      />
+                      <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 pointer-events-none">
+                        links / day
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 pt-3 border-t border-indigo-200/60 flex items-center justify-between text-[10px] text-zinc-500 font-bold">
+                  <span>Power Creators</span>
+                  <span className="text-indigo-600 font-black">Default: 50</span>
+                </div>
+              </div>
+
+              {/* Card 3: Premium VIP */}
+              <div className="liquid-glass-box rounded-[28px] p-5 sm:p-6 border-2 border-amber-400/50 shadow-md relative overflow-hidden flex flex-col justify-between bg-gradient-to-b from-amber-50/50 to-transparent">
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-amber-500/25 text-amber-950 border border-amber-500/40">
+                      Tier 3: Premium VIP
+                    </span>
+                    <Crown className="w-5 h-5 text-amber-600" />
+                  </div>
+                  <h3 className="text-lg font-black text-amber-950">Premium VIP</h3>
+                  <p className="text-[11px] text-zinc-500 font-semibold mt-0.5 leading-relaxed">
+                    VIP high-volume access with priority API and analytics.
+                  </p>
+
+                  <div className="mt-5 space-y-2">
+                    <label className="text-[10.5px] font-black text-zinc-700 uppercase tracking-wider block">
+                      Daily Requests Limit
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        min="1"
+                        max="999999"
+                        value={premiumPlanLimit}
+                        onChange={(e) => setPremiumPlanLimit(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                        className="w-full text-lg font-mono font-black px-4 py-2.5 rounded-2xl bg-white/80 border border-amber-300/80 focus:ring-2 focus:ring-amber-500 text-amber-950 shadow-inner"
+                      />
+                      <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 pointer-events-none">
+                        links / day
+                      </span>
+                    </div>
+
+                    {/* Quick presets */}
+                    <div className="flex items-center gap-1.5 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => setPremiumPlanLimit(99999)}
+                        className={cn(
+                          "px-2 py-0.5 rounded-lg text-[9.5px] font-black border transition-all cursor-pointer",
+                          premiumPlanLimit >= 99999
+                            ? "bg-amber-600 text-white border-amber-600 shadow-xs"
+                            : "bg-white/70 text-zinc-700 border-zinc-300 hover:bg-white"
+                        )}
+                      >
+                        Unlimited (99,999)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPremiumPlanLimit(500)}
+                        className={cn(
+                          "px-2 py-0.5 rounded-lg text-[9.5px] font-black border transition-all cursor-pointer",
+                          premiumPlanLimit === 500
+                            ? "bg-amber-600 text-white border-amber-600 shadow-xs"
+                            : "bg-white/70 text-zinc-700 border-zinc-300 hover:bg-white"
+                        )}
+                      >
+                        500/day
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPremiumPlanLimit(1000)}
+                        className={cn(
+                          "px-2 py-0.5 rounded-lg text-[9.5px] font-black border transition-all cursor-pointer",
+                          premiumPlanLimit === 1000
+                            ? "bg-amber-600 text-white border-amber-600 shadow-xs"
+                            : "bg-white/70 text-zinc-700 border-zinc-300 hover:bg-white"
+                        )}
+                      >
+                        1000/day
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 pt-3 border-t border-amber-200/60 flex items-center justify-between text-[10px] text-zinc-500 font-bold">
+                  <span>VIP Access</span>
+                  <span className="text-amber-700 font-black">Unlimited (99k)</span>
+                </div>
+              </div>
+
+              {/* Card 4: Guest Visitors */}
+              <div className="liquid-glass-box rounded-[28px] p-5 sm:p-6 border-2 border-rose-300/40 shadow-md relative overflow-hidden flex flex-col justify-between bg-gradient-to-b from-rose-50/30 to-transparent">
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-rose-500/15 text-rose-900 border border-rose-500/30">
+                      Guests
+                    </span>
+                    <Smartphone className="w-5 h-5 text-rose-600" />
+                  </div>
+                  <h3 className="text-lg font-black text-rose-950">Guest Devices</h3>
+                  <p className="text-[11px] text-zinc-500 font-semibold mt-0.5 leading-relaxed">
+                    Free test tries allowed per unregistered browser / device ID.
+                  </p>
+
+                  <div className="mt-5 space-y-2">
+                    <label className="text-[10.5px] font-black text-zinc-700 uppercase tracking-wider block">
+                      Free Tries Limit
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        min="1"
+                        max="50"
+                        value={guestLimit}
+                        onChange={(e) => setGuestLimit(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                        className="w-full text-lg font-mono font-black px-4 py-2.5 rounded-2xl bg-white/80 border border-rose-300/80 focus:ring-2 focus:ring-rose-500 text-rose-950 shadow-inner"
+                      />
+                      <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 pointer-events-none">
+                        tries / device
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 pt-3 border-t border-rose-200/60 flex items-center justify-between text-[10px] text-zinc-500 font-bold">
+                  <span>Prompt Signup After</span>
+                  <span className="text-rose-600 font-black">Default: 5</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Controls & Supabase Query Helper */}
+            <div className="liquid-glass-box rounded-[28px] p-5 sm:p-6 border-2 border-white/90 shadow-lg space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={syncUsersOnSave}
+                    onChange={(e) => setSyncUsersOnSave(e.target.checked)}
+                    className="w-4 h-4 rounded text-purple-600 focus:ring-purple-500 border-zinc-300 cursor-pointer"
+                  />
+                  <span className="text-xs font-bold text-zinc-800">
+                    Sync updated limits to all existing active accounts immediately
+                  </span>
+                </label>
+
+                <button
+                  onClick={() => handleSavePlanLimits()}
+                  disabled={savingPlanLimits}
+                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs font-black shadow-lg shadow-purple-500/25 flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all disabled:opacity-50"
+                >
+                  {savingPlanLimits ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                  <span>Save Dynamic Plan Limits</span>
+                </button>
+              </div>
+
+              {/* Collapsible Supabase SQL Query Box */}
+              <div className="mt-4 pt-4 border-t border-zinc-200/70">
+                <div 
+                  onClick={() => setShowSqlAccordion(!showSqlAccordion)}
+                  className="flex items-center justify-between cursor-pointer select-none"
+                >
+                  <div className="flex items-center gap-2 text-zinc-800 text-xs font-black">
+                    <Database className="w-4 h-4 text-purple-600" />
+                    <span>Supabase SQL Setup Query for Plan Limits</span>
+                  </div>
+                  <span className="text-[11px] text-purple-700 font-extrabold underline">
+                    {showSqlAccordion ? 'Hide SQL Query' : 'View / Copy SQL Query'}
+                  </span>
+                </div>
+
+                {showSqlAccordion && (
+                  <div className="mt-3 space-y-2">
+                    <p className="text-[11px] text-zinc-600 font-semibold leading-relaxed">
+                      Copy and run this SQL query once in your <strong>Supabase Dashboard → SQL Editor</strong> to create the plan limits columns:
+                    </p>
+                    <div className="relative">
+                      <pre className="text-[10px] font-mono bg-zinc-900 text-zinc-100 p-3.5 rounded-2xl overflow-x-auto max-h-48 leading-relaxed select-all">
+                        {`-- =========================================================================
+-- Add Dynamic Plan Limits Columns to admin_settings Table in Supabase
+-- =========================================================================
+ALTER TABLE public.admin_settings 
+ADD COLUMN IF NOT EXISTS free_daily_limit INTEGER NOT NULL DEFAULT 5,
+ADD COLUMN IF NOT EXISTS pro_daily_limit INTEGER NOT NULL DEFAULT 50,
+ADD COLUMN IF NOT EXISTS premium_daily_limit INTEGER NOT NULL DEFAULT 99999,
+ADD COLUMN IF NOT EXISTS guest_limit INTEGER NOT NULL DEFAULT 5,
+ADD COLUMN IF NOT EXISTS plan_limits JSONB DEFAULT '{"free": 5, "pro": 50, "premium": 99999, "guest": 5}'::jsonb;
+
+-- Update primary settings row with active defaults
+UPDATE public.admin_settings 
+SET 
+  free_daily_limit = COALESCE(free_daily_limit, 5),
+  pro_daily_limit = COALESCE(pro_daily_limit, 50),
+  premium_daily_limit = COALESCE(premium_daily_limit, 99999),
+  guest_limit = COALESCE(guest_limit, 5)
+WHERE id = 'primary';`}
+                      </pre>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(`ALTER TABLE public.admin_settings 
+ADD COLUMN IF NOT EXISTS free_daily_limit INTEGER NOT NULL DEFAULT 5,
+ADD COLUMN IF NOT EXISTS pro_daily_limit INTEGER NOT NULL DEFAULT 50,
+ADD COLUMN IF NOT EXISTS premium_daily_limit INTEGER NOT NULL DEFAULT 99999,
+ADD COLUMN IF NOT EXISTS guest_limit INTEGER NOT NULL DEFAULT 5,
+ADD COLUMN IF NOT EXISTS plan_limits JSONB DEFAULT '{"free": 5, "pro": 50, "premium": 99999, "guest": 5}'::jsonb;
+
+UPDATE public.admin_settings 
+SET 
+  free_daily_limit = COALESCE(free_daily_limit, 5),
+  pro_daily_limit = COALESCE(pro_daily_limit, 50),
+  premium_daily_limit = COALESCE(premium_daily_limit, 99999),
+  guest_limit = COALESCE(guest_limit, 5)
+WHERE id = 'primary';`);
+                          setSqlCopied(true);
+                          setTimeout(() => setSqlCopied(false), 2000);
+                        }}
+                        className="absolute top-2 right-2 px-2.5 py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-xl text-[10px] font-black flex items-center gap-1 transition-colors cursor-pointer"
+                      >
+                        {sqlCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        <span>{sqlCopied ? 'Copied!' : 'Copy SQL'}</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}

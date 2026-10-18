@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../../lib/supabase';
 import { getUserFromRequest } from '../../../../lib/userAuth';
+import { getPlanLimits } from '../../../../lib/planLimits';
 
 export async function GET(req: Request) {
   try {
@@ -8,6 +9,8 @@ export async function GET(req: Request) {
     if (!sessionUser) {
       return NextResponse.json({ authenticated: false, error: 'Unauthorized' }, { status: 401 });
     }
+
+    const planLimits = await getPlanLimits();
 
     // Fetch live user record from Supabase
     const { data: user, error } = await supabaseAdmin
@@ -21,7 +24,18 @@ export async function GET(req: Request) {
     }
 
     let plan = user.plan || 'free';
-    let dailyLimit = typeof user.daily_request_limit === 'number' ? user.daily_request_limit : 5;
+    let tierLimit = plan === 'premium' ? planLimits.premium : plan === 'pro' ? planLimits.pro : planLimits.free;
+    let dailyLimit = typeof user.daily_request_limit === 'number' && user.daily_request_limit > 0 ? user.daily_request_limit : tierLimit;
+
+    // Follow live tier minimums
+    if (plan === 'free') {
+      dailyLimit = planLimits.free;
+    } else if (plan === 'pro') {
+      dailyLimit = Math.max(dailyLimit, planLimits.pro);
+    } else if (plan === 'premium') {
+      dailyLimit = Math.max(dailyLimit, planLimits.premium);
+    }
+
     let dailyUsed = typeof user.daily_requests_used === 'number' ? user.daily_requests_used : 0;
     let planExpiresAt = user.plan_expires_at;
 
@@ -36,9 +50,9 @@ export async function GET(req: Request) {
       const expiryDate = new Date(planExpiresAt);
       if (expiryDate < now) {
         plan = 'free';
-        dailyLimit = 5;
+        dailyLimit = planLimits.free;
         updates.plan = 'free';
-        updates.daily_request_limit = 5;
+        updates.daily_request_limit = planLimits.free;
         needsUpdate = true;
       }
     }

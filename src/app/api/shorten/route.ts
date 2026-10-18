@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase, supabaseAdmin } from '../../../lib/supabase';
 import { getUserFromRequest } from '../../../lib/userAuth';
+import { getPlanLimits } from '../../../lib/planLimits';
 
 export async function OPTIONS() {
   const response = NextResponse.json({}, { status: 200 });
@@ -72,20 +73,33 @@ export async function POST(req: Request) {
             );
           }
 
+          const planLimits = await getPlanLimits();
           const now = new Date();
           const todayStr = now.toISOString().split('T')[0];
           let plan = dbUser.plan || 'free';
-          let dailyLimit = typeof dbUser.daily_request_limit === 'number' ? dbUser.daily_request_limit : 5;
+          let tierLimit = plan === 'premium' ? planLimits.premium : plan === 'pro' ? planLimits.pro : planLimits.free;
+          let dailyLimit = typeof dbUser.daily_request_limit === 'number' && dbUser.daily_request_limit > 0 
+            ? dbUser.daily_request_limit 
+            : tierLimit;
           let dailyUsed = typeof dbUser.daily_requests_used === 'number' ? dbUser.daily_requests_used : 0;
+
+          // Align with current live tier minimums
+          if (plan === 'free') {
+            dailyLimit = planLimits.free;
+          } else if (plan === 'pro') {
+            dailyLimit = Math.max(dailyLimit, planLimits.pro);
+          } else if (plan === 'premium') {
+            dailyLimit = Math.max(dailyLimit, planLimits.premium);
+          }
 
           // Check if paid plan expired
           if (plan !== 'free' && dbUser.plan_expires_at) {
             if (new Date(dbUser.plan_expires_at) < now) {
               plan = 'free';
-              dailyLimit = 5;
+              dailyLimit = planLimits.free;
               await supabaseAdmin
                 .from('app_users')
-                .update({ plan: 'free', daily_request_limit: 5 })
+                .update({ plan: 'free', daily_request_limit: planLimits.free })
                 .eq('id', dbUser.id);
             }
           }
@@ -130,7 +144,9 @@ export async function POST(req: Request) {
         console.error('Error verifying user plan quota:', err);
       }
     } else {
-      // 3. Guest Usage Quota Enforcement (5 Free Tries per device)
+      // 3. Guest Usage Quota Enforcement (Free Tries per device)
+      const planLimits = await getPlanLimits();
+      const guestQuota = planLimits.guest;
       if (deviceId) {
         const { count, error: countErr } = await supabaseAdmin
           .from('urls')
@@ -139,11 +155,11 @@ export async function POST(req: Request) {
 
         if (!countErr && typeof count === 'number') {
           guestUsageCount = count;
-          if (guestUsageCount >= 5) {
+          if (guestUsageCount >= guestQuota) {
             return NextResponse.json(
               {
                 error: 'QUOTA_EXCEEDED',
-                message: 'You have used your 5 free guest links. Please create a free account or sign in to continue generating unlimited links with full API hub access!',
+                message: `You have used your ${guestQuota} free guest links. Please create a free account or sign in to continue generating links with full API hub access!`,
                 guestCount: guestUsageCount,
                 remainingFreeTries: 0,
               },
@@ -243,7 +259,7 @@ export async function POST(req: Request) {
         data: data,
         isUnlimited: !!activeUser,
         guestCount: activeUser ? null : guestUsageCount + 1,
-        remainingFreeTries: activeUser ? null : Math.max(0, 4 - guestUsageCount),
+        remainingFreeTries: activeUser ? null : Math.max(0, (await getPlanLimits()).guest - 1 - guestUsageCount),
       },
       {
         status: 201,

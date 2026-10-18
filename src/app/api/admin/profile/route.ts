@@ -20,6 +20,8 @@ export async function GET(req: Request) {
     }
 
     const settings = await getAdminSettings();
+    const { getPlanLimits } = await import('../../../../lib/planLimits');
+    const planLimits = await getPlanLimits();
 
     return NextResponse.json({
       success: true,
@@ -28,6 +30,10 @@ export async function GET(req: Request) {
         displayName: settings?.display_name || 'Muhammad Saqib',
         brandName: settings?.brand_name || 'Saqib Visuals',
         avatarUrl: settings?.avatar_url || DEFAULT_AVATAR,
+        freeDailyLimit: planLimits.free,
+        proDailyLimit: planLimits.pro,
+        premiumDailyLimit: planLimits.premium,
+        guestLimit: planLimits.guest,
       },
     });
   } catch (err: any) {
@@ -43,7 +49,7 @@ export async function PUT(req: Request) {
     }
 
     const body = await req.json();
-    const { username, password, displayName, brandName, avatarUrl } = body;
+    const { username, password, displayName, brandName, avatarUrl, freeDailyLimit, proDailyLimit, premiumDailyLimit, guestLimit } = body;
 
     const currentSettings = await getAdminSettings();
 
@@ -55,6 +61,22 @@ export async function PUT(req: Request) {
       avatar_url: avatarUrl?.trim() || currentSettings?.avatar_url || DEFAULT_AVATAR,
       updated_at: new Date().toISOString(),
     };
+
+    if (freeDailyLimit !== undefined) updatePayload.free_daily_limit = Math.max(1, Number(freeDailyLimit) || 5);
+    if (proDailyLimit !== undefined) updatePayload.pro_daily_limit = Math.max(1, Number(proDailyLimit) || 50);
+    if (premiumDailyLimit !== undefined) updatePayload.premium_daily_limit = Math.max(1, Number(premiumDailyLimit) || 99999);
+    if (guestLimit !== undefined) updatePayload.guest_limit = Math.max(1, Number(guestLimit) || 5);
+
+    if (freeDailyLimit !== undefined || proDailyLimit !== undefined || premiumDailyLimit !== undefined || guestLimit !== undefined) {
+      updatePayload.plan_limits = {
+        free: Math.max(1, Number(freeDailyLimit ?? currentSettings?.free_daily_limit ?? 5)),
+        pro: Math.max(1, Number(proDailyLimit ?? currentSettings?.pro_daily_limit ?? 50)),
+        premium: Math.max(1, Number(premiumDailyLimit ?? currentSettings?.premium_daily_limit ?? 99999)),
+        guest: Math.max(1, Number(guestLimit ?? currentSettings?.guest_limit ?? 5)),
+      };
+      const { invalidatePlanLimitsCache } = await import('../../../../lib/planLimits');
+      invalidatePlanLimitsCache();
+    }
 
     if (password && typeof password === 'string' && password.trim().length > 0) {
       updatePayload.password_hash = await hashPasswordPBKDF2(password.trim(), DEFAULT_SALT);

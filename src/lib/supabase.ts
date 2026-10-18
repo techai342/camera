@@ -61,7 +61,8 @@ export const supabase: SupabaseClient = createClient(supabaseUrl, supabaseAnonKe
   },
 });
 
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const defaultServiceRoleKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlyaHFjcm9jenZka3l0dnZzaWNvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NzUxMjIxNSwiZXhwIjoyMDkzMDg4MjE1fQ.eRjXNOdqWHiUKkylJ_mluIuZwIXQe90TiGc7rrNxj3A';
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || defaultServiceRoleKey;
 
 export const supabaseAdmin: SupabaseClient = serviceRoleKey
   ? createClient(supabaseUrl, serviceRoleKey, {

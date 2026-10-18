@@ -1452,115 +1452,171 @@ create policy "Allow public delete access" on public.urls for delete using (true
               </button>
             </div>
 
-            {/* --- FLOATING MOBILE QUICK MENU DROPDOWN (< MD) --- */}
+            {/* --- FLOATING MOBILE QUICK MENU OVERLAY (< MD) - ROCK-SOLID & LUXURIOUS --- */}
             {showMobileQuickMenu && (
-              <div 
-                ref={mobileQuickMenuRef}
-                className="md:hidden absolute top-[calc(100%+8px)] left-0 right-0 p-3 rounded-2xl liquid-glass-box shadow-2xl backdrop-blur-2xl bg-white/95 border-2 border-white/95 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
-              >
-                <div className="grid grid-cols-2 gap-2 text-xs font-black">
-                  {/* Sound Toggle */}
-                  <button
-                    onClick={() => {
-                      const state = toggleSound();
-                      setSoundOn(state);
-                    }}
-                    className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 active:scale-95 transition-all text-left text-zinc-800"
-                  >
-                    <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0", soundOn ? "bg-emerald-500 text-white" : "bg-slate-200 text-slate-500")}>
-                      {soundOn ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="font-extrabold text-[11px]">Audio</div>
-                      <div className="text-[9.5px] text-zinc-500 font-semibold">{soundOn ? "Sound On" : "Muted"}</div>
-                    </div>
-                  </button>
+              <div className="md:hidden fixed inset-0 z-50 flex items-start justify-center pt-14 sm:pt-16 px-3 bg-black/45 backdrop-blur-sm animate-in fade-in duration-200">
+                {/* Click outside backdrop */}
+                <div 
+                  className="fixed inset-0 -z-10" 
+                  onClick={() => {
+                    playBubblePop(520);
+                    setShowMobileQuickMenu(false);
+                  }} 
+                />
 
-                  {/* Sync Device */}
-                  <button
-                    onClick={() => {
-                      playBubblePop(660);
-                      setShowMobileQuickMenu(false);
-                      setShowSyncModal(true);
-                    }}
-                    className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 active:scale-95 transition-all text-left text-zinc-800"
-                  >
-                    <div className="w-7 h-7 rounded-lg bg-indigo-500 text-white flex items-center justify-center shrink-0">
-                      <Smartphone className="w-4 h-4" />
+                {/* Main Menu Panel */}
+                <div 
+                  ref={mobileQuickMenuRef}
+                  className="relative w-full max-w-[370px] rounded-[28px] liquid-glass-box shadow-2xl backdrop-blur-2xl bg-white/95 border-2 border-white/95 p-4 space-y-3 animate-in zoom-in-95 duration-200 text-zinc-900"
+                >
+                  {/* Menu Top Bar */}
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-200/80">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-xl bg-blue-500/15 text-blue-600 flex items-center justify-center font-bold">
+                        <SlidersHorizontal className="w-3.5 h-3.5" />
+                      </div>
+                      <div>
+                        <h4 className="text-[12px] font-black text-zinc-900 leading-none">Quick Actions Hub</h4>
+                        <p className="text-[9.5px] text-zinc-500 font-semibold leading-none mt-1">Control Center & Shortcuts</p>
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <div className="font-extrabold text-[11px]">Sync Phone</div>
-                      <div className="text-[9.5px] text-zinc-500 font-semibold truncate">{phoneNumber ? phoneNumber : "Set ID"}</div>
-                    </div>
-                  </button>
+                    <button
+                      onClick={() => {
+                        playBubblePop(520);
+                        setShowMobileQuickMenu(false);
+                      }}
+                      className="glass-orb orb-champagne w-7 h-7 flex items-center justify-center text-zinc-600 active:scale-90"
+                      title="Close"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
 
-                  {/* Redeem Coupon */}
-                  <button
-                    onClick={() => {
-                      playBubblePop(660);
-                      setShowMobileQuickMenu(false);
-                      if (currentUser) {
-                        setShowUserPlanModal(true);
-                      } else {
-                        setAuthModalMode('login');
-                        setAuthModalReason('manual');
-                        setShowAuthModal(true);
-                      }
-                    }}
-                    className="flex items-center gap-2 p-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200/80 active:scale-95 transition-all text-left text-amber-950"
-                  >
-                    <div className="w-7 h-7 rounded-lg bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
-                      <Ticket className="w-4 h-4" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="font-extrabold text-[11px]">Coupons</div>
-                      <div className="text-[9.5px] text-amber-700 font-semibold">Redeem Promo</div>
-                    </div>
-                  </button>
+                  {/* Action Items List - Clean, Spacious & Never Colliding */}
+                  <div className="space-y-2">
+                    {/* Sound Audio Toggle */}
+                    <button
+                      onClick={() => {
+                        const state = toggleSound();
+                        setSoundOn(state);
+                      }}
+                      className="w-full flex items-center justify-between p-2.5 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 active:scale-98 transition-all text-left"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-xs", soundOn ? "bg-emerald-500 text-white" : "bg-slate-200 text-slate-500")}>
+                          {soundOn ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                        </div>
+                        <div>
+                          <div className="font-extrabold text-[12px] text-zinc-900 leading-snug">Tactile Bubble Audio</div>
+                          <div className="text-[10px] text-zinc-500 font-semibold leading-snug">{soundOn ? "Sound Effects Enabled" : "Sound Muted"}</div>
+                        </div>
+                      </div>
+                      <span className={cn("px-2 py-0.5 rounded-full text-[10px] font-black shrink-0", soundOn ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-600")}>
+                        {soundOn ? "ON" : "OFF"}
+                      </span>
+                    </button>
 
-                  {/* Developer API Hub */}
-                  <button
-                    onClick={() => {
-                      playBubblePop(690);
-                      setShowMobileQuickMenu(false);
-                      setShowApiModal(true);
-                    }}
-                    className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 active:scale-95 transition-all text-left text-zinc-800"
-                  >
-                    <div className="w-7 h-7 rounded-lg bg-violet-500 text-white flex items-center justify-center shrink-0">
-                      <Code className="w-4 h-4" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="font-extrabold text-[11px]">API Hub</div>
-                      <div className="text-[9.5px] text-zinc-500 font-semibold">Bot Docs & SDK</div>
-                    </div>
-                  </button>
-                </div>
+                    {/* Sync Device */}
+                    <button
+                      onClick={() => {
+                        playBubblePop(660);
+                        setShowMobileQuickMenu(false);
+                        setShowSyncModal(true);
+                      }}
+                      className="w-full flex items-center justify-between p-2.5 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 active:scale-98 transition-all text-left"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-9 h-9 rounded-xl bg-indigo-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                          <Smartphone className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-extrabold text-[12px] text-zinc-900 leading-snug">Sync Device Identity</div>
+                          <div className="text-[10px] text-zinc-500 font-semibold leading-snug truncate">
+                            {phoneNumber ? `ID: ${phoneNumber}` : "Bind phone or Telegram ID"}
+                          </div>
+                        </div>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 text-[10px] font-black shrink-0">
+                        {phoneNumber ? "Synced" : "Sync"}
+                      </span>
+                    </button>
 
-                {/* Bottom Action Row: WhatsApp Channel & Logout */}
-                <div className="mt-2.5 pt-2.5 border-t border-slate-200/80 flex items-center justify-between gap-2">
+                    {/* Redeem Coupon */}
+                    <button
+                      onClick={() => {
+                        playBubblePop(660);
+                        setShowMobileQuickMenu(false);
+                        if (currentUser) {
+                          setShowUserPlanModal(true);
+                        } else {
+                          setAuthModalMode('login');
+                          setAuthModalReason('manual');
+                          setShowAuthModal(true);
+                        }
+                      }}
+                      className="w-full flex items-center justify-between p-2.5 rounded-2xl bg-amber-50 hover:bg-amber-100/80 border border-amber-200/80 active:scale-98 transition-all text-left"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                          <Ticket className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="font-extrabold text-[12px] text-amber-950 leading-snug">Redeem Coupon Code</div>
+                          <div className="text-[10px] text-amber-700 font-semibold leading-snug">Unlock Pro & VIP Plans</div>
+                        </div>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 text-[10px] font-black shrink-0 shadow-xs">
+                        Promo 🎟️
+                      </span>
+                    </button>
+
+                    {/* Developer API Hub */}
+                    <button
+                      onClick={() => {
+                        playBubblePop(690);
+                        setShowMobileQuickMenu(false);
+                        setShowApiModal(true);
+                      }}
+                      className="w-full flex items-center justify-between p-2.5 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 active:scale-98 transition-all text-left"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-9 h-9 rounded-xl bg-violet-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                          <Code className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="font-extrabold text-[12px] text-zinc-900 leading-snug">Developer API Hub</div>
+                          <div className="text-[10px] text-zinc-500 font-semibold leading-snug">REST API, cURL & Telegram SDK</div>
+                        </div>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-full bg-violet-100 text-violet-800 text-[10px] font-black shrink-0">
+                        API ↗
+                      </span>
+                    </button>
+                  </div>
+
+                  {/* WhatsApp Channel */}
                   <a
                     href="https://www.whatsapp.com/channel/0029VbBTSK1EquiWrUt5uV1I"
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => playBubblePop(720)}
-                    className="flex-1 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white flex items-center justify-center gap-1.5 text-[11px] font-black shadow-sm transition-all"
+                    className="w-full py-2.5 px-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 active:scale-98 text-white flex items-center justify-center gap-2 text-[11.5px] font-black shadow-md transition-all block"
                   >
-                    <SiWhatsapp className="w-3.5 h-3.5 shrink-0" />
-                    <span>Join WhatsApp Channel</span>
+                    <SiWhatsapp className="w-4 h-4 shrink-0" />
+                    <span>Join Official WhatsApp Channel</span>
                   </a>
 
+                  {/* Logout (if authenticated) */}
                   {currentUser && (
                     <button
                       onClick={() => {
                         setShowMobileQuickMenu(false);
                         handleLogout();
                       }}
-                      className="py-2 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-700 flex items-center justify-center gap-1 text-[11px] font-black border border-rose-200 transition-all shrink-0"
-                      title="Sign Out"
+                      className="w-full py-2 px-3 rounded-2xl bg-rose-50 hover:bg-rose-100 active:scale-98 text-rose-700 flex items-center justify-center gap-1.5 text-[11px] font-black border border-rose-200/80 transition-all cursor-pointer"
                     >
                       <LogOut className="w-3.5 h-3.5" />
-                      <span>Logout</span>
+                      <span>Sign Out (@{currentUser.username})</span>
                     </button>
                   )}
                 </div>

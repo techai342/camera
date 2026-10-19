@@ -190,6 +190,13 @@ body::before {
   z-index: 2;
 }
 
+.glass-orb > *,
+.clay-circle-grey > *,
+.clay-teal-btn > * {
+  position: relative;
+  z-index: 10;
+}
+
 .glass-orb:hover,
 .clay-circle-grey:hover,
 .clay-teal-btn:hover {
@@ -211,6 +218,15 @@ body::before {
     0 12px 24px -4px rgba(37, 60, 175, 0.55),
     inset 0 4px 8px rgba(255, 255, 255, 0.9),
     inset 0 -6px 12px rgba(10, 18, 68, 0.65) !important;
+}
+
+.orb-purple {
+  background: radial-gradient(circle at 35% 30%, #a855f7 0%, #7c3aed 55%, #4c1d95 100%) !important;
+  color: #ffffff !important;
+  box-shadow:
+    0 12px 24px -4px rgba(109, 40, 217, 0.65),
+    inset 0 4px 8px rgba(255, 255, 255, 0.88),
+    inset 0 -6px 12px rgba(46, 16, 101, 0.8) !important;
 }
 
 .orb-red {

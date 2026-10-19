@@ -1487,11 +1487,16 @@ create policy "Allow public delete access" on public.urls for delete using (true
                     setAuthModalReason('manual');
                     setShowAuthModal(true);
                   }}
-                  className="flex items-center gap-1 px-2 py-1 rounded-full liquid-glass-input shadow-xs active:scale-95 transition-all text-left select-none"
-                  title="Sign In or Register"
+                  className={cn(
+                    "flex items-center gap-1 px-2.5 py-1 rounded-full shadow-xs active:scale-95 transition-all text-left select-none border font-black text-[10px]",
+                    guestTriesUsed >= 2
+                      ? "bg-rose-100 text-rose-950 border-rose-300 animate-pulse"
+                      : "bg-indigo-50 text-indigo-950 border-indigo-200"
+                  )}
+                  title="Guest limit: 2 free links. Click to unlock unlimited links!"
                 >
-                  <Sparkles className="w-3 h-3 text-indigo-600 shrink-0" />
-                  <span className="text-[10px] font-black text-indigo-950">
+                  <Sparkles className={cn("w-3 h-3 shrink-0", guestTriesUsed >= 2 ? "text-rose-600" : "text-indigo-600")} />
+                  <span>
                     {Math.max(0, 2 - guestTriesUsed)}/2 Free
                   </span>
                 </button>
@@ -1975,11 +1980,19 @@ create policy "Allow public delete access" on public.urls for delete using (true
                           setAuthModalReason('quota');
                           setShowAuthModal(true);
                         }}
-                        className="glass-orb orb-purple w-full min-h-[52px] py-3.5 text-[14px] sm:text-[15px] font-black uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-2xl transition-all text-white cursor-pointer animate-pulse"
+                        className="glass-orb orb-purple w-full min-h-[52px] py-3.5 px-3 text-[11.5px] xs:text-[12.5px] sm:text-[14px] font-black uppercase tracking-wide flex items-center justify-center gap-2 shadow-2xl transition-all cursor-pointer animate-pulse relative z-10"
+                        style={{
+                          background: 'radial-gradient(circle at 35% 30%, #a855f7 0%, #7c3aed 55%, #4c1d95 100%)',
+                          color: '#ffffff',
+                          textShadow: '0 1px 3px rgba(0, 0, 0, 0.75)',
+                          boxShadow: '0 12px 24px -4px rgba(109, 40, 217, 0.65), inset 0 4px 8px rgba(255, 255, 255, 0.88), inset 0 -6px 12px rgba(46, 16, 101, 0.8)',
+                        }}
                       >
-                        <Lock className="w-4 h-4" />
-                        <span>2 Free Tries Used — Sign In / Create Account</span>
-                        <ArrowRight className="w-4 h-4" />
+                        <Lock className="w-4 h-4 shrink-0 text-amber-300 drop-shadow-md" />
+                        <span className="text-white font-black drop-shadow-md text-center leading-tight">
+                          2 Free Tries Used — Sign In / Create Account
+                        </span>
+                        <ArrowRight className="w-4 h-4 shrink-0 text-white drop-shadow-md" />
                       </button>
                     ) : (
                       <button
@@ -2226,8 +2239,8 @@ create policy "Allow public delete access" on public.urls for delete using (true
                   </div>
 
                   {error && (
-                    <div className="p-3 rounded-xl bg-red-900/30 border border-red-500/40 text-red-200 text-xs font-bold flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                    <div className="p-3 rounded-2xl bg-rose-500/15 border-2 border-rose-400/50 text-rose-950 text-xs font-black flex items-center gap-2 shadow-sm">
+                      <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
                       <span>{error}</span>
                     </div>
                   )}

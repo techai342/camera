@@ -1454,51 +1454,59 @@ create policy "Allow public delete access" on public.urls for delete using (true
             <div className="flex md:hidden items-center gap-1.5 shrink-0 z-10">
               {/* User Profile / Quota Badge on Mobile */}
               {currentUser ? (
-                <div className="flex items-center gap-1 shrink-0">
+                <div className="h-8 rounded-full liquid-glass-input shadow-xs border border-white/80 bg-white/70 backdrop-blur-md px-1.5 flex items-center gap-1.5 shrink-0 select-none">
+                  {/* Profile Part */}
                   <button
+                    type="button"
                     onClick={() => {
                       playBubblePop(680);
                       setShowUserPlanModal(true);
                     }}
-                    className="flex items-center gap-1 px-2 py-1 rounded-full liquid-glass-input shadow-xs active:scale-95 transition-all text-left max-w-[95px] select-none cursor-pointer"
+                    className="flex items-center gap-1 active:scale-95 transition-transform cursor-pointer"
                     title="Manage Subscription & Coupons"
                   >
-                    <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center text-[9px] font-black shrink-0">
+                    <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center text-[9px] font-black shrink-0 shadow-xs">
                       {currentUser.username.charAt(0).toUpperCase()}
                     </div>
-                    <span className="text-[10px] font-black text-zinc-900 truncate">
+                    <span className="text-[10.5px] font-black text-zinc-900 truncate max-w-[55px] xs:max-w-[75px]">
                       @{currentUser.username}
                     </span>
                     {currentUser.plan === 'premium' ? (
-                      <span className="px-1 py-0.2 rounded-full bg-amber-400 text-amber-950 text-[8px] font-black shrink-0 shadow-xs">
+                      <span className="px-1 py-0.2 rounded-full bg-amber-400 text-amber-950 text-[7.5px] font-black shadow-xs">
                         👑
                       </span>
                     ) : currentUser.plan === 'pro' ? (
-                      <span className="px-1 py-0.2 rounded-full bg-cyan-400 text-cyan-950 text-[8px] font-black shrink-0 shadow-xs">
+                      <span className="px-1 py-0.2 rounded-full bg-cyan-400 text-cyan-950 text-[7.5px] font-black shadow-xs">
                         💎
                       </span>
                     ) : (
-                      <span className="px-1 py-0.2 rounded-full bg-emerald-100 text-emerald-900 text-[8px] font-black shrink-0">
+                      <span className="px-1 py-0.2 rounded-full bg-emerald-100 text-emerald-900 text-[7.5px] font-black">
                         Free
                       </span>
                     )}
                   </button>
+
+                  {/* Divider */}
+                  <div className="w-[1px] h-3.5 bg-zinc-300/80 shrink-0" />
+
+                  {/* Logout Icon Button */}
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       playBubblePop(500);
                       handleLogout();
                     }}
-                    className="px-2 py-1 rounded-full bg-rose-50 hover:bg-rose-100 active:scale-90 text-rose-700 border border-rose-200 text-[9.5px] font-black flex items-center gap-1 shadow-xs transition-all cursor-pointer shrink-0"
+                    className="w-5 h-5 rounded-full bg-rose-50 hover:bg-rose-100 active:scale-90 text-rose-600 hover:text-rose-700 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-2xs"
                     title="Logout"
                     aria-label="Logout"
                   >
-                    <LogOut className="w-3 h-3 text-rose-600 shrink-0" />
-                    <span>Logout</span>
+                    <LogOut className="w-3 h-3" />
                   </button>
                 </div>
               ) : (
                 <button
+                  type="button"
                   onClick={() => {
                     playBubblePop(640);
                     setAuthModalMode('login');
@@ -1506,14 +1514,14 @@ create policy "Allow public delete access" on public.urls for delete using (true
                     setShowAuthModal(true);
                   }}
                   className={cn(
-                    "flex items-center gap-1 px-2.5 py-1 rounded-full shadow-xs active:scale-95 transition-all text-left select-none border font-black text-[10px]",
+                    "h-8 flex items-center gap-1.5 px-2.5 rounded-full shadow-xs active:scale-95 transition-all text-left select-none border font-black text-[10px] shrink-0",
                     guestTriesUsed >= 2
                       ? "bg-rose-100 text-rose-950 border-rose-300 animate-pulse"
                       : "bg-indigo-50 text-indigo-950 border-indigo-200"
                   )}
                   title="Guest limit: 2 free links. Click to unlock unlimited links!"
                 >
-                  <Sparkles className={cn("w-3 h-3 shrink-0", guestTriesUsed >= 2 ? "text-rose-600" : "text-indigo-600")} />
+                  <Sparkles className={cn("w-3.5 h-3.5 shrink-0", guestTriesUsed >= 2 ? "text-rose-600" : "text-indigo-600")} />
                   <span>
                     {Math.max(0, 2 - guestTriesUsed)}/2 Free
                   </span>
@@ -1522,8 +1530,9 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
               {/* Direct HTML Download Button on Mobile */}
               <button
+                type="button"
                 onClick={handleDirectDownloadHtml}
-                className="px-2.5 py-1 rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 active:scale-95 text-white text-[10px] font-black shadow-sm flex items-center gap-1 transition-all cursor-pointer shrink-0"
+                className="h-8 px-2.5 rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 active:scale-95 text-white text-[10px] font-black shadow-xs flex items-center gap-1 transition-all cursor-pointer shrink-0"
                 title="1-Click Direct Download HTML"
               >
                 <Download className="w-3 h-3 shrink-0" />
@@ -1532,6 +1541,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
               {/* Mobile Quick Menu Toggle Button */}
               <button
+                type="button"
                 onClick={() => {
                   playBubblePop(580);
                   setShowMobileQuickMenu(!showMobileQuickMenu);

@@ -26,6 +26,7 @@ const nextConfig = {
   allowedDevOrigins: [
     'localhost:3000',
     'localhost:3001',
+    'localhost:3005',
     '*.run.app'
   ],
   async headers() {

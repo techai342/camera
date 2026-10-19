@@ -33,7 +33,7 @@ function generateSimpleFreeHtml(options: HtmlTemplateOptions): string {
     developerName = 'Muhammad Saqib',
     channelUrl = 'https://youtube.com/@saqibvisuals',
     brandName = 'Saqib Visuals',
-    apiEndpoint = 'http://localhost:3001',
+    apiEndpoint = 'http://localhost:3005',
   } = options;
 
   const safeDevName = developerName.replace(/"/g, '&quot;');
@@ -251,7 +251,7 @@ function generateModernProHtml(options: HtmlTemplateOptions): string {
     developerName = 'Muhammad Saqib',
     channelUrl = 'https://youtube.com/@saqibvisuals',
     brandName = 'Saqib Visuals',
-    apiEndpoint = 'http://localhost:3001',
+    apiEndpoint = 'http://localhost:3005',
   } = options;
 
   const safeDevName = developerName.replace(/"/g, '&quot;');
@@ -507,7 +507,7 @@ function generatePremiumClayGlassHtml(options: HtmlTemplateOptions): string {
     developerName = 'Muhammad Saqib',
     channelUrl = 'https://youtube.com/@saqibvisuals',
     brandName = 'Saqib Visuals',
-    apiEndpoint = 'http://localhost:3001',
+    apiEndpoint = 'http://localhost:3005',
   } = options;
 
   const safeDevName = developerName.replace(/"/g, '&quot;');

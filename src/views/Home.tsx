@@ -408,7 +408,7 @@ export default function Home() {
       developerName: htmlDevName || siteBranding.displayName || 'Muhammad Saqib',
       channelUrl: htmlChannelUrl || 'https://youtube.com/@saqibvisuals',
       brandName: htmlBrandName || siteBranding.brandName || 'Saqib Visuals',
-      apiEndpoint: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3001',
+      apiEndpoint: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3005',
       tier: userTier,
     });
 
@@ -3195,7 +3195,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                     <br/>
                     <pre className="text-zinc-300 font-mono mt-1 text-[11px] leading-snug">{`{
   "success": true,
-  "shortUrl": "${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3001'}/myalias",
+  "shortUrl": "${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3005'}/myalias",
   "latestClick": {
     "ip_address": "8.8.8.8",
     "location_name": "New York, US",
@@ -3463,7 +3463,7 @@ except Exception as error:
                 developerName: htmlDevName,
                 channelUrl: htmlChannelUrl,
                 brandName: htmlBrandName,
-                apiEndpoint: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3001',
+                apiEndpoint: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3005',
                 tier: htmlSelectedTier,
               });
 

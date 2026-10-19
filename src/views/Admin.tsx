@@ -534,7 +534,7 @@ export default function Admin() {
         developerName: profileDisplayName || 'Muhammad Saqib',
         channelUrl: 'https://youtube.com/@saqibvisuals',
         brandName: profileBrandName || 'Saqib Visuals',
-        apiEndpoint: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3001',
+        apiEndpoint: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3005',
         tier: 'premium',
       });
 

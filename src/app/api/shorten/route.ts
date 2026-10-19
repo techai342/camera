@@ -12,7 +12,7 @@ export async function OPTIONS() {
 }
 
 function getOriginAndDomain(req: Request) {
-  const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || 'localhost:3001';
+  const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || 'localhost:3005';
   let proto = req.headers.get('x-forwarded-proto');
   if (!proto) {
     proto = host.startsWith('localhost') || host.startsWith('127.0.0.1') ? 'http' : 'https';

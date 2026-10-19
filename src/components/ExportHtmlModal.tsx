@@ -25,7 +25,7 @@ export function ExportHtmlModal({
   const [devName, setDevName] = useState(defaultDevName);
   const [channelUrl, setChannelUrl] = useState(defaultChannelUrl);
   const [brandName, setBrandName] = useState(defaultBrandName);
-  const [apiEndpoint, setApiEndpoint] = useState(typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3001');
+  const [apiEndpoint, setApiEndpoint] = useState(typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3005');
   const [selectedTier, setSelectedTier] = useState<'free' | 'pro' | 'premium'>(userPlan);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
 
@@ -296,7 +296,7 @@ export function ExportHtmlModal({
                   required
                   value={apiEndpoint}
                   onChange={(e) => setApiEndpoint(e.target.value)}
-                  placeholder="http://localhost:3001"
+                  placeholder="http://localhost:3005"
                   className="w-full text-xs font-mono font-bold px-3.5 py-2.5 rounded-xl bg-white/80 border border-zinc-300/80 focus:ring-2 focus:ring-purple-500 text-zinc-900 shadow-inner"
                 />
               </div>

@@ -924,10 +924,11 @@ export function useMyDomainAnalytics() {
               />
               <button 
                 onClick={handleLogout}
-                className="p-1 text-red-600 hover:text-red-700 bg-red-500/10 rounded-full border border-red-500/20 active:scale-95 shadow-sm"
-                title="Logout"
+                className="px-2 py-1 text-red-700 hover:text-red-900 bg-red-500/15 hover:bg-red-500/25 rounded-full border border-red-500/30 active:scale-95 shadow-xs text-[11px] font-black flex items-center gap-1 cursor-pointer"
+                title="Logout from MrAdmin"
               >
-                <LogOut className="w-3.5 h-3.5" />
+                <LogOut className="w-3 h-3 text-red-600" />
+                <span>Logout</span>
               </button>
             </div>
           </div>

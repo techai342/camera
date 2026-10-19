@@ -1310,42 +1310,45 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
               {/* User Profile / Subscription Quota Badge */}
               {currentUser ? (
-                <div 
-                  onClick={() => {
-                    playBubblePop(680);
-                    setShowUserPlanModal(true);
-                  }}
-                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 rounded-full liquid-glass-input shadow-xs shrink-0 cursor-pointer hover:bg-white/60 active:scale-95 transition-all select-none"
-                  title="View Subscription & Redeem Coupons"
-                >
-                  <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center text-[9px] sm:text-[10px] font-black shrink-0">
-                    {currentUser.username.charAt(0).toUpperCase()}
-                  </div>
-                  <span className="text-[10px] sm:text-xs font-black text-zinc-900 truncate max-w-[80px] sm:max-w-[110px]">
-                    @{currentUser.username}
-                  </span>
-                  {currentUser.plan === 'premium' ? (
-                    <span className="px-1.5 py-0.2 rounded-full bg-amber-400 text-amber-950 text-[8.5px] font-black shadow-xs">
-                      👑 VIP
-                    </span>
-                  ) : currentUser.plan === 'pro' ? (
-                    <span className="px-1.5 py-0.2 rounded-full bg-cyan-400 text-cyan-950 text-[8.5px] font-black shadow-xs">
-                      💎 PRO
-                    </span>
-                  ) : (
-                    <span className="px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-900 text-[8.5px] font-black border border-emerald-300 shadow-xs">
-                      {currentUser.remainingToday ?? (currentUser.dailyLimit || 5)}/5 Free
-                    </span>
-                  )}
+                <div className="flex items-center gap-1.5 shrink-0">
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
+                    onClick={() => {
+                      playBubblePop(680);
+                      setShowUserPlanModal(true);
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1 rounded-full liquid-glass-input shadow-xs shrink-0 cursor-pointer hover:bg-white/60 active:scale-95 transition-all select-none"
+                    title="View Subscription & Redeem Coupons"
+                  >
+                    <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center text-[9px] sm:text-[10px] font-black shrink-0">
+                      {currentUser.username.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="text-[10px] sm:text-xs font-black text-zinc-900 truncate max-w-[80px] sm:max-w-[110px]">
+                      @{currentUser.username}
+                    </span>
+                    {currentUser.plan === 'premium' ? (
+                      <span className="px-1.5 py-0.2 rounded-full bg-amber-400 text-amber-950 text-[8.5px] font-black shadow-xs">
+                        👑 VIP
+                      </span>
+                    ) : currentUser.plan === 'pro' ? (
+                      <span className="px-1.5 py-0.2 rounded-full bg-cyan-400 text-cyan-950 text-[8.5px] font-black shadow-xs">
+                        💎 PRO
+                      </span>
+                    ) : (
+                      <span className="px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-900 text-[8.5px] font-black border border-emerald-300 shadow-xs">
+                        {currentUser.remainingToday ?? (currentUser.dailyLimit || 5)}/5 Free
+                      </span>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => {
+                      playBubblePop(500);
                       handleLogout();
                     }}
-                    className="text-zinc-500 hover:text-red-600 p-0.5 transition-colors cursor-pointer shrink-0"
-                    title="Log Out"
+                    className="px-2.5 py-1 rounded-full bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-700 border border-rose-200 text-xs font-extrabold flex items-center gap-1 shadow-xs transition-all cursor-pointer shrink-0"
+                    title="Sign Out"
                   >
-                    <LogOut className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                    <LogOut className="w-3.5 h-3.5 text-rose-600" />
+                    <span>Logout</span>
                   </button>
                 </div>
               ) : (
@@ -1451,34 +1454,49 @@ create policy "Allow public delete access" on public.urls for delete using (true
             <div className="flex md:hidden items-center gap-1.5 shrink-0 z-10">
               {/* User Profile / Quota Badge on Mobile */}
               {currentUser ? (
-                <button
-                  onClick={() => {
-                    playBubblePop(680);
-                    setShowUserPlanModal(true);
-                  }}
-                  className="flex items-center gap-1 px-2 py-1 rounded-full liquid-glass-input shadow-xs active:scale-95 transition-all text-left max-w-[115px] select-none"
-                  title="Manage Subscription & Coupons"
-                >
-                  <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center text-[9px] font-black shrink-0">
-                    {currentUser.username.charAt(0).toUpperCase()}
-                  </div>
-                  <span className="text-[10px] font-black text-zinc-900 truncate">
-                    @{currentUser.username}
-                  </span>
-                  {currentUser.plan === 'premium' ? (
-                    <span className="px-1 py-0.2 rounded-full bg-amber-400 text-amber-950 text-[8px] font-black shrink-0 shadow-xs">
-                      👑
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={() => {
+                      playBubblePop(680);
+                      setShowUserPlanModal(true);
+                    }}
+                    className="flex items-center gap-1 px-2 py-1 rounded-full liquid-glass-input shadow-xs active:scale-95 transition-all text-left max-w-[95px] select-none cursor-pointer"
+                    title="Manage Subscription & Coupons"
+                  >
+                    <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center text-[9px] font-black shrink-0">
+                      {currentUser.username.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="text-[10px] font-black text-zinc-900 truncate">
+                      @{currentUser.username}
                     </span>
-                  ) : currentUser.plan === 'pro' ? (
-                    <span className="px-1 py-0.2 rounded-full bg-cyan-400 text-cyan-950 text-[8px] font-black shrink-0 shadow-xs">
-                      💎
-                    </span>
-                  ) : (
-                    <span className="px-1 py-0.2 rounded-full bg-emerald-100 text-emerald-900 text-[8px] font-black shrink-0">
-                      Free
-                    </span>
-                  )}
-                </button>
+                    {currentUser.plan === 'premium' ? (
+                      <span className="px-1 py-0.2 rounded-full bg-amber-400 text-amber-950 text-[8px] font-black shrink-0 shadow-xs">
+                        👑
+                      </span>
+                    ) : currentUser.plan === 'pro' ? (
+                      <span className="px-1 py-0.2 rounded-full bg-cyan-400 text-cyan-950 text-[8px] font-black shrink-0 shadow-xs">
+                        💎
+                      </span>
+                    ) : (
+                      <span className="px-1 py-0.2 rounded-full bg-emerald-100 text-emerald-900 text-[8px] font-black shrink-0">
+                        Free
+                      </span>
+                    )}
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      playBubblePop(500);
+                      handleLogout();
+                    }}
+                    className="px-2 py-1 rounded-full bg-rose-50 hover:bg-rose-100 active:scale-90 text-rose-700 border border-rose-200 text-[9.5px] font-black flex items-center gap-1 shadow-xs transition-all cursor-pointer shrink-0"
+                    title="Logout"
+                    aria-label="Logout"
+                  >
+                    <LogOut className="w-3 h-3 text-rose-600 shrink-0" />
+                    <span>Logout</span>
+                  </button>
+                </div>
               ) : (
                 <button
                   onClick={() => {
@@ -3849,10 +3867,10 @@ except Exception as error:
                   handleLogout();
                   setShowUserPlanModal(false);
                 }}
-                className="text-xs font-bold text-red-600 hover:text-red-700 flex items-center gap-1.5 px-3 py-2 rounded-xl hover:bg-red-50/70 transition-colors cursor-pointer"
+                className="text-xs font-black text-rose-700 bg-rose-100 hover:bg-rose-200 border border-rose-300 flex items-center gap-1.5 px-3.5 py-2 rounded-xl active:scale-95 transition-all cursor-pointer shadow-xs"
               >
-                <LogOut className="w-3.5 h-3.5" />
-                <span>Sign Out</span>
+                <LogOut className="w-3.5 h-3.5 text-rose-600" />
+                <span>Logout (@{currentUser.username})</span>
               </button>
               <button
                 type="button"

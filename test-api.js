@@ -1,17 +1,18 @@
 import http from 'http';
 
 const data = JSON.stringify({
-  longUrl: 'https://google.com'
+  longUrl: 'https://google.com',
+  deviceId: 'cli-test-device'
 });
 
 const req = http.request({
   hostname: 'localhost',
-  port: 3000,
+  port: 3005,
   path: '/api/shorten',
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'Content-Length': data.length
+    'Content-Length': Buffer.byteLength(data)
   }
 }, (res) => {
   let body = '';
@@ -22,3 +23,4 @@ const req = http.request({
 req.on('error', (e) => console.error(e));
 req.write(data);
 req.end();
+

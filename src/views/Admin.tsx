@@ -2142,7 +2142,7 @@ export function useMyDomainAnalytics() {
                       <input
                         type="number"
                         min="1"
-                        max="50"
+                        max="999999"
                         value={guestLimit}
                         onChange={(e) => setGuestLimit(Math.max(1, parseInt(e.target.value, 10) || 1))}
                         className="w-full text-lg font-mono font-black px-4 py-2.5 rounded-2xl bg-white/80 border border-rose-300/80 focus:ring-2 focus:ring-rose-500 text-rose-950 shadow-inner"
@@ -2156,7 +2156,7 @@ export function useMyDomainAnalytics() {
 
                 <div className="mt-6 pt-3 border-t border-rose-200/60 flex items-center justify-between text-[10px] text-zinc-500 font-bold">
                   <span>Prompt Signup After</span>
-                  <span className="text-rose-600 font-black">Default: 2</span>
+                  <span className="text-rose-600 font-black">Unlimited (999,999)</span>
                 </div>
               </div>
             </div>

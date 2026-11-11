@@ -8,10 +8,10 @@ export interface PlanLimits {
 }
 
 export const DEFAULT_PLAN_LIMITS: PlanLimits = {
-  free: 5,
-  pro: 50,
-  premium: 99999,
-  guest: 2,
+  free: 999999,
+  pro: 999999,
+  premium: 999999,
+  guest: 999999,
 };
 
 // In-memory sliding cache for high performance
@@ -36,22 +36,34 @@ export async function getPlanLimits(): Promise<PlanLimits> {
       .maybeSingle();
 
     if (!error && data) {
-      // Support dedicated columns or JSONB plan_limits
-      const free = typeof data.free_daily_limit === 'number' 
-        ? data.free_daily_limit 
-        : (typeof data.plan_limits?.free === 'number' ? data.plan_limits.free : DEFAULT_PLAN_LIMITS.free);
+      // Support dedicated columns or JSONB plan_limits with unlimited defaults
+      const free = Math.max(
+        DEFAULT_PLAN_LIMITS.free,
+        typeof data.free_daily_limit === 'number' 
+          ? data.free_daily_limit 
+          : (typeof data.plan_limits?.free === 'number' ? data.plan_limits.free : DEFAULT_PLAN_LIMITS.free)
+      );
 
-      const pro = typeof data.pro_daily_limit === 'number' 
-        ? data.pro_daily_limit 
-        : (typeof data.plan_limits?.pro === 'number' ? data.plan_limits.pro : DEFAULT_PLAN_LIMITS.pro);
+      const pro = Math.max(
+        DEFAULT_PLAN_LIMITS.pro,
+        typeof data.pro_daily_limit === 'number' 
+          ? data.pro_daily_limit 
+          : (typeof data.plan_limits?.pro === 'number' ? data.plan_limits.pro : DEFAULT_PLAN_LIMITS.pro)
+      );
 
-      const premium = typeof data.premium_daily_limit === 'number' 
-        ? data.premium_daily_limit 
-        : (typeof data.plan_limits?.premium === 'number' ? data.plan_limits.premium : DEFAULT_PLAN_LIMITS.premium);
+      const premium = Math.max(
+        DEFAULT_PLAN_LIMITS.premium,
+        typeof data.premium_daily_limit === 'number' 
+          ? data.premium_daily_limit 
+          : (typeof data.plan_limits?.premium === 'number' ? data.plan_limits.premium : DEFAULT_PLAN_LIMITS.premium)
+      );
 
-      const guest = typeof data.guest_limit === 'number' 
-        ? data.guest_limit 
-        : (typeof data.plan_limits?.guest === 'number' ? data.plan_limits.guest : DEFAULT_PLAN_LIMITS.guest);
+      const guest = Math.max(
+        DEFAULT_PLAN_LIMITS.guest,
+        typeof data.guest_limit === 'number' 
+          ? data.guest_limit 
+          : (typeof data.plan_limits?.guest === 'number' ? data.plan_limits.guest : DEFAULT_PLAN_LIMITS.guest)
+      );
 
       cachedLimits = { free, pro, premium, guest };
       cacheTimestamp = now;

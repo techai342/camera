@@ -540,15 +540,7 @@ export default function Home() {
       return;
     }
 
-    // Free Quota Guard for Unregistered/Guest Users (Strict 2 Free Tries)
-    if (!currentUser && guestTriesUsed >= 2) {
-      setAuthModalMode('register');
-      setAuthModalReason('quota');
-      setShowAuthModal(true);
-      setError('You have used your 2 free guest links! Please create an account or sign in to continue.');
-      return;
-    }
-
+    // Guest link creation is unlimited!
     setIsSubmitting(true);
     
     // Check deviceId and phoneNumber requirement
@@ -595,17 +587,7 @@ export default function Home() {
       const result = await response.json();
 
       if (!response.ok) {
-        if (response.status === 403 && (result.code === 'QUOTA_EXCEEDED' || result.error === 'QUOTA_EXCEEDED' || result.error?.includes('free guest links') || result.message?.includes('free guest links'))) {
-          setGuestTriesUsed(2);
-          try {
-            localStorage.setItem('supashort_guest_tries', '2');
-            document.cookie = 'supashort_guest_tries=2; path=/; max-age=31536000; SameSite=Lax';
-          } catch {}
-          setAuthModalMode('register');
-          setAuthModalReason('quota');
-          setShowAuthModal(true);
-          setError(result.message || 'Free 2-try limit reached! Create an account for unlimited link creations.');
-        } else if (response.status === 409) {
+        if (response.status === 409) {
           setError(`The code "${customCode}" is already taken. Please choose another one.`);
         } else if (result.error?.includes('relation "urls" does not exist') || result.error?.includes('column "domain" of relation "urls" does not exist')) {
           setNeedsSetup(true);
@@ -623,28 +605,14 @@ export default function Home() {
       const generatedUrl = result.shortUrl;
       setShortUrl(generatedUrl);
 
-      // Track guest tries (Strictly 2 Free Tries)
+      // Track guest tries
       if (!currentUser) {
         let newTries = (guestTriesUsed || 0) + 1;
-        if (typeof result.guestCount === 'number') {
-          newTries = Math.max(newTries, result.guestCount);
-        }
-        if (typeof result.remainingFreeTries === 'number') {
-          newTries = Math.max(newTries, 2 - result.remainingFreeTries);
-        }
         setGuestTriesUsed(newTries);
         try {
           localStorage.setItem('supashort_guest_tries', String(newTries));
           document.cookie = `supashort_guest_tries=${newTries}; path=/; max-age=31536000; SameSite=Lax`;
         } catch {}
-
-        if (newTries >= 2) {
-          setTimeout(() => {
-            setAuthModalMode('register');
-            setAuthModalReason('quota');
-            setShowAuthModal(true);
-          }, 1400);
-        }
       }
       
       const newHistoryItem = { 
@@ -1354,24 +1322,13 @@ create policy "Allow public delete access" on public.urls for delete using (true
               ) : (
                 <div className="flex items-center gap-1.5 shrink-0">
                   {/* Guest Quota Badge */}
-                  <button
-                    onClick={() => {
-                      playBubblePop(620);
-                      setAuthModalMode('register');
-                      setAuthModalReason('quota');
-                      setShowAuthModal(true);
-                    }}
-                    className={cn(
-                      "px-2 sm:px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-black transition-all flex items-center gap-1 border shadow-xs cursor-pointer active:scale-95 shrink-0",
-                      guestTriesUsed >= 2 
-                        ? "bg-rose-100 text-rose-800 border-rose-300 animate-pulse" 
-                        : "bg-indigo-50 text-indigo-800 border-indigo-200 hover:bg-indigo-100"
-                    )}
-                    title="Guest limit: 2 free links. Click to unlock unlimited links!"
+                  <div
+                    className="px-2 sm:px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-black flex items-center gap-1 border shadow-xs select-none shrink-0 bg-emerald-50 text-emerald-800 border-emerald-200"
+                    title="Guest mode: Unlimited free links!"
                   >
-                    <Sparkles className="w-3 h-3 text-indigo-600 shrink-0" />
-                    <span>{Math.max(0, 2 - guestTriesUsed)}/2 Free</span>
-                  </button>
+                    <Sparkles className="w-3 h-3 text-emerald-600 shrink-0" />
+                    <span>Unlimited Free</span>
+                  </div>
 
                   {/* Sign In Button */}
                   <button
@@ -1505,27 +1462,13 @@ create policy "Allow public delete access" on public.urls for delete using (true
                   </button>
                 </div>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    playBubblePop(640);
-                    setAuthModalMode('login');
-                    setAuthModalReason('manual');
-                    setShowAuthModal(true);
-                  }}
-                  className={cn(
-                    "h-8 flex items-center gap-1.5 px-2.5 rounded-full shadow-xs active:scale-95 transition-all text-left select-none border font-black text-[10px] shrink-0",
-                    guestTriesUsed >= 2
-                      ? "bg-rose-100 text-rose-950 border-rose-300 animate-pulse"
-                      : "bg-indigo-50 text-indigo-950 border-indigo-200"
-                  )}
-                  title="Guest limit: 2 free links. Click to unlock unlimited links!"
+                <div
+                  className="h-8 flex items-center gap-1.5 px-2.5 rounded-full shadow-xs text-left select-none border font-black text-[10px] shrink-0 bg-emerald-50 text-emerald-950 border-emerald-200"
+                  title="Guest mode: Unlimited free links!"
                 >
-                  <Sparkles className={cn("w-3.5 h-3.5 shrink-0", guestTriesUsed >= 2 ? "text-rose-600" : "text-indigo-600")} />
-                  <span>
-                    {Math.max(0, 2 - guestTriesUsed)}/2 Free
-                  </span>
-                </button>
+                  <Sparkles className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
+                  <span>Unlimited Free</span>
+                </div>
               )}
 
               {/* Direct HTML Download Button on Mobile */}
@@ -1999,50 +1942,25 @@ create policy "Allow public delete access" on public.urls for delete using (true
 
                   {/* 3. Primary Action Button with 3D Glass Bubble Styling */}
                   <div>
-                    {!currentUser && guestTriesUsed >= 2 ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          playBubblePop(650);
-                          setAuthModalMode('register');
-                          setAuthModalReason('quota');
-                          setShowAuthModal(true);
-                        }}
-                        className="glass-orb orb-purple w-full min-h-[52px] py-3.5 px-3 text-[11.5px] xs:text-[12.5px] sm:text-[14px] font-black uppercase tracking-wide flex items-center justify-center gap-2 shadow-2xl transition-all cursor-pointer animate-pulse relative z-10"
-                        style={{
-                          background: 'radial-gradient(circle at 35% 30%, #a855f7 0%, #7c3aed 55%, #4c1d95 100%)',
-                          color: '#ffffff',
-                          textShadow: '0 1px 3px rgba(0, 0, 0, 0.75)',
-                          boxShadow: '0 12px 24px -4px rgba(109, 40, 217, 0.65), inset 0 4px 8px rgba(255, 255, 255, 0.88), inset 0 -6px 12px rgba(46, 16, 101, 0.8)',
-                        }}
-                      >
-                        <Lock className="w-4 h-4 shrink-0 text-amber-300 drop-shadow-md" />
-                        <span className="text-white font-black drop-shadow-md text-center leading-tight">
-                          2 Free Tries Used — Sign In / Create Account
-                        </span>
-                        <ArrowRight className="w-4 h-4 shrink-0 text-white drop-shadow-md" />
-                      </button>
-                    ) : (
-                      <button
-                        type="submit"
-                        disabled={isSubmitting || !longUrl.trim()}
-                        onClick={() => playBubblePop(740)}
-                        className="glass-orb orb-blue w-full min-h-[52px] py-3.5 text-[14px] sm:text-[15px] font-black uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-2xl transition-all disabled:opacity-50 text-white cursor-pointer"
-                      >
-                        {isSubmitting ? (
-                          <>
-                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            <span>Generating 3D Liquid Link...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Sparkles className="w-4 h-4" />
-                            <span>Shorten &amp; Generate Link</span>
-                            <ArrowRight className="w-4 h-4" />
-                          </>
-                        )}
-                      </button>
-                    )}
+                    <button
+                      type="submit"
+                      disabled={isSubmitting || !longUrl.trim()}
+                      onClick={() => playBubblePop(740)}
+                      className="glass-orb orb-blue w-full min-h-[52px] py-3.5 text-[14px] sm:text-[15px] font-black uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-2xl transition-all disabled:opacity-50 text-white cursor-pointer"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <span>Generating 3D Liquid Link...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-4 h-4" />
+                          <span>Shorten &amp; Generate Link</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </>
+                      )}
+                    </button>
                   </div>
 
                   {/* 4. Add More Customizations Accordion */}
@@ -3053,7 +2971,7 @@ create policy "Allow public delete access" on public.urls for delete using (true
                       <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5 stroke-[2.5]" />
                       <div>
                         <strong className="text-zinc-900">Unlimited Link Creations</strong>
-                        <p className="text-[11px] text-zinc-500 font-medium">Bypasses guest 5-link limit forever</p>
+                        <p className="text-[11px] text-zinc-500 font-medium">Create unlimited short links with full telemetry</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-2">

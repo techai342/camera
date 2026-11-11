@@ -144,58 +144,12 @@ export async function POST(req: Request) {
         console.error('Error verifying user plan quota:', err);
       }
     } else {
-      // 3. Guest Usage Quota Enforcement (Strict 2 Free Tries per device/cookie)
-      const planLimits = await getPlanLimits();
-      const guestQuota = typeof planLimits.guest === 'number' ? planLimits.guest : 2;
-
-      // Check cookie for persistent guest count across reloads
+      // 3. Guest / Without Signup Usage: Unlimited Tries
       const cookieHeader = req.headers.get('cookie') || '';
       const cookieMatch = cookieHeader.match(/supashort_guest_tries=(\d+)/);
       const cookieTries = cookieMatch ? parseInt(cookieMatch[1], 10) : 0;
-
-      if (cookieTries >= guestQuota) {
-        return NextResponse.json(
-          {
-            code: 'QUOTA_EXCEEDED',
-            error: 'QUOTA_EXCEEDED',
-            message: `You have used your ${guestQuota} free guest links. Please create a free account or sign in to continue generating links with full API hub access!`,
-            guestCount: cookieTries,
-            remainingFreeTries: 0,
-          },
-          {
-            status: 403,
-            headers: { 'Access-Control-Allow-Origin': '*' },
-          }
-        );
-      }
-
-      if (deviceId) {
-        const { count, error: countErr } = await supabaseAdmin
-          .from('urls')
-          .select('id', { count: 'exact', head: true })
-          .eq('device_id', deviceId);
-
-        if (!countErr && typeof count === 'number') {
-          guestUsageCount = Math.max(count, cookieTries);
-          if (guestUsageCount >= guestQuota) {
-            return NextResponse.json(
-              {
-                code: 'QUOTA_EXCEEDED',
-                error: 'QUOTA_EXCEEDED',
-                message: `You have used your ${guestQuota} free guest links. Please create a free account or sign in to continue generating links with full API hub access!`,
-                guestCount: guestUsageCount,
-                remainingFreeTries: 0,
-              },
-              {
-                status: 403,
-                headers: { 'Access-Control-Allow-Origin': '*' },
-              }
-            );
-          }
-        }
-      } else if (cookieTries > 0) {
-        guestUsageCount = cookieTries;
-      }
+      guestUsageCount = cookieTries;
+      // No quota blocking: without-signup / guest API usage is 100% UNLIMITED
     }
 
     if (!longUrl) {
@@ -277,14 +231,14 @@ export async function POST(req: Request) {
 
     const generatedUrl = `${origin}/${shortCode}`;
     const newGuestCount = activeUser ? null : guestUsageCount + 1;
-    const remaining = activeUser ? null : Math.max(0, 2 - (newGuestCount || 0));
+    const remaining = 999999; // Unlimited
 
     const response = NextResponse.json(
       {
         success: true,
         shortUrl: generatedUrl,
         data: data,
-        isUnlimited: !!activeUser,
+        isUnlimited: true,
         guestCount: newGuestCount,
         remainingFreeTries: remaining,
       },
